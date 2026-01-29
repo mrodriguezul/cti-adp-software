@@ -91,25 +91,22 @@ The project utilizes a **Headless Architecture**, separating the frontend presen
 
 ```mermaid
 graph TD
-    subgraph "Client Layer (Presentation)"
-        Web["Web Storefront (React)"]
-        Mobile["Mobile App (React Native/WebView)"]
-        Admin["Admin Desktop App (Java Swing)"]
+    subgraph "Project Scope: E-Commerce Web System"
+        Web["Web Storefront (React.js)"]
+        API["Backend API (Node.js/Express)"]
     end
 
-    subgraph "Service Layer (Business Logic)"
-        API["E-Commerce REST API (Node.js/Express)"]
-    end
-
-    subgraph "Data Layer (Persistence)"
-        DB["MySQL Centralized Database"]
+    subgraph "External / Legacy Systems"
+        DB[("MySQL Centralized Database")]
+        Desktop["Desktop Admin App (Java)"]
+        Mobile["Mobile App (Android)"]
     end
 
     %% Connections
-    Web -->|HTTPS / JSON| API
-    Mobile -->|HTTPS / JSON| API
-    API -->|SQL / Sequelize| DB
-    Admin -->|JDBC / TCP| DB
+    Web <-->|"HTTPS / JSON"| API
+    API <-->|"SQL / ORM"| DB
+    Desktop -.->|"JDBC (Direct Access)"| DB
+    Mobile -.->|"HTTPS / JSON"| API
 ```
 
 ### **2.2. Descripción de componentes principales:**
@@ -147,6 +144,7 @@ The shared storage engine that acts as the single source of truth for both the W
 
 The project follows a clean separation between the API and the Client.
 
+```
 /lpa-ecomms-web
 │
 ├── /backend-api            # Node.js Server
@@ -170,6 +168,7 @@ The project follows a clean separation between the API and the Client.
 │   └── package.json
 │
 └── /docs                   # Documentation & ERD Diagrams
+```
 
 ### **2.4. Infraestructura y despliegue**
 
