@@ -21,4 +21,42 @@ I am planning to create an e-commerce site for this case and also add some chara
 Do you understand?
 Before you do that, ask me all the questions that you need to know to clarify the idea.
 
-## USER PROMPT 1
+## USER PROMPT 2
+
+Got it, I will take the prioritised e-commerce functionalities table to create my own e-commerce for my case study.
+
+Also, based on the previous information about this project, I need:
+
+- Project Description
+- Objective, characteristics
+- Main Functions (take the prioritised e-commerce functionalities table, remove the "school req?" column)
+
+Show me in markdown format to export to a text file.
+
+## USER PROMPT 3
+
+Now you are a specialised software architect with experience in e-commerce applications.
+
+Based on the project we discussed before, I need you make the following:
+
+- Architecture Diagram
+Use the format you deem most appropriate to represent the application's main components and the technologies used. Explain whether it follows any predefined pattern, justify why this architecture was chosen, and highlight the main benefits it brings to the project and justify its use, as well as any trade-offs or limitations it entails.
+
+- Description of Main Components
+Describe the most important components, including the technology used.
+
+- High-Level Description of the Project and File Structure
+Represent the project structure and briefly explain the purpose of the main folders, as well as whether it follows any specific pattern or architecture.
+
+- Infrastructure and Deployment
+Detail the project infrastructure, including a diagram in the format you consider appropriate, and explain the deployment process followed.
+
+- Security
+List and describe the main security practices implemented in the project, adding examples where applicable.
+
+- Tests
+Briefly describe some of the tests performed.
+
+Show me in markdown (.md) format to export it a text file.
+
+## USER PROMPT 4
