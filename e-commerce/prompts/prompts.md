@@ -60,3 +60,13 @@ Briefly describe some of the tests performed.
 Show me in markdown (.md) format to export it a text file.
 
 ## USER PROMPT 4
+
+Now, You are a database expert with experience using, designing, normalising, and optimising MySQL databases for e-commerces.
+Based on the e-commerces project, I need you to complete the following:
+
+- Data Model Diagram
+Use Mermaid for the data model, and utilize all the parameters the syntax allows to provide maximum detail, such as primary and foreign keys.
+Use the syntax described in the requirements document.
+Add additional fields if necessary, and relate each table as required.
+- Description of Main Entities:
+Remember to include as much detail as possible for each entity, such as the name and type of each attribute, a brief description if applicable, primary and foreign keys, relationships and relationship type, constraints (unique, not null, etc.), etc.

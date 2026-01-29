@@ -252,12 +252,148 @@ graph LR
 
 ### **3.1. Diagrama del modelo de datos:**
 
-> Recomendamos usar mermaid para el modelo de datos, y utilizar todos los parámetros que permite la sintaxis para dar el máximo detalle, por ejemplo las claves primarias y foráneas.
+**Entity Relationship Diagram (ERD)**
+The following diagram represents the normalized schema for the LPA eComms system. It illustrates the relationships between the Inventory (Stock), Customers (Clients), Sales (Invoices), and System Administrators (Users).
 
+**Key Architectural Decisions:**
+
+* **Historical Data Preservation:** The `lpa_invoices` and `lpa_invoice_items` tables are intentionally "denormalized" to store snapshots of data (like address and price) at the time of purchase. This prevents old invoices from changing if a product price or client address changes in the future.
+* **Separation of Concerns:** `lpa_users` is strictly for internal staff (Admins/Stock Managers), while `lpa_clients` manages external customer data.
+
+```mermaid
+erDiagram
+    %% ENTITY DEFINITIONS
+    lpa_stock {
+        VARCHAR lpa_stock_ID PK "Primary Key, SKU"
+        VARCHAR lpa_stock_name "Product Name"
+        TEXT lpa_stock_desc "Full Description"
+        VARCHAR lpa_stock_onhand "Inventory Count"
+        DECIMAL lpa_stock_price "Unit Price"
+        CHAR lpa_stock_status "A=Active, D=Disabled"
+        VARCHAR lpa_stock_image_url "Added: Product Image Path"
+        DATETIME created_at "Added: Audit Timestamp"
+    }
+
+    lpa_clients {
+        VARCHAR lpa_client_ID PK "Primary Key"
+        VARCHAR lpa_client_firstname
+        VARCHAR lpa_client_lastname
+        VARCHAR lpa_client_address "Shipping Address"
+        VARCHAR lpa_client_phone
+        VARCHAR lpa_client_email "Added: Unique, for Auth"
+        VARCHAR lpa_client_password "Added: Hashed Password"
+        CHAR lpa_client_status "A=Active, D=Disabled"
+    }
+
+    lpa_invoices {
+        VARCHAR lpa_inv_no PK "Primary Key, Invoice #"
+        DATETIME lpa_inv_date "Transaction Date"
+        VARCHAR lpa_inv_client_ID FK "Link to Client"
+        VARCHAR lpa_inv_client_name "Snapshot: Name"
+        VARCHAR lpa_inv_client_address "Snapshot: Address"
+        DECIMAL lpa_inv_amount "Total Order Value"
+        CHAR lpa_inv_status "P=Paid, U=Unpaid"
+    }
+
+    lpa_invoice_items {
+        VARCHAR lpa_invitem_no PK "Primary Key"
+        VARCHAR lpa_invitem_inv_no FK "Link to Invoice"
+        VARCHAR lpa_invitem_stock_ID FK "Link to Original Stock"
+        VARCHAR lpa_invitem_stock_name "Snapshot: Item Name"
+        VARCHAR lpa_invitem_qty "Quantity Purchased"
+        DECIMAL lpa_invitem_stock_price "Snapshot: Unit Price"
+        DECIMAL lpa_invitem_stock_amount "Line Total (Qty * Price)"
+    }
+
+    lpa_users {
+        VARCHAR lpa_user_ID PK "Primary Key"
+        VARCHAR lpa_user_username "Unique Login"
+        VARCHAR lpa_user_password "Hashed String"
+        VARCHAR lpa_user_firstname
+        VARCHAR lpa_user_lastname
+        VARCHAR lpa_user_group "admin or user"
+        CHAR lpa_user_status "A=Active, D=Disabled"
+    }
+
+    %% RELATIONSHIPS
+    lpa_clients ||--o{ lpa_invoices : "places"
+    lpa_invoices ||--|{ lpa_invoice_items : "contains"
+    lpa_stock ||--o{ lpa_invoice_items : "listed_as"
+```
 
 ### **3.2. Descripción de entidades principales:**
 
-> Recuerda incluir el máximo detalle de cada entidad, como el nombre y tipo de cada atributo, descripción breve si procede, claves primarias y foráneas, relaciones y tipo de relación, restricciones (unique, not null…), etc.
+### A. Table: `lpa_stock` (Product Catalog)
+
+Represents the inventory of physical electronics available for sale.
+
+* **Purpose:** Central repository for all product information displayed on the Web Storefront and managed via the Desktop Admin App.
+* **Columns:**
+  * `lpa_stock_ID` (**PK**, VARCHAR 20): Unique identifier (SKU).
+  * `lpa_stock_name` (VARCHAR 250): The display name of the product.
+  * `lpa_stock_desc` (TEXT): Detailed HTML or text description of the product specs.
+  * `lpa_stock_onhand` (VARCHAR 5): Current quantity in the warehouse. *Optimization Note: In a production DB, this should be `INT`, but we adhere to VARCHAR as per requirements.*
+  * `lpa_stock_price` (DECIMAL 7,2): Unit cost (e.g., 999.99).
+  * `lpa_stock_status` (CHAR 1): 'A' (Active) or 'D' (Disabled) to soft-delete items without removing data.
+  * `lpa_stock_image_url` (**Added**): Path to the product image for the frontend gallery.
+* **Constraints:** `lpa_stock_ID` is Unique. `lpa_stock_price` must be >= 0.
+
+### B. Table: `lpa_clients` (Customers)
+
+Represents the external users who register on the website to purchase items.
+
+* **Purpose:** Stores customer shipping details and authentication credentials.
+* **Columns:**
+  * `lpa_client_ID` (**PK**, VARCHAR 20): Unique Client ID.
+  * `lpa_client_firstname` / `lastname` (VARCHAR 50): Customer's legal name.
+  * `lpa_client_address` (VARCHAR 250): Default shipping address.
+  * `lpa_client_phone` (VARCHAR 30): Contact number for delivery.
+  * `lpa_client_status` (CHAR 1): Account status.
+  * `lpa_client_email` (**Added**): Essential for modern login and order notifications.
+  * `lpa_client_password` (**Added**): Required for the "Customer Login" requirement. Stores the Bcrypt hash.
+* **Constraints:** `lpa_client_email` must be Unique.
+
+### C. Table: `lpa_invoices` (Orders)
+
+Represents the header information of a completed sales transaction.
+
+* **Purpose:** Tracks the financial transaction, date, and "Who bought what".
+* **Columns:**
+  * `lpa_inv_no` (**PK**, VARCHAR 20): Unique Invoice Number.
+  * `lpa_inv_date` (DATETIME): Exact timestamp of purchase.
+  * `lpa_inv_client_ID` (**FK**, VARCHAR 20): References `lpa_clients.lpa_client_ID`.
+  * `lpa_inv_client_name` / `address`: **Snapshot fields**. These store the name/address *as they were at the moment of purchase*, ensuring historical accuracy even if the client profile changes later.
+  * `lpa_inv_amount` (DECIMAL 8,2): Total sum of all items in the order.
+  * `lpa_inv_status` (CHAR 1): e.g., 'P' (Paid), 'S' (Shipped).
+* **Relationships:** Many-to-One with `lpa_clients`.
+
+### D. Table: `lpa_invoice_items` (Order Line Items)
+
+Represents the specific products included within a single invoice.
+
+* **Purpose:** Acts as a bridge table between Invoices and Stock, allowing multiple items per order.
+* **Columns:**
+  * `lpa_invitem_no` (**PK**, VARCHAR 20): Unique Line Item ID.
+  * `lpa_invitem_inv_no` (**FK**, VARCHAR 20): References `lpa_invoices.lpa_inv_no`.
+  * `lpa_invitem_stock_ID` (**FK**, VARCHAR 20): References `lpa_stock.lpa_stock_ID`.
+  * `lpa_invitem_stock_name` (VARCHAR 250): Snapshot of the product name.
+  * `lpa_invitem_qty` (VARCHAR 6): Quantity purchased.
+  * `lpa_invitem_stock_price` (DECIMAL 7,2): Snapshot of price at the time of sale.
+  * `lpa_invitem_stock_amount` (DECIMAL 7,2): Calculated field (`qty * price`).
+* **Relationships:** Many-to-One with `lpa_invoices`; Many-to-One with `lpa_stock`.
+
+### E. Table: `lpa_users` (Internal Staff)
+
+Represents the internal staff members who access the Desktop Application.
+
+* **Purpose:** Controls access to the Admin Dashboard (RBAC).
+* **Columns:**
+  * `lpa_user_ID` (**PK**, VARCHAR 20): Unique User ID.
+  * `lpa_user_username` (VARCHAR 30): Login username.
+  * `lpa_user_password` (VARCHAR 50/255): Hashed password.
+  * `lpa_user_group` (VARCHAR 50): Defines permissions ('admin' has RW access, 'user' has Read-Only).
+  * `lpa_user_status` (CHAR 1): Account status.
+* **Constraints:** `lpa_user_username` must be Unique.
 
 ---
 
