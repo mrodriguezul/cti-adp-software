@@ -404,25 +404,40 @@ Represents the internal staff members who access the Desktop Application.
 
 ## 5. Historias de Usuario
 
-> Documenta 3 de las historias de usuario principales utilizadas durante el desarrollo, teniendo en cuenta las buenas prácticas de producto al respecto.
-
-**Historia de Usuario 1**
-
-**Historia de Usuario 2**
-
-**Historia de Usuario 3**
+| ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
+| :--- | :--- | :--- | :--- | :--- |
+| **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate email registrations.<br>4. Upon success, user is redirected to Login. |
+| **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 | 1. User enters Email and Password.<br>2. System validates credentials against the database.<br>3. On success, a secure session (Token) is started.<br>4. On failure, a generic "Invalid credentials" message appears. |
+| **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 | 1. Passwords are never stored in plain text.<br>2. Passwords are hashed (e.g., Bcrypt) before saving to the DB.<br>3. Input field masks characters (shows dots) while typing. |
 
 ---
 
 ## 6. Tickets de Trabajo
 
-> Documenta 3 de los tickets de trabajo principales del desarrollo, uno de backend, uno de frontend, y uno de bases de datos. Da todo el detalle requerido para desarrollar la tarea de inicio a fin teniendo en cuenta las buenas prácticas al respecto. 
-
-**Ticket 1**
-
-**Ticket 2**
-
-**Ticket 3**
+| Ticket ID | Story Ref | Title | Details & Acceptance Criteria (AC) | Priority | Est. (Pts) | Assign | Labels |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **T-001** | **1.1.3** | **[Backend] Setup Password Encryption Service** | **Desc:** Implement Bcrypt hashing utility.<br>**AC:**<br>1. `hashPassword(str)` returns a hash.<br>2. `compare(str, hash)` returns boolean.<br>3. Unit tests pass. | Critical | 3 | Backend | `Security` |
+| **T-002** | **1.1.1** | **[API] User Registration Endpoint** | **Desc:** `POST /api/register`. Validates input and creates `lpa_client` record.<br>**AC:**<br>1. Validates Email format.<br>2. Prevents duplicate emails (409 Conflict).<br>3. Returns 201 Created on success. | High | 5 | Backend | `API` `Auth` |
+| **T-003** | **1.1.1** | **[Frontend] Registration Form** | **Desc:** UI with Email/Pass/Name fields.<br>**AC:**<br>1. Client-side validation (Min 8 chars).<br>2. Submit calls API.<br>3. Success redirects to Login. | High | 5 | Frontend | `UI` |
+| **T-004** | **1.1.2** | **[API] Login & JWT Generation** | **Desc:** `POST /api/login`. Issues JWT.<br>**AC:**<br>1. Valid creds return Token.<br>2. Invalid creds return 401.<br>3. Token contains User ID & Role. | High | 5 | Backend | `API` `Auth` |
+| **T-005** | **1.1.2** | **[Frontend] Login Page & Auth State** | **Desc:** Login UI and global `AuthContext`.<br>**AC:**<br>1. Form submits to API.<br>2. Stores Token in LocalStorage/Cookie.<br>3. Redirects to Home. | High | 3 | Frontend | `UI` |
+| **T-006** | **1.2.3** | **[DB] Create Stock Table Schema** | **Desc:** Create `lpa_stock` table.<br>**AC:**<br>1. Columns: ID, Name, Desc, Price, OnHand, Image.<br>2. Migration runs successfully. | Critical | 2 | Database | `DB` |
+| **T-007** | **1.2.3** | **[API] Admin: Add Product Endpoint** | **Desc:** `POST /api/admin/products`.<br>**AC:**<br>1. Requires Admin Token.<br>2. Validates Price > 0.<br>3. Creates DB record. | High | 3 | Backend | `API` `Admin` |
+| **T-008** | **1.2.3** | **[Desktop] Admin: Add Product Form** | **Desc:** Java Swing Form to input product details.<br>**AC:**<br>1. Fields for all columns.<br>2. Save button commits to DB via JDBC. | High | 5 | Desktop | `Java` |
+| **T-009** | **1.2.1** | **[API] Public Product List Endpoint** | **Desc:** `GET /api/products`.<br>**AC:**<br>1. Returns JSON array.<br>2. Supports Pagination (`?page=1`).<br>3. Excludes Disabled items. | High | 3 | Backend | `API` |
+| **T-010** | **1.2.1** | **[Frontend] Product Grid UI** | **Desc:** Display products in a responsive grid.<br>**AC:**<br>1. Shows Image, Name, Price.<br>2. "Out of Stock" items dimmed. | High | 5 | Frontend | `UI` |
+| **T-011** | **1.2.2** | **[Frontend] Product Detail View** | **Desc:** Individual product page (`/product/:id`).<br>**AC:**<br>1. Fetches data by ID.<br>2. Renders HTML Description.<br>3. Shows "Add to Cart" button. | High | 3 | Frontend | `UI` |
+| **T-012** | **1.2.4** | **[Desktop] Admin: Edit Stock** | **Desc:** Update Price/Qty in Java App.<br>**AC:**<br>1. Search for item.<br>2. Update fields.<br>3. Save updates DB immediately. | Med | 3 | Desktop | `Java` |
+| **T-013** | **1.3.1** | **[Frontend] Cart Logic (Context)** | **Desc:** Global state for Cart.<br>**AC:**<br>1. `addToCart` adds item ID/Qty.<br>2. Persists on page reload.<br>3. Checks Max Stock limit. | High | 5 | Frontend | `Logic` |
+| **T-014** | **1.3.2** | **[Frontend] Cart Page UI** | **Desc:** View all items in cart.<br>**AC:**<br>1. Lists items with thumbnail.<br>2. Shows Subtotal & Grand Total. | High | 3 | Frontend | `UI` |
+| **T-015** | **1.3.3** | **[Frontend] Update/Remove Cart Items** | **Desc:** Controls to change Qty.<br>**AC:**<br>1. `+` / `-` buttons update state.<br>2. "Remove" deletes item.<br>3. Totals recalculate instantly. | Med | 3 | Frontend | `UI` |
+| **T-016** | **1.4.1** | **[Frontend] Checkout: Address Form** | **Desc:** Step 1 of Checkout.<br>**AC:**<br>1. Validation for City/Zip.<br>2. Auto-fills if User has Profile.<br>3. Next button blocked if invalid. | High | 3 | Frontend | `UI` |
+| **T-017** | **1.4.2** | **[Frontend] Mock Payment UI** | **Desc:** Step 2 of Checkout.<br>**AC:**<br>1. Credit Card Input fields.<br>2. Mock validation (Length 16).<br>3. Returns specific Token. | Critical | 5 | Frontend | `UI` |
+| **T-018** | **1.4.3** | **[API] Create Order (Transaction)** | **Desc:** `POST /api/orders`. Atomic transaction.<br>**AC:**<br>1. Verify Stock.<br>2. Create Invoice.<br>3. Create Items.<br>4. Decrement Stock. | Critical | 8 | Backend | `API` |
+| **T-019** | **1.4.3** | **[Frontend] Order Success Page** | **Desc:** Final confirmation.<br>**AC:**<br>1. Displays Invoice ID.<br>2. Clears Cart state.<br>3. Link to "Continue Shopping". | High | 2 | Frontend | `UI` |
+| **T-020** | **1.5.1** | **[Desktop] Admin: Order List** | **Desc:** View incoming orders.<br>**AC:**<br>1. Table showing Date, Client, Total, Status.<br>2. Sort by Newest. | High | 3 | Desktop | `Java` |
+| **T-021** | **1.5.2** | **[Desktop] Admin: Order Details** | **Desc:** View items in an order.<br>**AC:**<br>1. Master-Detail view.<br>2. Shows Shipping Address.<br>3. Shows List of Items (Qty). | High | 2 | Desktop | `Java` |
+| **T-022** | **1.5.3** | **[Desktop] Admin: Update Status** | **Desc:** Mark as Shipped.<br>**AC:**<br>1. Dropdown for Status (Paid -> Shipped).<br>2. Update commits to DB. | Med | 2 | Desktop | `Java` |
 
 ---
 
