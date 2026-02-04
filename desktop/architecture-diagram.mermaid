@@ -1,0 +1,43 @@
+graph TB
+    subgraph "Presentation Layer"
+        UI[StockManagementApp<br/>JavaFX Application]
+        FXML[stock-view.fxml<br/>UI Layout]
+        CSS[styles.css<br/>Styling]
+        CTRL[StockController<br/>UI Logic]
+    end
+
+    subgraph "Application Layer"
+        SVC[StockService<br/>Business Operations]
+    end
+
+    subgraph "Domain Layer"
+        ENTITY[Stock Entity<br/>Business Logic & Rules]
+        REPO_INT[StockRepository<br/>Interface]
+    end
+
+    subgraph "Infrastructure Layer"
+        DB_CFG[DatabaseConfig<br/>Connection Pool]
+        REPO_IMPL[MySQLStockRepository<br/>Data Access]
+        MYSQL[(MySQL Database<br/>lpa_stock table)]
+    end
+
+    UI --> FXML
+    UI --> CSS
+    UI --> CTRL
+    CTRL --> SVC
+    SVC --> ENTITY
+    SVC --> REPO_INT
+    REPO_INT -.implements.- REPO_IMPL
+    REPO_IMPL --> DB_CFG
+    REPO_IMPL --> MYSQL
+    DB_CFG --> MYSQL
+
+    classDef presentation fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef application fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef domain fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef infrastructure fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+
+    class UI,FXML,CSS,CTRL presentation
+    class SVC application
+    class ENTITY,REPO_INT domain
+    class DB_CFG,REPO_IMPL,MYSQL infrastructure
