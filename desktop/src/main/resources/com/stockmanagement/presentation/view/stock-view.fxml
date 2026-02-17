@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.stockmanagement.presentation.controller.StockController"
+            prefHeight="700.0" prefWidth="1200.0"
+            stylesheets="@../style/styles.css">
+    
+
+    <!-- Top: Title Bar -->
+
+    <top>
+        <VBox styleClass="header">
+            <Label text="Stock Management System" styleClass="title-label">
+                <font>
+                    <Font name="System Bold" size="24.0"/>
+                </font>
+            </Label>
+            <Separator/>
+        </VBox>
+    </top>
+
+    <!-- Center: Table View -->
+    <center>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+            </padding>
+
+            <!-- Search Bar -->
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="Search:"/>
+                <TextField fx:id="searchField" promptText="Search by product name..." 
+                          HBox.hgrow="ALWAYS" prefWidth="300.0"/>
+                <Button text="Refresh" onAction="#handleRefresh" styleClass="btn-refresh"/>
+            </HBox>
+
+            <!-- Stock Table -->
+            <TableView fx:id="stockTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50.0"/>
+                    <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="150.0"/>
+                    <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200.0"/>
+                    <TableColumn fx:id="quantityColumn" text="Quantity" prefWidth="80.0"/>
+                    <TableColumn fx:id="priceColumn" text="Price" prefWidth="100.0"/>
+                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120.0"/>
+                    <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="150.0"/>
+                    <TableColumn fx:id="updatedAtColumn" text="Updated At" prefWidth="150.0"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- Right: Form Panel -->
+    <right>
+        <VBox spacing="15.0" styleClass="form-panel" prefWidth="350.0">
+            <padding>
+                <Insets top="10.0" right="15.0" bottom="10.0" left="15.0"/>
+            </padding>
+
+            <Label text="Stock Details" styleClass="section-label">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+
+            <Separator/>
+
+            <!-- Product Name -->
+            <VBox spacing="5.0">
+                <Label text="Product Name *" styleClass="field-label"/>
+                <TextField fx:id="productNameField" promptText="Enter product name"/>
+            </VBox>
+
+            <!-- Description -->
+            <VBox spacing="5.0">
+                <Label text="Description" styleClass="field-label"/>
+                <TextArea fx:id="descriptionField" promptText="Enter description" 
+                         prefRowCount="3" wrapText="true"/>
+            </VBox>
+
+            <!-- Quantity -->
+            <VBox spacing="5.0">
+                <Label text="Quantity *" styleClass="field-label"/>
+                <TextField fx:id="quantityField" promptText="Enter quantity"/>
+            </VBox>
+
+            <!-- Price -->
+            <VBox spacing="5.0">
+                <Label text="Price *" styleClass="field-label"/>
+                <TextField fx:id="priceField" promptText="Enter price"/>
+            </VBox>
+
+            <!-- Category -->
+            <VBox spacing="5.0">
+                <Label text="Category" styleClass="field-label"/>
+                <TextField fx:id="categoryField" promptText="Enter category"/>
+            </VBox>
+
+            <Separator/>
+
+            <!-- Action Buttons -->
+            <VBox spacing="10.0">
+                <Button fx:id="saveButton" text="Save New" onAction="#handleSave" 
+                       maxWidth="Infinity" styleClass="btn-save"/>
+                <Button fx:id="updateButton" text="Update Selected" onAction="#handleUpdate" 
+                       maxWidth="Infinity" styleClass="btn-update"/>
+                <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDelete" 
+                       maxWidth="Infinity" styleClass="btn-delete"/>
+                <Button fx:id="clearButton" text="Clear Form" onAction="#handleClear" 
+                       maxWidth="Infinity" styleClass="btn-clear"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Label text="* Required fields" styleClass="hint-label"/>
+        </VBox>
+    </right>
+
+</BorderPane>
