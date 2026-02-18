@@ -10,18 +10,20 @@ import java.util.Properties;
 
 /**
  * Database configuration using HikariCP connection pool
- * Singleton pattern to ensure single instance
+ * Thread-safe Singleton pattern with eager initialization
  */
 public class DatabaseConfig {
-    private static DatabaseConfig instance;
+    // Eager initialization ensures thread safety
+    private static final DatabaseConfig instance = new DatabaseConfig();
     private final HikariDataSource dataSource;
 
     private DatabaseConfig() {
         Properties props = loadProperties();
         HikariConfig config = new HikariConfig();
         
-        config.setJdbcUrl(props.getProperty("db.url", "jdbc:mysql://localhost:3306/lpa_ecomms"));
-        config.setUsername(props.getProperty("db.username", "root"));
+        config.setJdbcUrl(props.getProperty("db.url", "jdbc:mysql://localhost:3306/stock_management"));
+        config.setUsername(props.getProperty(
+                "db.username", "root"));
         config.setPassword(props.getProperty("db.password", ""));
         config.setDriverClassName(props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver"));
         
@@ -60,10 +62,10 @@ public class DatabaseConfig {
         return props;
     }
 
-    public static synchronized DatabaseConfig getInstance() {
-        if (instance == null) {
-            instance = new DatabaseConfig();
-        }
+    /**
+     * Get singleton instance - thread-safe
+     */
+    public static DatabaseConfig getInstance() {
         return instance;
     }
 

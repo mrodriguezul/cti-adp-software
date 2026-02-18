@@ -58,6 +58,14 @@ public interface StockRepository {
     List<Stock> findByProductNameContaining(String productName);
     
     /**
+     * Find stocks with quantity below threshold
+     * Optimized database-level query for better performance
+     * @param threshold the quantity threshold
+     * @return list of stocks below threshold
+     */
+    List<Stock> findByQuantityBelow(Integer threshold);
+
+    /**
      * Check if a stock item exists by ID
      * @param id the stock ID
      * @return true if exists, false otherwise

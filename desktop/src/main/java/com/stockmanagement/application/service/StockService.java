@@ -4,6 +4,7 @@ import com.stockmanagement.domain.model.Stock;
 import com.stockmanagement.domain.repository.StockRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,10 +122,14 @@ public class StockService {
 
     /**
      * Get low stock items (quantity less than threshold)
+     * Uses optimized database-level filtering for better performance
      */
     public List<Stock> getLowStockItems(Integer threshold) {
-        return getAllStocks().stream()
-            .filter(stock -> stock.isLowStock(threshold))
-            .toList();
+        if (threshold == null || threshold <= 0) {
+            return new ArrayList<>();
+        }
+
+        // Use database-level filtering for optimal performance
+        return stockRepository.findByQuantityBelow(threshold);
     }
 }

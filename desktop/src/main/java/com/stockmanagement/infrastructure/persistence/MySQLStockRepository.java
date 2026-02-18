@@ -42,6 +42,9 @@ public class MySQLStockRepository implements StockRepository {
     private static final String EXISTS_SQL = 
         "SELECT COUNT(*) FROM lpa_stock WHERE id = ?";
 
+    private static final String SELECT_BY_QUANTITY_BELOW_SQL =
+        "SELECT * FROM lpa_stock WHERE quantity < ? ORDER BY quantity ASC";
+
     public MySQLStockRepository() {
         this.dbConfig = DatabaseConfig.getInstance();
     }
@@ -206,6 +209,27 @@ public class MySQLStockRepository implements StockRepository {
         return false;
     }
 
+    @Override
+    public List<Stock> findByQuantityBelow(Integer threshold) {
+        List<Stock> stocks = new ArrayList<>();
+
+        try (Connection conn = dbConfig.getDataSource().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_QUANTITY_BELOW_SQL)) {
+
+            stmt.setInt(1, threshold);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    stocks.add(mapResultSetToStock(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding stocks by quantity: " + e.getMessage(), e);
+        }
+
+        return stocks;
+    }
+
     // Helper methods
     private void setStockParameters(PreparedStatement stmt, Stock stock) throws SQLException {
         stmt.setString(1, stock.getProductName());
@@ -216,6 +240,10 @@ public class MySQLStockRepository implements StockRepository {
     }
 
     private Stock mapResultSetToStock(ResultSet rs) throws SQLException {
+        // Safely extract timestamps - convert to LocalDateTime only if not null
+        Timestamp createdTs = rs.getTimestamp("created_at");
+        Timestamp updatedTs = rs.getTimestamp("updated_at");
+
         return new Stock(
             rs.getInt("id"),
             rs.getString("product_name"),
@@ -223,8 +251,8 @@ public class MySQLStockRepository implements StockRepository {
             rs.getInt("quantity"),
             rs.getBigDecimal("price"),
             rs.getString("category"),
-            rs.getTimestamp("created_at").toLocalDateTime(),
-            rs.getTimestamp("updated_at").toLocalDateTime()
+            createdTs != null ? createdTs.toLocalDateTime() : null,
+            updatedTs != null ? updatedTs.toLocalDateTime() : null
         );
     }
 }
