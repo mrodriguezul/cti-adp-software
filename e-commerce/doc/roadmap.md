@@ -1,35 +1,45 @@
-# LPA eComms - Product Roadmap
+# LPA eComms - Product Roadmap (Web Storefront)
 
 ## Product Roadmap
 
-This roadmap outlines the strategic implementation of the 12 prioritized use cases, divided into three phases: **MVP (Minimum Viable Product)**, **V1 (Enhanced UX)**, and **V2 (Growth & Engagement)**.
+This roadmap outlines the strategic implementation of customer-facing features for the **Web Storefront**, divided into three phases: **MVP (Minimum Viable Product)**, **V1 (Enhanced UX)**, and **V2 (Growth & Engagement)**.
+
+**Note:** Admin operations (inventory management, order fulfillment, staff management) are handled in separate applications:
+- **Desktop Admin Application (Java)**: Staff and administrators use this for back-office operations
+- **Admin Web Application (planned future)**: Additional admin features will be implemented separately
+
+---
 
 ### Phase 1: The Core Foundation (MVP)
-**Goal:** Enable a user to browse products, register, and complete a valid purchase, while allowing Admins to manage stock.
+**Goal:** Enable customers to browse products, register, and complete a valid purchase through the web storefront.
 * **Duration Estimate:** Sprints 1-4
-* **Focus:** Core transactional integrity and Database connectivity.
-* **Included Use Cases:**
-    * Authentication (Login/Register)
+* **Focus:** Core customer transaction flow and database connectivity
+* **Included Capabilities:**
+    * Authentication (Registration/Login)
     * Product Catalog (Browse/View)
-    * Stock Management (CRUD)
     * Shopping Cart Management
-    * Checkout & Invoicing
-    * Order Management
+    * Checkout & Order Processing
+    * Order Confirmation & Invoicing
+    * Guest Checkout Support
 
 ### Phase 2: User Experience & Optimization (V1)
-**Goal:** Reduce friction in the buying process and allow users to manage their own data.
+**Goal:** Reduce friction in the customer buying process and enable customers to manage their own account data.
 * **Duration Estimate:** Sprints 5-6
-* **Focus:** Searchability, User retention, and Validation.
+* **Focus:** Discoverability, customer retention, and self-service features
 * **Included Use Cases:**
-    * Search & Filtering
-    * Payment Simulation (Stripe Sandbox integration)
-    * Customer Profile (Self-service address updates)
+    * Keyword Search & Product Filtering
+    * Product Sorting (Price, Name, Relevance)
+    * Payment Simulation (Mock Stripe integration)
+    * Customer Profile Management (Self-service address updates)
+    * Change Password functionality
 
 ### Phase 3: Growth & Community (V2)
-**Goal:** Increase Average Order Value (AOV) and build social proof.
+**Goal:** Increase customer engagement, Average Order Value (AOV), and build community through social features.
 * **Duration Estimate:** Sprints 7-8
-* **Focus:** Marketing features and Recommendations.
+* **Focus:** Personalization, retention, and social proof
 * **Included Use Cases:**
-    * Wishlist
-    * Related Products
-    * Product Reviews
+    * Wishlists & Save for Later
+    * Related Products & Recommendations
+    * Product Reviews & Ratings
+    * Personalized Recommendations (ML-based)
+    * Email Notifications for Order Status

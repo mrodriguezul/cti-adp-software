@@ -33,42 +33,59 @@ The system is architected to handle the specific complexities of electronic hard
 
 ## 1. Descripción general del producto
 
-**LPA eComms** is a comprehensive e-commerce software solution designed for the retail of physical electronics. The project aims to modernize the retail experience by integrating a customer-facing web and mobile storefront with a centralized, robust administrative backend.
-The system is architected to handle the specific complexities of electronic hardware retail, utilizing a custom-built architecture to ensure scalability, security, and seamless data synchronization between the consumer mobile/web interface and the internal desktop management system.
+**LPA eComms** is a comprehensive e-commerce software solution designed for the retail of physical electronics. The project is structured with a clear separation of concerns:
+
+- **Web Storefront (This Application):** Customer-facing online shopping experience for browsing products, managing carts, and placing orders
+- **Desktop Admin Application:** Java-based application for internal staff to manage inventory, process orders, and handle fulfillment
+- **Admin Web Application (Future):** Planned web-based admin panel for additional administrative functions
+
+The system is architected to handle the specific complexities of electronic hardware retail, utilizing a custom-built architecture to ensure scalability, security, and seamless data synchronization across all applications through a centralized PostgreSQL database.
 
 ### **1.1. Objetivo:**
 
-* **Centralized Data Management:** Implement a unified PostgreSQL database structure to synchronize data across the Mobile/Web storefronts and the Desktop Administrative interface, ensuring real-time consistency in stock levels and pricing.
-* **Secure Transaction Processing:** Develop a secure checkout flow that captures customer details, shipping information, and simulates payment processing while generating accurate invoice records.
-* **Role-Based Access Control (RBAC):** Enforce strict security protocols where Administrators have full read/write access (for stock and user management) while standard Users are restricted to read-only access or self-service account updates.
-* **Modern Customer Experience:** Deliver a responsive, user-friendly shopping experience including product discovery, persistent shopping carts, and intuitive navigation.
+* **Centralized Data Management:** Implement a unified PostgreSQL database structure to synchronize data across the Web/Mobile storefronts and the Admin applications, ensuring real-time consistency in stock levels and pricing.
+* **Secure Customer Transaction Processing:** Develop a secure checkout flow that captures customer details, shipping information, and simulates payment processing while generating accurate invoice records.
+* **Customer-Only Web Experience:** Deliver a responsive, user-friendly shopping experience including product discovery, persistent shopping carts, and intuitive navigation exclusively for customers.
+* **Separate Admin Operations:** All administrative functions (inventory management, order fulfillment, user management) are handled in dedicated admin applications with appropriate access controls and workflows.
 
 ### **1.2. Características y funcionalidades principales:**
 
-* **Product Focus:** Specialized for **Physical Electronics**, supporting rich metadata and inventory-dependent availability within the `lpa_stock` system.
-* **Architecture:**
-  * **Frontend (Storefront):** Modern mobile-first web interface (Android/WebView compatible) for customer interaction.
-  * **Backend (Admin):** Java-based Desktop interface for internal staff to manage stock, invoices, and users.
-  * **Database:** Centralized PostgreSQL database acting as the single source of truth, featuring tables for Stocks, Clients, Invoices, and Users.
-* **Security:** Implementation of hashed password storage (e.g., Blowfish) and session management to protect user data.
-* **Scalability:** Designed with a modular structure (Product Catalog, Cart, User Auth) to allow for future feature expansion such as real-time shipping calculation or API integrations.
+#### **Web Storefront (This Application):**
+* **Product Catalog & Discovery:** Full product browsing with search, filtering by price and category, and sorting capabilities
+* **Product Details:** Rich product information including specifications, images, availability status, and customer reviews
+* **Shopping Experience:** Persistent shopping cart, quantity management, and visual stock indicators
+* **User Accounts:** Registration, login, profile management, password security, and order history
+* **Checkout & Orders:** Multi-step checkout with address collection, mock payment processing, order review, confirmation, and invoicing
+* **Customer Features:** Wishlists, product reviews, personalized recommendations, order notifications, and quick reorder functionality
+* **Database:** Centralized PostgreSQL database with `lpa_stock` (products), `lpa_clients` (customers), `lpa_invoices` (orders)
 
-The following functionalities are prioritized to ensure the Core Value Proposition is met while allowing for future enhancements.
+#### **Admin Services (Separate Applications):**
+* **Desktop Admin Application (Java):** Staff interface for inventory management, stock CRUD operations, order fulfillment, and customer data handling
+* **Admin Web Application (Planned Future):** Additional admin capabilities for analytics, reporting, and management
+* **Database:** Same centralized PostgreSQL database with role-based access control
 
-| Priority | Functionality | Description & Modern Implementation |
+#### **Architecture:**
+* **Frontend (Web Storefront):** Modern mobile-first web interface (React/Next.js) for customer interaction
+* **Backend API:** Node.js/Express REST API serving both customer-facing and admin applications
+* **Database:** Centralized PostgreSQL database acting as single source of truth
+* **Security:** JWT-based authentication, Bcrypt password hashing, role-based access control (customers vs. staff)
+* **Scalability:** Modular structure supporting future expansion (real-time shipping, API integrations, mobile apps)
+
+| Priority | Functionality | Description & Implementation |
 | :--- | :--- | :--- |
-| **High (P1)** | **Product Catalog (PIM)** | Centralized storage of products with rich metadata (Name, SKU, Price, Description, Stock Level). Supports retrieval for both the web storefront and admin inventory management. |
-| **High (P1)** | **Cart & Session Management** | Functionality for users to add/remove items and adjust quantities. Uses modern session storage or cookies to persist cart data during the shopping session. |
-| **High (P1)** | **Checkout & Invoicing** | A multi-step flow collecting shipping and payment info. Upon completion, it automatically generates an invoice record in the database and updates inventory counts. |
-| **High (P1)** | **Order Management (OMS)** | Backend capability for Admins to view, search, and manage generated invoices. Includes calculating total sales amounts and tracking order status. |
-| **High (P1)** | **Authentication & Authorization** | Secure Login/Register system. Differentiates between "Customers" (Web) and "Staff/Admins" (Desktop), ensuring users only access permitted data. |
-| **High (P1)** | **Stock Management** | A dedicated interface for Admins to Create, Read, Update, and Delete (CRUD) stock items. Includes toggling item status (Enabled/Disabled). |
-| **Medium (P2)** | **Search & Filtering** | Robust search bar and filtering options (by Price, Name, Category) to help customers find specific electronics quickly. |
-| **Medium (P2)** | **Customer Profile** | Self-service portal where registered customers can view their details and update shipping addresses or contact info. |
-| **Medium (P2)** | **Payment Gateway Simulation** | A mockup of the payment process (e.g., via Stripe Sandbox or generic selection) to validate credit card inputs and handle "Success/Fail" transaction states. |
-| **Low (P3)** | **Reviews & Ratings** | System allowing verified purchasers to leave star ratings and text reviews on products to build social proof. |
-| **Low (P3)** | **Wishlist** | Feature allowing users to save items for future consideration without reserving stock or adding them to the immediate transaction. |
-| **Low (P3)** | **Related Products** | Recommendation engine displaying "You might also like" items based on the current product view to increase Average Order Value. |
+| **High (P1)** | **Product Catalog (PIM)** | Centralized storage of products with rich metadata (Name, SKU, Price, Description, Stock Level). RESTful API endpoints for web storefront to retrieve product data. |
+| **High (P1)** | **Cart & Session Management** | Functionality for customers to add/remove items and adjust quantities. Uses modern session storage to persist cart data during shopping. |
+| **High (P1)** | **Checkout & Invoicing** | Multi-step flow collecting shipping information and processing mock payments. Automatically generates invoice records in database upon completion. |
+| **High (P1)** | **User Authentication & Authorization** | Secure Login/Register system for customers. Differentiates between "Customers" (web) and "Staff" (admin apps) with appropriate access controls. |
+| **Medium (P2)** | **Search & Filtering** | Robust search functionality and filtering options (by Price, Category, etc.) to help customers find specific products. |
+| **Medium (P2)** | **Customer Profile & Order History** | Self-service portal where registered customers can view/update account information, view past orders, and reorder. |
+| **Medium (P2)** | **Payment Gateway Simulation** | Mock payment processing (using Stripe test cards) to validate inputs and handle transaction states. |
+| **Low (P3)** | **Reviews & Ratings** | Verified purchasers can rate and review products to build social proof and help other customers make decisions. |
+| **Low (P3)** | **Wishlist** | Feature allowing customers to save items for future consideration without purchasing. |
+| **Low (P3)** | **Personalized Recommendations** | ML-based recommendation engine displaying "You might also like" items to increase Average Order Value. |
+| **Low (P3)** | **Notifications** | Email notifications for order status updates (Paid, Shipped, Delivered). |
+
+**Note:** Admin features (inventory management, order fulfillment, staff management) are implemented in separate admin applications with their own feature priorities and backlogs.
 
 ### **1.3. Diseño y experiencia de usuario:**
 
@@ -421,40 +438,48 @@ Represents the internal staff members who access the Desktop Application.
 
 ## 5. Historias de Usuario
 
+This section provides sample user stories. **For a complete list of all 30 customer-facing user stories (organized by phase and epic), please refer to the following documents:**
+
+- **Phase 1 (MVP - 13 stories):** [phase-1-user-stories.md](./phase-1-user-stories.md) - Core shopping experience
+- **Phase 2 (V1 - 8 stories):** [phase-2-user-stories.md](./phase-2-user-stories.md) - Search, filters, and account management
+- **Phase 3 (V2 - 9 stories):** [phase-3-user-stories.md](./phase-3-user-stories.md) - Engagement and community features
+- **Product Backlog (30 stories):** [product-backlog.md](./product-backlog.md) - Complete prioritized backlog
+- **Epics Documentation:** [epics.md](./epics.md) - Epic descriptions and scope
+
+**Sample Stories (from Phase 1):**
+
 | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :--- | :--- | :--- | :--- | :--- |
 | **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate email registrations.<br>4. Upon success, user is redirected to Login. |
 | **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 | 1. User enters Email and Password.<br>2. System validates credentials against the database.<br>3. On success, a secure session (Token) is started.<br>4. On failure, a generic "Invalid credentials" message appears. |
 | **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 | 1. Passwords are never stored in plain text.<br>2. Passwords are hashed (e.g., Bcrypt) before saving to the DB.<br>3. Input field masks characters (shows dots) while typing. |
 
+**Admin User Stories:** Admin-related stories (inventory management, order fulfillment, staff operations) are documented separately in the Desktop Admin Application and planned Admin Web Application backlogs.
+
 ---
 
 ## 6. Tickets de Trabajo
 
-| Ticket ID | Story Ref | Title | Details & Acceptance Criteria (AC) | Priority | Est. (Pts) | Assign | Labels |
+This section shows sample implementation tickets for customer-facing features. **For a complete list of work items and detailed specifications, refer to:**
+- **Tickets Document:** [tickets.md](./tickets.md)
+
+**Sample Web Storefront Tickets:**
+
+| Ticket ID | Story Ref | Title | Details & Acceptance Criteria (AC) | Priority | Est. (Pts) | Domain | Labels |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **T-001** | **1.1.3** | **[Backend] Setup Password Encryption Service** | **Desc:** Implement Bcrypt hashing utility.<br>**AC:**<br>1. `hashPassword(str)` returns a hash.<br>2. `compare(str, hash)` returns boolean.<br>3. Unit tests pass. | Critical | 3 | Backend | `Security` |
 | **T-002** | **1.1.1** | **[API] User Registration Endpoint** | **Desc:** `POST /api/register`. Validates input and creates `lpa_clients` record.<br>**AC:**<br>1. Validates Email format.<br>2. Prevents duplicate emails (409 Conflict).<br>3. Returns 201 Created on success. | High | 5 | Backend | `API` `Auth` |
 | **T-003** | **1.1.1** | **[Frontend] Registration Form** | **Desc:** UI with Email/Pass/Name fields.<br>**AC:**<br>1. Client-side validation (Min 8 chars).<br>2. Submit calls API.<br>3. Success redirects to Login. | High | 5 | Frontend | `UI` |
 | **T-004** | **1.1.2** | **[API] Login & JWT Generation** | **Desc:** `POST /api/login`. Issues JWT.<br>**AC:**<br>1. Valid creds return Token.<br>2. Invalid creds return 401.<br>3. Token contains User ID & Role. | High | 5 | Backend | `API` `Auth` |
 | **T-005** | **1.1.2** | **[Frontend] Login Page & Auth State** | **Desc:** Login UI and global `AuthContext`.<br>**AC:**<br>1. Form submits to API.<br>2. Stores Token in LocalStorage/Cookie.<br>3. Redirects to Home. | High | 3 | Frontend | `UI` |
-| **T-006** | **1.2.3** | **[DB] Create Stock Table Schema** | **Desc:** Create `lpa_stock` table.<br>**AC:**<br>1. Columns: ID, SKU, Name, Description, OnHand, Price, Status, Image URL.<br>2. Migration runs successfully. | Critical | 2 | Database | `DB` |
-| **T-007** | **1.2.3** | **[API] Admin: Add Product Endpoint** | **Desc:** `POST /api/admin/products`.<br>**AC:**<br>1. Requires Admin Token.<br>2. Validates Price > 0.<br>3. Creates DB record. | High | 3 | Backend | `API` `Admin` |
-| **T-008** | **1.2.3** | **[Desktop] Admin: Add Product Form** | **Desc:** Java Swing Form to input product details.<br>**AC:**<br>1. Fields for all columns.<br>2. Save button commits to DB via JDBC. | High | 5 | Desktop | `Java` |
 | **T-009** | **1.2.1** | **[API] Public Product List Endpoint** | **Desc:** `GET /api/products`.<br>**AC:**<br>1. Returns JSON array.<br>2. Supports Pagination (`?page=1`).<br>3. Excludes Disabled items. | High | 3 | Backend | `API` |
 | **T-010** | **1.2.1** | **[Frontend] Product Grid UI** | **Desc:** Display products in a responsive grid.<br>**AC:**<br>1. Shows Image, Name, Price.<br>2. "Out of Stock" items dimmed. | High | 5 | Frontend | `UI` |
 | **T-011** | **1.2.2** | **[Frontend] Product Detail View** | **Desc:** Individual product page (`/product/:id`).<br>**AC:**<br>1. Fetches data by ID.<br>2. Renders HTML Description.<br>3. Shows "Add to Cart" button. | High | 3 | Frontend | `UI` |
-| **T-012** | **1.2.4** | **[Desktop] Admin: Edit Stock** | **Desc:** Update Price/Qty in Java App.<br>**AC:**<br>1. Search for item.<br>2. Update fields.<br>3. Save updates DB immediately. | Med | 3 | Desktop | `Java` |
 | **T-013** | **1.3.1** | **[Frontend] Cart Logic (Context)** | **Desc:** Global state for Cart.<br>**AC:**<br>1. `addToCart` adds item ID/Qty.<br>2. Persists on page reload.<br>3. Checks Max Stock limit. | High | 5 | Frontend | `Logic` |
-| **T-014** | **1.3.2** | **[Frontend] Cart Page UI** | **Desc:** View all items in cart.<br>**AC:**<br>1. Lists items with thumbnail.<br>2. Shows Subtotal & Grand Total. | High | 3 | Frontend | `UI` |
-| **T-015** | **1.3.3** | **[Frontend] Update/Remove Cart Items** | **Desc:** Controls to change Qty.<br>**AC:**<br>1. `+` / `-` buttons update state.<br>2. "Remove" deletes item.<br>3. Totals recalculate instantly. | Med | 3 | Frontend | `UI` |
-| **T-016** | **1.4.1** | **[Frontend] Checkout: Address Form** | **Desc:** Step 1 of Checkout.<br>**AC:**<br>1. Validation for City/Zip.<br>2. Auto-fills if User has Profile.<br>3. Next button blocked if invalid. | High | 3 | Frontend | `UI` |
 | **T-017** | **1.4.2** | **[Frontend] Mock Payment UI** | **Desc:** Step 2 of Checkout.<br>**AC:**<br>1. Credit Card Input fields.<br>2. Mock validation (Length 16).<br>3. Returns specific Token. | Critical | 5 | Frontend | `UI` |
 | **T-018** | **1.4.3** | **[API] Create Order (Transaction)** | **Desc:** `POST /api/orders`. Atomic transaction.<br>**AC:**<br>1. Verify Stock.<br>2. Create Invoice.<br>3. Create Items.<br>4. Decrement Stock. | Critical | 8 | Backend | `API` |
-| **T-019** | **1.4.3** | **[Frontend] Order Success Page** | **Desc:** Final confirmation.<br>**AC:**<br>1. Displays Invoice ID.<br>2. Clears Cart state.<br>3. Link to "Continue Shopping". | High | 2 | Frontend | `UI` |
-| **T-020** | **1.5.1** | **[Desktop] Admin: Order List** | **Desc:** View incoming orders.<br>**AC:**<br>1. Table showing Date, Client, Total, Status.<br>2. Sort by Newest. | High | 3 | Desktop | `Java` |
-| **T-021** | **1.5.2** | **[Desktop] Admin: Order Details** | **Desc:** View items in an order.<br>**AC:**<br>1. Master-Detail view.<br>2. Shows Shipping Address.<br>3. Shows List of Items (Qty). | High | 2 | Desktop | `Java` |
-| **T-022** | **1.5.3** | **[Desktop] Admin: Update Status** | **Desc:** Mark as Shipped.<br>**AC:**<br>1. Dropdown for Status (Paid -> Shipped).<br>2. Update commits to DB. | Med | 2 | Desktop | `Java` |
+
+**Admin Tickets:** Implementation tickets for inventory management, order fulfillment, and staff operations are maintained separately in the Desktop Admin Application and Admin Web Application repositories.
 
 ---
 
