@@ -38,7 +38,7 @@ The system is architected to handle the specific complexities of electronic hard
 
 ### **1.1. Objetivo:**
 
-* **Centralized Data Management:** Implement a unified MySQL database structure to synchronize data across the Mobile/Web storefronts and the Desktop Administrative interface, ensuring real-time consistency in stock levels and pricing.
+* **Centralized Data Management:** Implement a unified PostgreSQL database structure to synchronize data across the Mobile/Web storefronts and the Desktop Administrative interface, ensuring real-time consistency in stock levels and pricing.
 * **Secure Transaction Processing:** Develop a secure checkout flow that captures customer details, shipping information, and simulates payment processing while generating accurate invoice records.
 * **Role-Based Access Control (RBAC):** Enforce strict security protocols where Administrators have full read/write access (for stock and user management) while standard Users are restricted to read-only access or self-service account updates.
 * **Modern Customer Experience:** Deliver a responsive, user-friendly shopping experience including product discovery, persistent shopping carts, and intuitive navigation.
@@ -49,7 +49,7 @@ The system is architected to handle the specific complexities of electronic hard
 * **Architecture:**
   * **Frontend (Storefront):** Modern mobile-first web interface (Android/WebView compatible) for customer interaction.
   * **Backend (Admin):** Java-based Desktop interface for internal staff to manage stock, invoices, and users.
-  * **Database:** Centralized MySQL database acting as the single source of truth, featuring tables for Stocks, Clients, Invoices, and Users.
+  * **Database:** Centralized PostgreSQL database acting as the single source of truth, featuring tables for Stocks, Clients, Invoices, and Users.
 * **Security:** Implementation of hashed password storage (e.g., Blowfish) and session management to protect user data.
 * **Scalability:** Designed with a modular structure (Product Catalog, Cart, User Auth) to allow for future feature expansion such as real-time shipping calculation or API integrations.
 
@@ -97,7 +97,7 @@ graph TD
     end
 
     subgraph "External / Legacy Systems"
-        DB[("MySQL Centralized Database")]
+        DB[("PostgreSQL Centralized Database")]
         Desktop["Desktop Admin App (Java)"]
         Mobile["Mobile App (Android)"]
     end
@@ -135,7 +135,7 @@ The bridge between the user interface and the data, handling all business logic 
 
 The shared storage engine that acts as the single source of truth for both the Web Storefront and the external Desktop/Mobile applications.
 
-* **Technology:** MySQL.
+* **Technology:** PostgreSQL.
 * **Responsibility:**
   * Stores the `lpa_stock`, `lpa_clients`, `lpa_invoices`, and `lpa_users` tables as required by the schema definitions.
   * Maintains data consistency across all platforms.
@@ -175,7 +175,7 @@ The project follows a clean separation between the API and the Client.
 **Deployment Process** The deployment focuses on hosting the Web components.
 
 * **Database Provisioning:**
-  * A Managed MySQL instance is provisioned on a cloud provider.
+  * A Managed PostgreSQL instance is provisioned on a cloud provider.
   * SQL schema scripts are executed to initialize the required tables (lpa_stock, lpa_invoices, etc.).
 
 * **Backend Deployment:**
@@ -192,7 +192,7 @@ graph LR
     subgraph "Cloud Hosting (e.g., AWS/Vercel/Railway)"
         CDN["Frontend Host (CDN)"]
         APIServer["API Container (Node.js)"]
-        DBServer["Managed MySQL Database"]
+        DBServer["Managed PostgreSQL Database"]
     end
 
     User["Customer Browser"] -->|Requests Website| CDN
@@ -243,7 +243,7 @@ graph LR
         1.  Send a `POST` request to `/api/checkout` with mock product data.
         2.  **Verify:** The server returns a 200 OK status.
         3.  **Verify:** A new invoice row is created in the `lpa_invoices` table.
-        4.  **Verify:** The `lpa_stock_onhand` value for the purchased item decreases by the correct quantity in the database.
+        4.  **Verify:** The `lpa_stock.onhand` value for the purchased item decreases by the correct quantity in the database.
 
 ---
 
@@ -434,11 +434,11 @@ Represents the internal staff members who access the Desktop Application.
 | Ticket ID | Story Ref | Title | Details & Acceptance Criteria (AC) | Priority | Est. (Pts) | Assign | Labels |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **T-001** | **1.1.3** | **[Backend] Setup Password Encryption Service** | **Desc:** Implement Bcrypt hashing utility.<br>**AC:**<br>1. `hashPassword(str)` returns a hash.<br>2. `compare(str, hash)` returns boolean.<br>3. Unit tests pass. | Critical | 3 | Backend | `Security` |
-| **T-002** | **1.1.1** | **[API] User Registration Endpoint** | **Desc:** `POST /api/register`. Validates input and creates `lpa_client` record.<br>**AC:**<br>1. Validates Email format.<br>2. Prevents duplicate emails (409 Conflict).<br>3. Returns 201 Created on success. | High | 5 | Backend | `API` `Auth` |
+| **T-002** | **1.1.1** | **[API] User Registration Endpoint** | **Desc:** `POST /api/register`. Validates input and creates `lpa_clients` record.<br>**AC:**<br>1. Validates Email format.<br>2. Prevents duplicate emails (409 Conflict).<br>3. Returns 201 Created on success. | High | 5 | Backend | `API` `Auth` |
 | **T-003** | **1.1.1** | **[Frontend] Registration Form** | **Desc:** UI with Email/Pass/Name fields.<br>**AC:**<br>1. Client-side validation (Min 8 chars).<br>2. Submit calls API.<br>3. Success redirects to Login. | High | 5 | Frontend | `UI` |
 | **T-004** | **1.1.2** | **[API] Login & JWT Generation** | **Desc:** `POST /api/login`. Issues JWT.<br>**AC:**<br>1. Valid creds return Token.<br>2. Invalid creds return 401.<br>3. Token contains User ID & Role. | High | 5 | Backend | `API` `Auth` |
 | **T-005** | **1.1.2** | **[Frontend] Login Page & Auth State** | **Desc:** Login UI and global `AuthContext`.<br>**AC:**<br>1. Form submits to API.<br>2. Stores Token in LocalStorage/Cookie.<br>3. Redirects to Home. | High | 3 | Frontend | `UI` |
-| **T-006** | **1.2.3** | **[DB] Create Stock Table Schema** | **Desc:** Create `lpa_stock` table.<br>**AC:**<br>1. Columns: ID, Name, Desc, Price, OnHand, Image.<br>2. Migration runs successfully. | Critical | 2 | Database | `DB` |
+| **T-006** | **1.2.3** | **[DB] Create Stock Table Schema** | **Desc:** Create `lpa_stock` table.<br>**AC:**<br>1. Columns: ID, SKU, Name, Description, OnHand, Price, Status, Image URL.<br>2. Migration runs successfully. | Critical | 2 | Database | `DB` |
 | **T-007** | **1.2.3** | **[API] Admin: Add Product Endpoint** | **Desc:** `POST /api/admin/products`.<br>**AC:**<br>1. Requires Admin Token.<br>2. Validates Price > 0.<br>3. Creates DB record. | High | 3 | Backend | `API` `Admin` |
 | **T-008** | **1.2.3** | **[Desktop] Admin: Add Product Form** | **Desc:** Java Swing Form to input product details.<br>**AC:**<br>1. Fields for all columns.<br>2. Save button commits to DB via JDBC. | High | 5 | Desktop | `Java` |
 | **T-009** | **1.2.1** | **[API] Public Product List Endpoint** | **Desc:** `GET /api/products`.<br>**AC:**<br>1. Returns JSON array.<br>2. Supports Pagination (`?page=1`).<br>3. Excludes Disabled items. | High | 3 | Backend | `API` |

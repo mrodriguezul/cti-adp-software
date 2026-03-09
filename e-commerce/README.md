@@ -36,8 +36,8 @@ This is an e-commerce platform developed as part of the CTI Advanced Programming
 ### Backend
 - **Runtime**: Node.js
 - **Framework**: Express.js / NestJS
-- **Database**: MongoDB / PostgreSQL / MySQL
-- **ORM**: Mongoose / Prisma / TypeORM
+- **Database**: PostgreSQL
+- **ORM**: Prisma / TypeORM
 - **Authentication**: JWT / OAuth 2.0
 - **Payment Gateway**: Stripe / PayPal API
 
@@ -80,7 +80,7 @@ e-commerce/
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn
-- MongoDB/PostgreSQL (depending on configuration)
+- PostgreSQL (v12 or higher)
 - Git
 
 ### Installation
@@ -108,7 +108,7 @@ e-commerce/
    Create `.env` file in the backend directory:
    ```env
    PORT=5000
-   DATABASE_URL=mongodb://localhost:27017/ecommerce
+   DATABASE_URL=postgresql://user:password@localhost:5432/lpa_ecomms
    JWT_SECRET=your_jwt_secret_key
    STRIPE_SECRET_KEY=your_stripe_secret_key
    CLOUDINARY_URL=your_cloudinary_url

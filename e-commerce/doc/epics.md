@@ -22,7 +22,7 @@ The following Epics group the prioritized use cases into actionable development 
     * **Frontend:** Create Product Listing Page (Grid view) and Product Detail Page (Specs, Price, Image).
     * **Backend:** API endpoints to fetch `lpa_stock` data (GET /products).
     * **Admin:** Interface to Add/Edit/Delete products and toggle Status (Active/Disabled).
-    * **Data:** Display real-time `lpa_stock_onhand` availability.
+    * **Data:** Display real-time `lpa_stock.onhand` availability.
 
 ### Epic-03: Shopping Cart & Session State
 * **Description:** Implement the temporary storage mechanism that holds user intent (items to buy) before the transaction is finalized.
@@ -31,7 +31,7 @@ The following Epics group the prioritized use cases into actionable development 
 * **Key Scope:**
     * Develop a persistent Cart (using LocalStorage or Session).
     * Functions to Add Item, Remove Item, and Update Quantity.
-    * Validation: Prevent users from adding more quantity than is currently in stock (`lpa_stock_onhand`).
+    * Validation: Prevent users from adding more quantity than is currently in stock (`lpa_stock.onhand`).
     * Calculate "Estimated Total" dynamically as items change.
 
 ### Epic-04: Checkout Engine & Order Processing
@@ -44,7 +44,7 @@ The following Epics group the prioritized use cases into actionable development 
     * **Order Generation:** Atomic transaction that:
         1.  Creates `lpa_invoices` record.
         2.  Creates `lpa_invoice_items` snapshots.
-        3.  Decrements `lpa_stock_onhand`.
+        3.  Decrements `lpa_stock.onhand`.
     * **Notification:** Display Order Success page with Invoice ID.
 
 ### Epic-05: Admin Order Fulfillment
@@ -61,7 +61,7 @@ The following Epics group the prioritized use cases into actionable development 
 * **Priority:** Medium (P2)
 * **Business Value:** Enhances User Experience (UX) and Sales Velocity. In electronics, customers often have specific needs (e.g., "Sony" or "Under $500"). If they can't filter or search, they leave. Effective search reduces the "Time to Purchase."
 * **Key Scope:**
-    * **Keyword Search:** Search bar querying `lpa_stock_name` and `lpa_stock_desc`.
+    * **Keyword Search:** Search bar querying `lpa_stock.name` and `lpa_stock.description`.
     * **Filtering:** Sidebar filters for Price Range (Min/Max) and Category.
     * **Sorting:** Sort by Price (Low-High), Name (A-Z), and Newest.
 
