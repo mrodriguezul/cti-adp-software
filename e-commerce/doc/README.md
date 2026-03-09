@@ -438,48 +438,88 @@ Represents the internal staff members who access the Desktop Application.
 
 ## 5. Historias de Usuario
 
-This section provides sample user stories. **For a complete list of all 30 customer-facing user stories (organized by phase and epic), please refer to the following documents:**
+This section provides sample user stories from the **30 customer-facing stories** organized into three delivery phases. **For complete details, refer to:**
 
-- **Phase 1 (MVP - 13 stories):** [phase-1-user-stories.md](./phase-1-user-stories.md) - Core shopping experience
-- **Phase 2 (V1 - 8 stories):** [phase-2-user-stories.md](./phase-2-user-stories.md) - Search, filters, and account management
-- **Phase 3 (V2 - 9 stories):** [phase-3-user-stories.md](./phase-3-user-stories.md) - Engagement and community features
-- **Product Backlog (30 stories):** [product-backlog.md](./product-backlog.md) - Complete prioritized backlog
-- **Epics Documentation:** [epics.md](./epics.md) - Epic descriptions and scope
+- **Phase 1 (MVP - 13 stories):** [phase-1-user-stories.md](./phase-1-user-stories.md) - Core authentication, product browsing, shopping cart, and checkout
+- **Phase 2 (V1 - 8 stories):** [phase-2-user-stories.md](./phase-2-user-stories.md) - Search, filtering, sorting, account management, order history
+- **Phase 3 (V2 - 9 stories):** [phase-3-user-stories.md](./phase-3-user-stories.md) - Recommendations, wishlists, reviews, notifications, quick reorder
+- **Product Backlog (30 stories):** [product-backlog.md](./product-backlog.md) - Complete prioritized list with estimates
+- **Epics Documentation (10 epics):** [epics.md](./epics.md) - Epic scope, business value, and story mapping
 
-**Sample Stories (from Phase 1):**
+**Sample Critical Stories (MVP Phase):**
 
-| ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
-| :--- | :--- | :--- | :--- | :--- |
-| **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate email registrations.<br>4. Upon success, user is redirected to Login. |
-| **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 | 1. User enters Email and Password.<br>2. System validates credentials against the database.<br>3. On success, a secure session (Token) is started.<br>4. On failure, a generic "Invalid credentials" message appears. |
-| **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 | 1. Passwords are never stored in plain text.<br>2. Passwords are hashed (e.g., Bcrypt) before saving to the DB.<br>3. Input field masks characters (shows dots) while typing. |
+| ID | User Story | Epic | Priority | Pts | Acceptance Criteria |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | Epic-01: IAM | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate emails (409 error returned).<br>4. Upon success, user is redirected to Login page. |
+| **1.1.4** | **As a Guest Shopper**, I want to **browse products and add items to cart without creating an account**, but I must **log in at checkout** so that I can complete my purchase while maintaining account security. | Epic-01: IAM | Medium | 5 | 1. Guests can browse products and add to cart freely.<br>2. At checkout, system requires login or registration.<br>3. After login, cart items are preserved and merged.<br>4. Checkout continues seamlessly without cart loss. |
+| **1.2.1** | **As a Customer**, I want to **view a list of available products** organized in a grid so that I can easily browse the catalog. | Epic-02: Catalog | High | 5 | 1. Products display in responsive grid (4 cols desktop, 2 mobile).<br>2. Each card shows: thumbnail, name, price, stock status.<br>3. Out-of-stock items visually indicated but still browsable.<br>4. Pagination or "Load More" for large catalogs. |
+| **1.4.3** | **As a Customer**, I want to **review my order details before paying** and **receive an order confirmation** so that I have proof of my purchase. | Epic-04: Checkout | High | 5 | 1. Order summary shows shipping, items, and totals.<br>2. "Place Order" button creates invoice transaction.<br>3. Confirmation page displays unique invoice number.<br>4. Email confirmation sent to customer address. |
 
-**Admin User Stories:** Admin-related stories (inventory management, order fulfillment, staff operations) are documented separately in the Desktop Admin Application and planned Admin Web Application backlogs.
+**Sample Phase 2 Story (Search & Discovery):**
+
+| ID | User Story | Epic | Priority | Pts | Acceptance Criteria |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **2.5.1** | **As a Customer**, I want to **search for products by keyword** so that I can quickly find specific items I'm looking for. | Epic-05: Discovery Search | High | 5 | 1. Search box in header/navbar with debounce.<br>2. Autocomplete shows 5 suggestions during typing.<br>3. Pressing Enter navigates to full results page.<br>4. Results highlight matching keywords.<br>5. Results support pagination and sorting. |
+
+**Sample Phase 3 Story (Customer Engagement):**
+
+| ID | User Story | Epic | Priority | Pts | Acceptance Criteria |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **3.9.4** | **As a Verified Buyer**, I want to **read reviews from other customers** so that I can make informed purchasing decisions. | Epic-09: Community & Social | Low | 3 | 1. Product detail page shows average star rating (e.g., "4.5★ based on 42 reviews").<br>2. Reviews section lists individual customer feedback.<br>3. Each review shows: rating, title, text, author name, date.<br>4. Pagination for browsing all reviews.<br>5. "Helpful?" voting counter displayed. |
+
+**Admin User Stories:** Administrative functions (inventory management, order fulfillment, staff operations) are implemented in separate applications:
+- **Desktop Admin Application (Java):** [/desktop/README.md](../../desktop/README.md) - Stock management, order processing
+- **Admin Web Application (Planned):** Future web-based admin panel
 
 ---
 
 ## 6. Tickets de Trabajo
 
-This section shows sample implementation tickets for customer-facing features. **For a complete list of work items and detailed specifications, refer to:**
-- **Tickets Document:** [tickets.md](./tickets.md)
+**Ticket Organization:** Tickets are organized using a systematic ID format (`x.y.z.n`) that directly references story IDs for complete traceability. For example, story `1.1.3` may have tickets `1.1.3.1`, `1.1.3.2`, etc.
 
-**Sample Web Storefront Tickets:**
+**For complete ticket specifications and the full list of 59 implementation tickets across all phases, refer to:**
+- **Comprehensive Tickets Document:** [tickets.md](./tickets.md) - All 59 tickets ordered by backlog priority
 
-| Ticket ID | Story Ref | Title | Details & Acceptance Criteria (AC) | Priority | Est. (Pts) | Domain | Labels |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **T-001** | **1.1.3** | **[Backend] Setup Password Encryption Service** | **Desc:** Implement Bcrypt hashing utility.<br>**AC:**<br>1. `hashPassword(str)` returns a hash.<br>2. `compare(str, hash)` returns boolean.<br>3. Unit tests pass. | Critical | 3 | Backend | `Security` |
-| **T-002** | **1.1.1** | **[API] User Registration Endpoint** | **Desc:** `POST /api/register`. Validates input and creates `lpa_clients` record.<br>**AC:**<br>1. Validates Email format.<br>2. Prevents duplicate emails (409 Conflict).<br>3. Returns 201 Created on success. | High | 5 | Backend | `API` `Auth` |
-| **T-003** | **1.1.1** | **[Frontend] Registration Form** | **Desc:** UI with Email/Pass/Name fields.<br>**AC:**<br>1. Client-side validation (Min 8 chars).<br>2. Submit calls API.<br>3. Success redirects to Login. | High | 5 | Frontend | `UI` |
-| **T-004** | **1.1.2** | **[API] Login & JWT Generation** | **Desc:** `POST /api/login`. Issues JWT.<br>**AC:**<br>1. Valid creds return Token.<br>2. Invalid creds return 401.<br>3. Token contains User ID & Role. | High | 5 | Backend | `API` `Auth` |
-| **T-005** | **1.1.2** | **[Frontend] Login Page & Auth State** | **Desc:** Login UI and global `AuthContext`.<br>**AC:**<br>1. Form submits to API.<br>2. Stores Token in LocalStorage/Cookie.<br>3. Redirects to Home. | High | 3 | Frontend | `UI` |
-| **T-009** | **1.2.1** | **[API] Public Product List Endpoint** | **Desc:** `GET /api/products`.<br>**AC:**<br>1. Returns JSON array.<br>2. Supports Pagination (`?page=1`).<br>3. Excludes Disabled items. | High | 3 | Backend | `API` |
-| **T-010** | **1.2.1** | **[Frontend] Product Grid UI** | **Desc:** Display products in a responsive grid.<br>**AC:**<br>1. Shows Image, Name, Price.<br>2. "Out of Stock" items dimmed. | High | 5 | Frontend | `UI` |
-| **T-011** | **1.2.2** | **[Frontend] Product Detail View** | **Desc:** Individual product page (`/product/:id`).<br>**AC:**<br>1. Fetches data by ID.<br>2. Renders HTML Description.<br>3. Shows "Add to Cart" button. | High | 3 | Frontend | `UI` |
-| **T-013** | **1.3.1** | **[Frontend] Cart Logic (Context)** | **Desc:** Global state for Cart.<br>**AC:**<br>1. `addToCart` adds item ID/Qty.<br>2. Persists on page reload.<br>3. Checks Max Stock limit. | High | 5 | Frontend | `Logic` |
-| **T-017** | **1.4.2** | **[Frontend] Mock Payment UI** | **Desc:** Step 2 of Checkout.<br>**AC:**<br>1. Credit Card Input fields.<br>2. Mock validation (Length 16).<br>3. Returns specific Token. | Critical | 5 | Frontend | `UI` |
-| **T-018** | **1.4.3** | **[API] Create Order (Transaction)** | **Desc:** `POST /api/orders`. Atomic transaction.<br>**AC:**<br>1. Verify Stock.<br>2. Create Invoice.<br>3. Create Items.<br>4. Decrement Stock. | Critical | 8 | Backend | `API` |
+**Sample Critical Path Tickets (MVP Phase):**
 
-**Admin Tickets:** Implementation tickets for inventory management, order fulfillment, and staff operations are maintained separately in the Desktop Admin Application and Admin Web Application repositories.
+| Ticket ID | Story | Title | Domain | Est. (Pts) | Key AC |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **1.1.3.1** | 1.1.3 | **[Backend] Setup Password Hashing Service** | Backend | 3 | Bcrypt hashing with 12 rounds; `hashPassword()` and `comparePassword()` functions; unit tests validate both. |
+| **1.1.1.1** | 1.1.1 | **[API] User Registration Endpoint** | Backend | 5 | `POST /api/auth/register` validates email (RFC 5322), prevents duplicates (409 error), hashes password, inserts into `lpa_clients`, returns 201 Created. |
+| **1.1.1.2** | 1.1.1 | **[Frontend] Registration Form & Page** | Frontend | 5 | React form with client-side validation (password min 8 chars), email format check; submit calls API; success redirects to Login with confirmation. |
+| **1.1.2.1** | 1.1.2 | **[API] Login & JWT Token Generation** | Backend | 5 | `POST /api/auth/login` verifies credentials, generates 24h JWT token on success, returns 401 Unauthorized on failure with generic message. |
+| **1.1.2.2** | 1.1.2 | **[Frontend] Login Page & Auth Context** | Frontend | 3 | Login form with email/password; submit calls 1.1.2.1 API; stores JWT in LocalStorage; sets AuthContext; redirects to Home. |
+| **1.2.1.1** | 1.2.1 | **[Backend] Public Product List Endpoint** | Backend | 3 | `GET /api/products` returns `lpa_stock` records (Active only); supports `?page=1&limit=12` pagination; returns count and hasMore flag. |
+| **1.2.1.2** | 1.2.1 | **[Frontend] Product Grid UI** | Frontend | 5 | Responsive grid (4 cols desktop, 2 mobile); displays image, name, price, stock status; out-of-stock items grayed out; pagination controls. |
+| **1.4.3.2** | 1.4.3 | **[API] Create Order Transaction** | Backend | 8 | `POST /api/checkout/orders` validates stock availability, creates atomic transaction: `lpa_invoices` + `lpa_invoice_items` records, updates `lpa_stock.onhand`, clears cart on success. |
+| **1.4.4.2** | 1.4.4 | **[Backend] Order Confirmation Email** | Backend | 3 | Triggered after successful checkout (1.4.3.2); includes Invoice ID, items, total, tracking placeholder; uses SendGrid; error logging only (non-blocking). |
+
+**Sample Phase 2 Tickets (Search & Account Mgmt):**
+
+| Ticket ID | Story | Title | Domain | Est. (Pts) | Key AC |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **2.5.1.1** | 2.5.1 | **[API] Keyword Search Endpoint** | Backend | 5 | `GET /api/products/search?q=query` searches `lpa_stock` (name, description, sku) with LIKE or full-text; returns paginated results; no results handling. |
+| **2.5.1.2** | 2.5.1 | **[Frontend] Search Bar Component** | Frontend | 5 | Debounced search-as-you-type with 5 quick suggestions; Enter key navigates to `/search?q=...` with full results grid; search term highlighted. |
+| **2.6.2.1** | 2.6.2 | **[API] Get User Orders Endpoint** | Backend | 3 | `GET /api/profile/orders` (auth required) returns user's invoices from `lpa_invoices` sorted by date descending; supports pagination. |
+| **2.6.2.2** | 2.6.2 | **[Frontend] Order History Page** | Frontend | 3 | Table layout: Order ID, Date, Item Count, Status, Total; status badges (Paid/Shipped/Delivered); clicking row shows detail view; pagination controls. |
+
+**Sample Phase 3 Tickets (Engagement):**
+
+| Ticket ID | Story | Title | Domain | Est. (Pts) | Key AC |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **3.9.4.1** | 3.9.4 | **[API] Get Product Reviews Endpoint** | Backend | 2 | `GET /api/products/:id/reviews` returns approved reviews; includes average rating calculation; sorted by helpful/recent; paginated. |
+| **3.9.4.2** | 3.9.4 | **[Frontend] Product Reviews Display** | Frontend | 3 | Reviews section on product detail page; average rating badge (e.g., "4.5★ based on 42 reviews"); individual review cards; helpful voting buttons. |
+| **3.10.1.1** | 3.10.1 | **[API] Reorder Helper Endpoint** | Backend | 2 | `POST /api/profile/orders/:invoiceId/reorder` (auth required) reads line items from prior invoice, checks current stock, returns items with current prices. |
+| **3.10.1.2** | 3.10.1 | **[Frontend] Reorder Functionality** | Frontend | 3 | "Reorder" button on Order History; calls 3.10.1.1 API; adds items to cart with updated prices; warns on out-of-stock; redirects to cart with confirmation. |
+
+**Administrative Tickets:** Implementation tickets for inventory management, order fulfillment, and staff operations are maintained separately in the Desktop Admin Application and planned Admin Web Application repositories.
+
+**Ticket Statistics:**
+- **Total Implementation Tickets:** 59
+- **Phase 1 (MVP):** 26 tickets across 13 stories (61 story points)
+- **Phase 2 (V1):** 21 tickets across 8 stories (35 story points)
+- **Phase 3 (V2):** 12 tickets across 9 stories (50 story points)
+- **Estimated Delivery:** 8-11 sprints at typical 5-7 points/day velocity
 
 ---
 
