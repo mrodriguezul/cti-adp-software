@@ -1,45 +1,49 @@
-# LPA eComms - Strategic Product Backlog (Corrected)
+# LPA eComms - Strategic Product Backlog (Customer-Facing Application)
 
-## Strategic Ordering Logic
-The backlog is ordered based on the **"Dependency & Value Chain"** method:
-1.  **Foundation (Ranks 1-4):** Identity and Stock Management. Without these, no other feature can exist.
-2.  **Revenue Loop (Ranks 5-11):** The critical path for a user to find a product, cart it, and pay. This constitutes the MVP.
-3.  **Operational Closure (Ranks 12-14):** Tools for staff to actually fulfill the orders sold.
-4.  **UX Friction Removal (Ranks 15-19):** Features that make buying *easier* (Search, Filters).
-5.  **Retention & Growth (Ranks 20-29):** Features that encourage repeat visits (Wishlist, Reviews, History).
+**Scope:** This backlog includes only user stories for the customer-facing Web Storefront. Admin inventory management and order fulfillment features are managed in a separate Desktop Admin application backlog.
 
 ---
 
-## The Complete Backlog (29 Items)
+## Strategic Ordering Logic
+The backlog is ordered based on the **"Dependency & Value Chain"** method:
+1.  **Foundation (Ranks 1-3):** Security & Identity. Without secure authentication, no other feature adds value.
+2.  **Revenue Loop (Ranks 4-13):** The critical path for a user to browse, cart, and checkout. This constitutes the MVP.
+3.  **UX Polish & Discoverability (Ranks 14-18):** Features that make shopping easier and faster (Search, Filters, Sorting).
+4.  **Customer Retention (Ranks 19-27):** Features that encourage repeat visits and loyalty (Wishlist, Reviews, Reorder, Notifications).
 
-| Rank | ID | Story Name | Phase | Value | Effort | Strategic Rationale (Criteria Analysis) |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1** | **1.1.3** | **Password Encryption** | MVP | Critical | 3 | **Risk & Foundation:** Security is a hard constraint. We cannot safely test registration without encryption logic (Bcrypt) in place first. |
-| **2** | **1.2.3** | **Admin: Add Stock** | MVP | Critical | 5 | **Dependency:** The "Chicken and Egg" problem. Admins must populate the DB before customers can view a catalog. |
-| **3** | **1.2.1** | **View Product List** | MVP | High | 5 | **User Impact:** The primary entry point. If customers can't see products, the site has no value. |
-| **4** | **1.2.2** | **Product Detail View** | MVP | High | 3 | **User Impact:** Essential for electronics. Customers need specs/details to decide to buy. |
-| **5** | **1.1.1** | **Register Account** | MVP | High | 5 | **Dependency:** Checkout requires a registered user. Capturing user data early enables the sales funnel. |
-| **6** | **1.1.2** | **Login** | MVP | High | 3 | **Dependency:** Prerequisite for the Cart and Checkout session logic. |
-| **7** | **1.3.1** | **Add to Cart** | MVP | High | 3 | **Business Value:** Captures purchase intent. The first step of the conversion funnel. |
-| **8** | **1.3.2** | **View Cart** | MVP | High | 2 | **UX:** Users need cost confirmation and a summary before committing to payment. |
-| **9** | **1.4.1** | **Checkout: Address** | MVP | High | 3 | **Business Value:** Captures the shipping contract. Essential for the invoice data structure. |
-| **10** | **1.4.2** | **Simulate Payment** | MVP | Critical | 5 | **Risk & Value:** High technical risk (API integration). Must be tackled early to ensure transactions work. |
-| **11** | **1.4.3** | **Order Confirmation** | MVP | Critical | 5 | **Business Value:** The "Handshake." Finalizes revenue, generates the Invoice, and updates Inventory. |
-| **12** | **1.5.1** | **Admin: View Orders** | MVP | High | 3 | **Urgency:** Once orders arrive, staff immediately need visibility to prevent a fulfillment backlog. |
-| **13** | **1.5.2** | **Admin: Order Details** | MVP | High | 2 | **Urgency:** Operational necessity. Staff cannot pack a box if they don't know *what* is in the order. |
-| **14** | **1.5.3** | **Admin: Ship Order** | MVP | Med | 2 | **Operations:** Completes the lifecycle. Lower complexity, but finishes the MVP loop. |
-| **15** | **2.6.1** | **Keyword Search** | V1 | High | 5 | **UX Impact:** As the catalog grows, browsing becomes painful. Search is the highest ROI UX improvement. |
-| **16** | **2.6.2** | **Filter by Price** | V1 | Med | 3 | **UX Impact:** Critical for electronics shoppers with strict budgets. Improves conversion rate. |
-| **17** | **1.3.3** | **Edit Cart Items** | MVP* | Med | 3 | **UX:** Nice to have for launch, but users can survive by removing/re-adding items. Lower priority in MVP. |
-| **18** | **1.2.4** | **Admin: Update Stock** | MVP* | Med | 3 | **Risk:** Operational risk if prices are wrong, but "Add Stock" (1.2.3) covers initial setup. |
-| **19** | **2.7.1** | **Update Profile** | V1 | Med | 3 | **Retention:** Reduces friction for returning users (auto-fill address). Good V1 candidate. |
-| **20** | **2.6.3** | **Filter by Category** | V1 | Med | 3 | **UX:** Useful, but Keyword Search usually covers this need for smaller catalogs. |
-| **21** | **2.7.2** | **Order History List** | V1 | Low | 5 | **Retention:** Useful for users to track spending, but not critical for store function. |
-| **22** | **2.7.3** | **View Order Details** | V1 | Med | 3 | **Retention:** *Previously Missing.* Allows users to see exactly what they bought in past orders. Dependent on 2.7.2. |
-| **23** | **3.6.5** | **Related Products** | V2 | Low | 5 | **Growth:** Increases Average Order Value (AOV). Best for V2 when we have data. |
-| **24** | **3.7.8** | **Read Reviews** | V2 | Low | 3 | **Growth:** Social proof is powerful, but requires a critical mass of sales first. |
-| **25** | **3.7.7** | **Write Review** | V2 | Low | 5 | **Growth:** Dependent on "Read Reviews" to be useful. |
-| **26** | **3.7.5** | **Add to Wishlist** | V2 | Low | 3 | **Retention:** Allows saving interest without buying. |
-| **27** | **3.7.6** | **View Wishlist** | V2 | Low | 3 | **Retention:** *Previously Missing.* The necessary companion to "Add to Wishlist". |
-| **28** | **2.6.4** | **Sort Products** | V1 | Low | 2 | **UX:** Low effort, but also low impact compared to Filters. |
-| **29** | **2.7.4** | **Change Password** | V1 | Low | 3 | **Security:** Edge case. Users can contact admin for resets in early versions. |
+---
+
+## The Complete Backlog (30 Validated Customer-Facing User Stories)
+
+| Rank | ID | Story Name | Phase | Epic | Value | Effort | Strategic Rationale |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1** | **1.1.3** | **Password Encryption** | MVP | IAM | Critical | 3 | **Risk & Foundation:** Security is a hard constraint for data protection (GDPR compliance). Implementation must precede all other auth features. |
+| **2** | **1.1.1** | **Register Account** | MVP | IAM | High | 5 | **Dependency:** Checkout requires registered users. Early user data capture enables personalization and repeat purchases. |
+| **3** | **1.1.2** | **Login** | MVP | IAM | High | 3 | **Dependency:** Prerequisite for cart persistence, order history, and profile management. Unblocks all member-only features. |
+| **4** | **1.2.1** | **View Product List** | MVP | Catalog | Critical | 5 | **User Impact:** The primary entry point. If customers cannot see products, the site has no value and users bounce immediately. |
+| **5** | **1.2.2** | **Product Detail View** | MVP | Catalog | High | 3 | **User Impact:** Essential for informed purchasing. Customers need full specs, images, and availability to decide whether to buy. |
+| **6** | **1.3.1** | **Add to Cart** | MVP | Cart | High | 3 | **Business Value:** Captures purchase intent. First step of conversion funnel; directly impacts revenue. |
+| **7** | **1.3.2** | **View Cart** | MVP | Cart | High | 2 | **UX & Compliance:** Users need to review items, verify pricing, and see totals before committing. Reduces checkout friction. |
+| **8** | **1.3.3** | **Edit Cart Items** | MVP | Cart | Medium | 3 | **UX:** Allows quantity adjustments and item removal without re-browsing. Essential for cart flexibility and conversion. |
+| **9** | **1.4.1** | **Checkout: Shipping Address** | MVP | Checkout | High | 3 | **Business Value:** Captures critical fulfillment data. Essential for invoice creation and order delivery. |
+| **10** | **1.4.2** | **Simulate Payment** | MVP | Checkout | Critical | 5 | **Risk & Revenue:** High technical complexity (payment gateway integration). Must validate early to ensure transaction processing works under load. |
+| **11** | **1.4.3** | **Order Review** | MVP | Checkout | High | 3 | **UX & Risk:** Final verification step prevents accidental orders and builds customer confidence. Reduces disputes/cancellations. |
+| **12** | **1.4.4** | **Order Confirmation** | MVP | Checkout | Critical | 5 | **Revenue Realization:** The "handshake" moment. Finalizes revenue, generates invoice, and creates audit trail. Email confirmation provides customer record. |
+| **13** | **1.1.4** | **Guest Shopping with Checkout Login** | MVP | IAM | Medium | 5 | **Conversion & UX:** Allows guests to browse and cart without friction. Forced login at checkout captures user data while removing pre-checkout barriers. Increases conversion by reducing initial registration friction. |
+| **14** | **2.5.1** | **Keyword Search** | V1 | Discovery | High | 5 | **UX Impact:** As catalog grows, Search becomes highest ROI feature. Reduces browsing fatigue and improves purchase velocity. |
+| **15** | **2.5.2** | **Filter by Price** | V1 | Discovery | Medium | 3 | **UX & Conversion:** Critical for budget-conscious electronics shoppers. Highly relevant filters reduce bounce rate by 20-30%. |
+| **16** | **2.5.3** | **Sort Products** | V1 | Discovery | Low | 2 | **UX:** Low effort, useful utility. Enables common sorting expectations (Price, Newest, Relevance). |
+| **17** | **2.6.1** | **Edit Profile** | V1 | Account | High | 3 | **Retention:** Reduces support inquiries and checkout friction for repeat buyers. Auto-fill of saved address improves conversion. |
+| **18** | **2.6.2** | **View Order History** | V1 | Account | Medium | 5 | **Retention:** Transparent order management builds trust. Enables reordering and reduces support questions ("Where's my order?"). |
+| **19** | **2.6.3** | **View Order Details** | V1 | Account | Medium | 3 | **Retention & Support:** Allows customers to self-serve for order inquiries. Prerequisite for reorder and tracking features. |
+| **20** | **2.6.4** | **Change Password** | V1 | Account | Low | 2 | **Security:** Account security enhancement. Enables users to address compromised credentials without support intervention. |
+| **21** | **2.7.1** | **Filter by Category** | V1 | Discovery | Medium | 3 | **UX:** Useful for large catalogs (100+ SKUs). Reduces cognitive load and discovery time. Complements keyword search. |
+| **22** | **3.8.1** | **Related Products (You Might Also Like)** | V2 | Engagement | Low | 5 | **Growth:** Cross-sell driver. Avg. 10-20% uplift in AOV when implemented effectively. Low priority but high impact. |
+| **23** | **3.8.2** | **Personalized Recommendations** | V2 | Engagement | Low | 8 | **Advanced Growth:** ML-driven recommendations based on history. High effort but significant AOV uplift (15-25%) when tuned. Deferred to V2. |
+| **24** | **3.9.1** | **Add to Wishlist** | V2 | Engagement | Low | 3 | **Retention:** Captures "remind me later" intent. Enables email remarketing campaigns and signals customer interest. |
+| **25** | **3.9.2** | **View & Manage Wishlist** | V2 | Engagement | Low | 3 | **Retention & Sales:** Essential companion to add-to-wishlist. Shareable lists enable social proof and gift planning, driving referrals. |
+| **26** | **3.9.3** | **Write Product Review** | V2 | Engagement | Low | 5 | **Social Proof:** User-generated content builds credibility. Increases average review count and conversion. Requires post-purchase verification. |
+| **27** | **3.9.4** | **Read Product Reviews** | V2 | Engagement | Low | 3 | **Social Proof:** Displays aggregate ratings and reviews. Critical trust signal for B2C e-commerce; impacts purchase confidence. |
+| **28** | **3.9.5** | **Order Status Notifications** | V2 | Engagement | Medium | 5 | **Customer Satisfaction:** Reduces "Where is my order?" support inquiries. Email notifications with tracking improve satisfaction and reduce returns. |
+| **29** | **3.10.1** | **Quick Reorder** | V2 | Account | Low | 3 | **Repeat Purchase:** Removes friction for repeat buyers. Increases repeat order rate by enabling single-click reordering of previous items. |
+| **30** | **3.10.2** | **Purchase Summary Dashboard** | V2 | Account | Low | 3 | **Analytics & Loyalty:** Gamification element (spending insights, loyalty tier). Sets foundation for future loyalty programs. |

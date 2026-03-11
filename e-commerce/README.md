@@ -1,28 +1,32 @@
 # E-Commerce Application
 
 ## Overview
-This is an e-commerce platform developed as part of the CTI Advanced Programming course. The application provides a complete online shopping experience with product browsing, cart management, order processing, and payment integration.
 
-## Features
+This is the **Customer-Facing Web Storefront** for LPA eComms, an electronics e-commerce platform developed as part of the CTI Advanced Programming course. The web application provides a complete online shopping experience with product browsing, cart management, order processing, and payment simulation.
 
-### Customer Features
-- **Product Catalog**: Browse products by category with search and filtering capabilities
-- **Product Details**: View detailed product information, images, specifications, and reviews
-- **Shopping Cart**: Add/remove items, update quantities, and view cart summary
-- **User Authentication**: Register, login, and manage user profiles
-- **Checkout Process**: Multi-step checkout with shipping and billing information
-- **Payment Integration**: Secure payment processing with multiple payment methods
-- **Order History**: View past orders and track current order status
-- **Wishlist**: Save favorite products for later purchase
-- **Product Reviews**: Rate and review purchased products
+**Note:** Admin operations are handled in separate applications:
+- **Desktop Admin App (Java)** - For staff inventory and order management (see `/desktop` directory)
+- **Admin Web App** - Planned for future development (separate repository)
 
-### Admin Features
-- **Product Management**: Create, update, and delete products
-- **Inventory Management**: Track stock levels and manage product variants
-- **Order Management**: View, process, and update order statuses
-- **Customer Management**: View and manage customer accounts
-- **Analytics Dashboard**: Sales reports, revenue tracking, and performance metrics
-- **Category Management**: Organize products into categories and subcategories
+## Application Scope
+
+**This directory contains the Customer-Facing Web Storefront application.** Admin features (inventory management, order fulfillment, staff operations) are implemented in separate applications:
+- **Admin Web Application**: Coming soon (separate repository)
+- **Admin Desktop Application (Java)**: See parent `desktop/` directory in the project root
+
+## Features (Customer-Facing Web Storefront)
+
+### Core Shopping Features
+- **Product Catalog**: Browse all available products with search and filtering capabilities
+- **Product Details**: View detailed product information, specifications, images, and customer reviews
+- **Shopping Cart**: Add/remove items, update quantities, and view cart summary with real-time totals
+- **User Authentication**: Register account, login, and manage user profiles
+- **Checkout Process**: Multi-step checkout with shipping address, payment simulation, and order review
+- **Order History**: View past orders, track order status, and reorder from previous purchases
+- **Wishlist**: Save favorite products for future consideration and email notifications
+- **Product Reviews**: Read reviews from other verified buyers; write reviews for purchased products
+- **Order Notifications**: Email notifications for order status updates (Paid, Shipped, Delivered)
+- **Personalized Recommendations**: Get product suggestions based on browsing and purchase history
 
 ## Technology Stack
 
@@ -36,8 +40,8 @@ This is an e-commerce platform developed as part of the CTI Advanced Programming
 ### Backend
 - **Runtime**: Node.js
 - **Framework**: Express.js / NestJS
-- **Database**: MongoDB / PostgreSQL / MySQL
-- **ORM**: Mongoose / Prisma / TypeORM
+- **Database**: PostgreSQL
+- **ORM**: Prisma / TypeORM
 - **Authentication**: JWT / OAuth 2.0
 - **Payment Gateway**: Stripe / PayPal API
 
@@ -80,7 +84,7 @@ e-commerce/
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn
-- MongoDB/PostgreSQL (depending on configuration)
+- PostgreSQL (v12 or higher)
 - Git
 
 ### Installation
@@ -108,7 +112,7 @@ e-commerce/
    Create `.env` file in the backend directory:
    ```env
    PORT=5000
-   DATABASE_URL=mongodb://localhost:27017/ecommerce
+   DATABASE_URL=postgresql://user:password@localhost:5432/lpa_ecomms
    JWT_SECRET=your_jwt_secret_key
    STRIPE_SECRET_KEY=your_stripe_secret_key
    CLOUDINARY_URL=your_cloudinary_url

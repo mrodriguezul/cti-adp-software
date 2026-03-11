@@ -1,27 +1,30 @@
 # LPA eComms - Phase 1 (MVP) User Stories
 
-This document outlines the user stories required to deliver the Minimum Viable Product (MVP) for the LPA eComms system.
+This document outlines the user stories required to deliver the Minimum Viable Product (MVP) for the LPA eComms Web Storefront (Customer-facing application).
+
+**Scope:** This phase focuses on the core customer shopping experience, from discovery to checkout. Admin inventory management is handled in a separate Desktop Admin application.
+
+---
 
 ## Epic-01: Identity & Access Management (IAM)
 **Goal:** Securely manage customer access to personal data and the checkout process.
 
 | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate email registrations.<br>4. Upon success, user is redirected to Login. |
-| **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 | 1. User enters Email and Password.<br>2. System validates credentials against the database.<br>3. On success, a secure session (Token) is started.<br>4. On failure, a generic "Invalid credentials" message appears. |
-| **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 | 1. Passwords are never stored in plain text.<br>2. Passwords are hashed (e.g., Bcrypt) before saving to the DB.<br>3. Input field masks characters (shows dots) while typing. |
+| **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 | 1. User can enter Email, Password, Name, and Phone.<br>2. System validates email format and password strength (min 8 chars).<br>3. System prevents duplicate email registrations.<br>4. Upon success, user is redirected to Login page with confirmation message. |
+| **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 | 1. User enters Email and Password.<br>2. System validates credentials against the database.<br>3. On success, a secure session (JWT Token) is created and stored.<br>4. On failure, a generic "Invalid credentials" message appears. |
+| **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 | 1. Passwords are never stored in plain text.<br>2. Passwords are hashed using Bcrypt before saving to the DB.<br>3. Password input field masks characters (shows dots) while typing. |
+| **1.1.4** | **As a Guest Shopper**, I want to **add items to my cart and browse without logging in** so that I can make a quick purchase. | High | 5 | 1. Guest users can view products and add items to cart without registration.<br>2. Cart persists and displays item count in navbar.<br>3. When guest clicks "Checkout" or "Proceed to Checkout", system prompts: "Please log in or create an account to continue".<br>4. Guest is redirected to Login/Register page with option to continue after account creation.<br>5. After login, guest cart is preserved and merged with their account. |
 
 ---
 
 ## Epic-02: Core Catalog & Inventory System
-**Goal:** Present products to customers and allow Admins to manage the `lpa_stock` inventory.
+**Goal:** Present active products to customers with accurate availability information.
 
 | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| **1.2.1** | **As a Shopper**, I want to **view a list of all available products** so that I can browse what the store has to offer. | High | 5 | 1. Page displays product grid with Image, Name, and Price.<br>2. Pagination or "Load More" is used for large lists.<br>3. "Out of Stock" items are visually distinct but still visible. |
-| **1.2.2** | **As a Shopper**, I want to **click on a product to see its details** so that I can read the technical specs and check availability. | High | 3 | 1. Clicking a product card opens the Detail View.<br>2. View shows Description, Stock Level, and "Add to Cart" button.<br>3. Price is clearly formatted (e.g., $999.00). |
-| **1.2.3** | **As an Inventory Manager**, I want to **add new electronics to the system** so that customers can buy them. | High | 5 | 1. Admin can input Name, Description, Price, Stock Qty, and Image URL.<br>2. System saves the new record to `lpa_stock`.<br>3. New item immediately appears on the Web Storefront. |
-| **1.2.4** | **As an Inventory Manager**, I want to **update product details (Price/Stock)** so that the store information is always accurate. | Medium | 3 | 1. Admin can search for a product by ID or Name.<br>2. Admin can edit Price and Quantity fields.<br>3. Changes are saved and reflected instantly. |
+| **1.2.1** | **As a Shopper**, I want to **view a list of all available products** so that I can browse what the store has to offer. | High | 5 | 1. Page displays product grid with Image, Name, and Price.<br>2. Pagination or "Load More" is used for large lists.<br>3. "Out of Stock" items are visually distinct (grayed out) but still visible.<br>4. Only "Active" products are displayed (Admin-disabled items are hidden). |
+| **1.2.2** | **As a Shopper**, I want to **click on a product to see its details** so that I can read the technical specs and check availability. | High | 3 | 1. Clicking a product card opens the Detail View.<br>2. View shows Full Description, Current Stock Level, Price, and "Add to Cart" button.<br>3. Price is clearly formatted (e.g., $999.00).<br>4. Product image gallery displays (if multiple images available). |
 
 ---
 
@@ -30,28 +33,20 @@ This document outlines the user stories required to deliver the Minimum Viable P
 
 | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| **1.3.1** | **As a Shopper**, I want to **add an item to my cart** so that I can purchase it later. | High | 3 | 1. Clicking "Add to Cart" adds the item to the session.<br>2. Cart counter in the navbar increments.<br>3. System prevents adding more quantity than is available in stock. |
-| **1.3.2** | **As a Shopper**, I want to **view my current cart** so that I can see the total cost and what I have selected. | High | 2 | 1. Cart view lists all selected items with thumbnail, name, price, and row total.<br>2. "Grand Total" is calculated and displayed at the bottom. |
-| **1.3.3** | **As a Shopper**, I want to **change quantities or remove items** from my cart so that I can manage my budget before checking out. | Medium | 3 | 1. User can hit "+" or "-" to adjust quantity.<br>2. Setting quantity to 0 removes the item.<br>3. "Remove" button deletes the item immediately.<br>4. Total price updates dynamically without page reload. |
+| **1.3.1** | **As a Shopper**, I want to **add an item to my cart** so that I can purchase it later. | High | 3 | 1. Clicking "Add to Cart" adds the item to the session with quantity 1.<br>2. Cart counter in the navbar increments immediately.<br>3. System prevents adding more quantity than is available in stock (shows alert).<br>4. Cart persists across page navigation and browser refresh. |
+| **1.3.2** | **As a Shopper**, I want to **view my current cart** so that I can see the total cost and what I have selected. | High | 2 | 1. Cart view lists all selected items with thumbnail, name, unit price, quantity, and row total.<br>2. "Subtotal", "Estimated Tax" (if applicable), and "Grand Total" are calculated and displayed.<br>3. Cart shows when empty with "Continue Shopping" button. |
+| **1.3.3** | **As a Shopper**, I want to **change quantities or remove items** from my cart so that I can manage my budget before checking out. | Medium | 3 | 1. User can increment/decrement quantity using "+" or "-" buttons or direct input.<br>2. Setting quantity to 0 removes the item from cart.<br>3. "Remove" button permanently deletes the item from cart.<br>4. Total price updates dynamically without page reload (AJAX). |
 
 ---
 
 ## Epic-04: Checkout Engine & Order Processing
-**Goal:** Convert the Shopping Cart into a finalized Order (Invoice) and capture revenue.
+**Goal:** Convert the Shopping Cart into a finalized Order (Invoice) with a smooth, secure checkout flow.
 
 | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| **1.4.1** | **As a Ready-to-Buy Customer**, I want to **enter my shipping address** so that the store knows where to send my electronics. | High | 3 | 1. Checkout Step 1 asks for Address, City, State, Zip.<br>2. If user is logged in, these fields pre-fill from their Profile.<br>3. Form requires all fields to be completed to proceed. |
-| **1.4.2** | **As a Customer**, I want to **simulate a payment** so that I can complete the order process without using real money. | High | 5 | 1. User selects "Credit Card" (Simulation).<br>2. User enters mock details (e.g., Stripe Test Card).<br>3. System validates the format (16 digits).<br>4. System receives a "Success" token from the mock provider. |
-| **1.4.3** | **As a Customer**, I want to **receive an Order Confirmation** so that I know my purchase was successful. | High | 5 | 1. Upon payment success, user sees a "Thank You" page.<br>2. An Invoice ID is displayed (e.g., `INV-1001`).<br>3. The user's Cart is cleared.<br>4. Stock quantity in `lpa_stock` is automatically reduced. |
+| **1.4.1** | **As a Ready-to-Buy Customer**, I want to **enter my shipping address** so that the store knows where to send my electronics. | High | 3 | 1. Checkout Step 1 displays form with fields: Address, City, State/Province, Zip/Postal Code, Country.<br>2. If user is logged in, fields pre-fill from their Profile (if saved).<br>3. Form validation requires all fields to be completed before proceeding.<br>4. "Next" button advances to payment step. |
+| **1.4.2** | **As a Customer**, I want to **simulate a payment** so that I can complete the order process without using real money. | High | 5 | 1. Checkout Step 2 displays payment method selection (Credit Card, PayPal, etc.).<br>2. For Credit Card, user enters mock/test card details (e.g., Stripe Test Card 4242...).<br>3. System validates card format (16 digits, exp date, CVV).<br>4. System receives a "Success" token from the mock payment provider (simulated). |
+| **1.4.3** | **As a Customer**, I want to **review my order before final submission** so that I can verify all details are correct. | High | 3 | 1. Checkout Step 3 displays Order Summary: items, quantities, prices, shipping address, and total.<br>2. User can edit cart quantities or go back to address step.<br>3. "Place Order" button submits the purchase transaction. |
+| **1.4.4** | **As a Customer**, I want to **receive an Order Confirmation** so that I know my purchase was successful and I have a reference number. | High | 5 | 1. Upon payment success, user sees a "Thank You" page with order details.<br>2. Order ID (Invoice Number, e.g., `INV-20260309-001`) is prominently displayed.<br>3. User's cart is cleared and persistent state is reset.<br>4. Confirmation details are sent to user's email (backend: should include order items, total, and tracking info). |
 
 ---
-
-## Epic-05: Admin Order Fulfillment
-**Goal:** Provide the warehouse staff with the visibility needed to process and ship customer orders.
-
-| ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
-| :--- | :--- | :--- | :--- | :--- |
-| **1.5.1** | **As a Warehouse Staff**, I want to **view a list of new orders** so that I know what needs to be packed today. | High | 3 | 1. Admin Dashboard lists all Invoices from `lpa_invoices`.<br>2. List shows Date, Client Name, Total, and Status.<br>3. Orders are sorted by Date (Newest first). |
-| **1.5.2** | **As a Warehouse Staff**, I want to **view the specific items in an order** so that I pack the correct products. | High | 2 | 1. Clicking an Invoice shows the "Line Items" (Product Name, Qty).<br>2. Shipping Address is clearly visible for printing labels. |
-| **1.5.3** | **As a Warehouse Staff**, I want to **update the order status to "Shipped"** so that the system tracks fulfillment. | Medium | 2 | 1. Admin can change `lpa_inv_status` from "Paid" to "Shipped".<br>2. The status update is saved to the database. |
