@@ -32,6 +32,23 @@ Output the steps logically. Provide the necessary terminal commands first (using
 
 ## USER PROMPT 2
 
+@workspace #file:assets/db/lpa_ecomms_schema.sql
+
+# Role & Context
+You are a Database Administrator and Backend Engineer. We are initializing a PostgreSQL database for the "CTI" electronics e-commerce platform.
+
+# The Task
+Read the attached schema file and generate a new file named `mock_data.sql` to be placed in the `assets/db/` directory. 
+
+# Requirements for the Mock Data:
+1. **Realistic Electronics:** Generate at least 10 realistic electronics products (e.g., Laptops, Headphones, Monitors) with sensible prices, SKUs, and descriptions.
+2. **Stock/Inventory:** Ensure these products have active status and realistic `onhand` stock quantities so they appear in our Phase 1 MVP catalog.
+3. **Categories:** Create relevant categories for these products if your schema includes a categories table.
+4. **Test User:** Generate at least one test user/client account. Since we haven't built the Bcrypt hashing yet, provide a placeholder hashed string for the password (e.g., `$2b$12$SomeFakeHashedPasswordString1234567890`) and note the plain-text equivalent in a SQL comment so I can log in later.
+5. **Foreign Keys:** Ensure all INSERT statements are ordered correctly to respect foreign key constraints (e.g., insert categories before products).
+
+Output the pure SQL commands intended for PostgreSQL.
+
 ## USER PROMPT 3
 
 ## USER PROMPT 4
