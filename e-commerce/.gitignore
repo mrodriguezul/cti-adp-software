@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.log
+.env.local
+.env.*.local
+coverage/
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+.history/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
