@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,41 +7,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Example: User entity for the system
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  firstName String?
-  lastName  String?
-  role      String   @default("customer")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(50)
+  password  String   @db.VarChar(255)
+  firstname String?  @db.VarChar(50)
+  lastname  String?  @db.VarChar(50)
+  role      String   @default("user") @db.VarChar(20)
+  status    String   @default("A") @db.Char(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("users")
+  @@map("lpa_users")
 }
 
-// Example: Product entity for the e-commerce catalog
-model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int      @default(0)
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Stock {
+  id           Int           @id @default(autoincrement())
+  sku          String        @unique @db.VarChar(50)
+  name         String        @db.VarChar(255)
+  description  String?
+  onhand       Int           @default(0)
+  price        Decimal       @default(0.00) @db.Decimal(10, 2)
+  status       String        @default("A") @db.Char(1)
+  imageUrl     String?       @map("image_url") @db.VarChar(255)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  invoiceItems InvoiceItem[]
 
-  @@map("products")
+  @@map("lpa_stock")
 }
 
-// Example: Order entity for tracking customer orders
-model Order {
-  id        String   @id @default(cuid())
-  userId    String
-  status    String   @default("pending")
-  total     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Client {
+  id        Int       @id @default(autoincrement())
+  firstname String    @db.VarChar(50)
+  lastname  String    @db.VarChar(50)
+  address   String?   @db.VarChar(255)
+  phone     String?   @db.VarChar(30)
+  email     String    @unique @db.VarChar(100)
+  password  String    @db.VarChar(255)
+  status    String    @default("A") @db.Char(1)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  invoices  Invoice[]
 
-  @@map("orders")
+  @@map("lpa_clients")
+}
+
+model Invoice {
+  id            Int           @id @default(autoincrement())
+  invoiceNumber String        @unique @map("invoice_number") @db.VarChar(50)
+  clientId      Int           @map("client_id")
+  clientName    String?       @map("client_name") @db.VarChar(100)
+  clientAddress String?       @map("client_address") @db.VarChar(255)
+  amount        Decimal       @default(0.00) @db.Decimal(12, 2)
+  status        String        @default("U") @db.Char(1)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  client        Client        @relation(fields: [clientId], references: [id])
+  items         InvoiceItem[]
+
+  @@map("lpa_invoices")
+}
+
+model InvoiceItem {
+  id        Int      @id @default(autoincrement())
+  invoiceId Int      @map("invoice_id")
+  stockId   Int      @map("stock_id")
+  stockName String?  @map("stock_name") @db.VarChar(255)
+  price     Decimal  @db.Decimal(10, 2)
+  quantity  Int
+  subtotal  Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  stock     Stock    @relation(fields: [stockId], references: [id])
+
+  @@map("lpa_invoice_items")
 }
