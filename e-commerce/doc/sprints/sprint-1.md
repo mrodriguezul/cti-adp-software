@@ -1,0 +1,54 @@
+# Sprint 1: Core Product Catalog & Shopping Cart
+
+## Sprint Goal
+Build the core product catalog and shopping cart experience, enabling customers to browse products, view detailed information, and manage items in their cart before checkout.
+
+**Duration:** TBD
+**Scope:** 5 User Stories | 6 Implementation Tickets | Estimated Effort: 17 Points
+
+---
+
+## Sprint 1 User Stories
+
+| Status | ID | User Story | Priority | Est. (Pts) |
+| :---: | :--- | :--- | :--- | :--- |
+| [ ] | **1.2.1** | **As a Shopper**, I want to **view a list of all available products** so that I can browse what the store has to offer. | High | 5 |
+| [ ] | **1.2.2** | **As a Shopper**, I want to **click on a product to see its details** so that I can read the technical specs and check availability. | High | 3 |
+| [ ] | **1.3.1** | **As a Shopper**, I want to **add an item to my cart** so that I can purchase it later. | High | 3 |
+| [ ] | **1.3.2** | **As a Shopper**, I want to **view my current cart** so that I can see the total cost and what I have selected. | High | 2 |
+| [ ] | **1.3.3** | **As a Shopper**, I want to **change quantities or remove items** from my cart so that I can manage my budget before checking out. | Medium | 3 |
+
+---
+
+## Sprint 1 Implementation Tickets
+
+| Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Domain | Effort |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| [ ] | **1.2.1.1** | **[Backend] Public Product List Endpoint** | **Desc:** Create `GET /api/products` endpoint.<br>**AC:**<br>1. Returns JSON array of products from `lpa_stock`.<br>2. Supports pagination: `?page=1&limit=12`.<br>3. Returns only Active products (status='A').<br>4. Each product includes: id, sku, name, price, onhand, image_url.<br>5. Returns count and hasMore for pagination. | Backend | 3 |
+| [ ] | **1.2.1.2** | **[Frontend] Product Grid UI** | **Desc:** Build responsive product grid component.<br>**AC:**<br>1. Displays products in responsive grid (4 cols desktop, 2 mobile).<br>2. Each card shows: image, name, price, stock status.<br>3. Out-of-stock items grayed out but visible.<br>4. Pagination buttons or "Load More".<br>5. Loading state displayed during fetch. | Frontend | 5 |
+| [ ] | **1.2.2.1** | **[Frontend] Product Detail Page** | **Desc:** Build single product detail page (`/product/:id`).<br>**AC:**<br>1. Fetches product data from `GET /api/products/:id`.<br>2. Displays: image gallery, name, description, price, stock level.<br>3. "Add to Cart" button visible and functional.<br>4. Breadcrumb navigation back to listing.<br>5. Loading and error states handled. | Frontend | 3 |
+| [ ] | **1.3.1.1** | **[Frontend] Cart State Management** | **Desc:** Build global cart state using Context API or Redux.<br>**AC:**<br>1. Cart stores: itemId, quantity, price snapshot.<br>2. `addToCart(itemId, qty)` function prevents qty > stock.<br>3. Cart persists across page navigation (LocalStorage).<br>4. Cart persists on page refresh.<br>5. Events trigger for cart updates (e.g., navbar counter). | Frontend | 5 |
+| [ ] | **1.3.2.1** | **[Frontend] Shopping Cart Page** | **Desc:** Build cart review page (`/cart`).<br>**AC:**<br>1. Lists all cart items: thumbnail, name, unit price, quantity, subtotal.<br>2. Displays Subtotal, Estimated Tax (if enabled), Grand Total.<br>3. Empty cart shows message with "Continue Shopping" button.<br>4. "Checkout" button accessible and functional.<br>5. Cart counter in navbar shows current item count. | Frontend | 3 |
+| [ ] | **1.3.3.1** | **[Frontend] Cart Item Editing Controls** | **Desc:** Build quantity adjustment and removal UI.<br>**AC:**<br>1. `+` and `-` buttons adjust quantity dynamically.<br>2. Direct quantity input field with validation.<br>3. Setting quantity to 0 or clicking "Remove" deletes item.<br>4. Totals update immediately (no page reload).<br>5. Stock limit prevents quantity > onhand. | Frontend | 3 |
+
+---
+
+## Sprint Metrics
+
+| Metric | Value |
+| :--- | :--- |
+| Total User Stories | 5 |
+| Total Tickets | 6 |
+| Total Story Points | 16 |
+| Total Ticket Effort (man-days) | 22 |
+| Backend Tickets | 1 |
+| Frontend Tickets | 5 |
+
+---
+
+## Dependencies & Notes
+
+- **Blockers:** Story 1.2.1 (backend endpoint) must be completed before Stories 1.2.2 and 1.3.1 can proceed (frontend requires API data)
+- **Architecture Decision:** Cart state managed in frontend (LocalStorage) for MVP; future phases may move to backend sessions
+- **Testing Plan:** Unit tests for cart state logic; API integration tests for `/api/products` endpoint; E2E tests for cart workflow (add → view → edit)
+- **Definition of Done:** All AC met, code reviewed, tests passing, documented API contracts, no console errors
