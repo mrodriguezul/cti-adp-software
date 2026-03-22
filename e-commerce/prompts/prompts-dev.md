@@ -151,6 +151,33 @@ Please output the entire markdown content in a single code block and save it int
 
 ## USER PROMPT 8
 
+@workspace #file:doc/sprints/sprint-1.md #file:doc/tickets.md #file:backend/prisma/schema.prisma
+
+# Role & Context
+You are a Senior TypeScript Engineer strictly following Layered Clean Architecture and Domain-Driven Design (DDD). We are executing **Ticket 1.2.1.1: [Backend] Public Product List Endpoint**.
+
+# Architectural Mapping & Task
+You must split the implementation across our existing folder structure. Do not create new root folders. Apply SOLID, DRY, and KISS principles.
+
+1. **Domain Layer (`backend/src/domain/`):**
+   - Create `repositories/IProductRepository.ts`: Define an interface for fetching paginated products (needs to return active products, total count, and a `hasMore` boolean).
+   - Create `entities/Product.ts` (if necessary for typing the return layer, or just use Prisma types in the infra layer and map to a custom DTO).
+
+2. **Infrastructure Layer (`backend/src/infrastructure/`):**
+   - Create `persistence/PrismaProductRepository.ts`: Implement `IProductRepository` using the Prisma client. It must query the `Stock` (or `lpa_stock`) table where `status='A'`. Apply pagination logic (`skip` and `take`).
+
+3. **Application Layer (`backend/src/application/`):**
+   - Create `use-cases/GetProductsUseCase.ts`: This class should accept `IProductRepository` via dependency injection. It handles the business logic of validating pagination inputs (defaults to page=1, limit=12) and executing the repository call.
+
+4. **Presentation Layer (`backend/src/presentation/`):**
+   - Create `controllers/ProductController.ts`: Handle the Express `Request` and `Response`. Instantiate/inject the use case, extract query parameters, and return the JSON payload.
+   - Create `routes/product.routes.ts`: Define the `GET /api/products` route and bind it to the controller.
+
+# Output
+Output the complete TypeScript code for each file sequentially. Ensure all imports use correct relative paths based on the provided folder structure.
+
+## USER PROMPT 9
+
 @workspace #file:frontend-static/src/main.tsx #file:frontend-static/src/App.tsx #file:frontend-static/src/index.css #file:frontend-static/tailwind.config.ts #file:frontend-static/components.json
 
 # Role & Context
@@ -172,8 +199,6 @@ Migrate the core architectural shell, routing, providers, and global design toke
 
 # Output Format
 Please provide the terminal commands needed to install the core layout dependencies (like `react-router-dom`, `@tanstack/react-query`, `lucide-react`, `tailwindcss-animate`, etc.), followed by a summary of the files you are creating/updating. Use the "Apply in Editor" capability where possible.
-
-## USER PROMPT 9
 
 ## USER PROMPT 10
 
