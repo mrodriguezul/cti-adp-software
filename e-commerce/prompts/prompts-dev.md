@@ -178,6 +178,28 @@ Output the complete TypeScript code for each file sequentially. Ensure all impor
 
 ## USER PROMPT 9
 
+@workspace #file:frontend-static/src/main.tsx #file:frontend-static/src/App.tsx #file:frontend-static/src/index.css #file:frontend-static/tailwind.config.ts #file:frontend-static/components.json
+
+# Role & Context
+You are a Lead Frontend React Architect. Before we build specific feature pages, we need to establish the global App Shell in our active `frontend` directory using the Lovable-generated `frontend-static` directory as our exact blueprint.
+
+# The Task
+Migrate the core architectural shell, routing, providers, and global design tokens from `frontend-static` to our active `frontend` directory.
+
+# Execution Steps:
+1. **Design System & Configs:** - Copy the exact contents of `tailwind.config.ts`, `components.json` (for shadcn/ui), and `tsconfig.json` (specifically the path aliases like `@/*`) from the static folder to the active frontend folder.
+   - Copy the global CSS variables and base styles from `frontend-static/src/index.css` to `frontend/src/index.css`.
+2. **Core Providers & Entry:**
+   - Replicate `frontend-static/src/main.tsx` into the active folder.
+   - Replicate `frontend-static/src/App.tsx`. Ensure `react-router-dom` (BrowserRouter, Routes, Route) and `@tanstack/react-query` (QueryClientProvider) are set up exactly as they are in the static version.
+3. **The Layout Shell:**
+   - Locate the main layout component (usually `src/components/Layout.tsx`, `Navbar.tsx`, or similar) in the static folder and port it over to the active folder. 
+   - Keep all `lucide-react` icons and `shadcn/ui` structural classes intact.
+   - For any placeholder pages in the routes (like `/products`, `/cart`, `/login`), just create dummy placeholder components for now (e.g., `const Products = () => <div>Products Page</div>`). We will build the real ones in the upcoming tickets.
+
+# Output Format
+Please provide the terminal commands needed to install the core layout dependencies (like `react-router-dom`, `@tanstack/react-query`, `lucide-react`, `tailwindcss-animate`, etc.), followed by a summary of the files you are creating/updating. Use the "Apply in Editor" capability where possible.
+
 ## USER PROMPT 10
 
 ## USER PROMPT 11
