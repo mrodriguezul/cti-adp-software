@@ -202,6 +202,23 @@ Please provide the terminal commands needed to install the core layout dependenc
 
 ## USER PROMPT 10
 
+@workspace #file:doc/tickets.md #file:doc/sprints/sprint-1.md #file:doc/phase-1-user-stories.md
+
+# The Task
+Update the Acceptance Criteria and details for **Ticket 1.2.1.2: [Frontend] Product List View** (and its parent User Story 1.2.1) across all attached files to match the finalized UI design.
+
+# Updates to Apply:
+Please add the following explicit UI requirements to the Acceptance Criteria for the Product Card component:
+1. The card must display the product image at the top.
+2. Below the image, display the product `sku` in small, muted text.
+3. Display the product `name` in a bold heading.
+4. Display the product `description`, truncated to 2 lines.
+5. In the footer of the card, display the `price` (bolded) and the `stock` count (e.g., "45 in stock") stacked on the left.
+6. On the right side of the footer, include an "Add to Cart" button containing a cart icon.
+
+# Output Format
+Output the fully updated tables for each file in distinct markdown code blocks so I can apply the changes directly in the editor. Do not alter any other tickets or statuses.
+
 ## USER PROMPT 11
 
 ## USER PROMPT 12

@@ -23,7 +23,7 @@ This document outlines the user stories required to deliver the Minimum Viable P
 
 | Status | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.2.1** | **As a Shopper**, I want to **view a list of all available products** so that I can browse what the store has to offer. | High | 5 | 1. Page displays product grid with Image, Name, and Price.<br>2. Pagination or "Load More" is used for large lists.<br>3. "Out of Stock" items are visually distinct (grayed out) but still visible.<br>4. Only "Active" products are displayed (Admin-disabled items are hidden). |
+| [ ] | **1.2.1** | **As a Shopper**, I want to **view a list of all available products** so that I can browse what the store has to offer. | High | 5 | 1. Page displays product grid (4 cols desktop, 2 mobile).<br>2. Each product card displays: image at top, `sku` in small muted text, `name` as bold heading, `description` truncated to 2 lines.<br>3. Card footer shows: `price` (bolded) and `stock` count (e.g., "45 in stock") stacked on left; "Add to Cart" button with cart icon on right.<br>4. "Out of Stock" items are visually distinct (grayed out) but still visible.<br>5. Only "Active" products are displayed (Admin-disabled items are hidden).<br>6. Pagination or "Load More" is used for large lists. |
 | [ ] | **1.2.2** | **As a Shopper**, I want to **click on a product to see its details** so that I can read the technical specs and check availability. | High | 3 | 1. Clicking a product card opens the Detail View.<br>2. View shows Full Description, Current Stock Level, Price, and "Add to Cart" button.<br>3. Price is clearly formatted (e.g., $999.00).<br>4. Product image gallery displays (if multiple images available). |
 
 ---
