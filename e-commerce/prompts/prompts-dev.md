@@ -221,7 +221,78 @@ Output the fully updated tables for each file in distinct markdown code blocks s
 
 ## USER PROMPT 11
 
+@workspace #file:doc/tickets.md #file:frontend-static/src/pages/Products.tsx #file:frontend-static/src/components/ProductCard.tsx 
+
+# Role & Context
+You are a Senior React/TypeScript Engineer. We are executing **Ticket 1.2.1.2: [Frontend] Product Grid UI**. 
+Our active working directory is `frontend`. The `frontend-static` directory is our static design reference. 
+
+# The Task
+Migrate the Product Catalog UI from `frontend-static` into our active `frontend` directory. Replace the mock data with a real integration to our backend API (`http://localhost:3000/api/products`).
+
+# Strict Frontend Best Practices & Architecture:
+Please implement this using a clean 3-layer separation of concerns:
+
+1. **Service Layer (`frontend/src/services/productService.ts`):**
+   - Create a service function to fetch products. 
+   - It must accept `page` and `limit` parameters.
+   - Define strict TypeScript interfaces for the API Response (matching our backend: `data` array of products, `total`, `hasMore`).
+
+2. **State/Hook Layer (`frontend/src/hooks/useProducts.ts`):**
+   - Use `@tanstack/react-query` (`useQuery`) to manage the fetching state.
+   - Handle loading and error states gracefully.
+
+3. **Presentation Layer (`frontend/src/pages/Products.tsx` & `frontend/src/components/ProductCard.tsx`):**
+   - Copy the visual layout, Tailwind classes, and `shadcn/ui` structure EXACTLY as they appear in the `frontend-static` reference files. Do not change the design.
+   - Map the real API data (e.g., `sku`, `name`, `price`, `description`, `stock`) to the UI.
+   - Add basic pagination controls (Next/Previous buttons) at the bottom of the grid using the `page` state.
+
+# Output Format
+Output the complete TypeScript code for `productService.ts`, `useProducts.ts`, `ProductCard.tsx`, and `Products.tsx` sequentially.
+
 ## USER PROMPT 12
+
+@workspace #file:frontend/src/services/productService.ts #file:frontend/src/hooks/useProducts.ts #file:frontend/src/pages/Products.tsx
+
+# The Problem
+The frontend `productService` is failing because the fetch URL is hardcoded and the backend API response structure is different than expected.
+
+# Real Backend Response:
+{
+    "success": true,
+    "data": {
+        "products": [
+            {
+                "id": 1001,
+                "sku": "SKU-CTI-LAP-1001",
+                "name": "Lenovo ThinkPad E14 Gen 5",
+                "description": "14-inch business laptop...",
+                "price": 1299.99,
+                "onhand": 18,
+                "imageUrl": null
+            }
+        ],
+        "pagination": {
+            "page": 1,
+            "limit": 12,
+            "totalCount": 5,
+            "hasMore": false,
+            "totalPages": 1
+        }
+    }
+}
+
+# The Task
+Refactor the frontend to correctly consume this API.
+
+# Execution Steps:
+1. **Environment Variables:** In `productService.ts`, replace the hardcoded URL with `import.meta.env.VITE_API_URL`. Ensure the fetch URL is properly constructed (e.g., `${import.meta.env.VITE_API_URL}/products?page=${page}&limit=${limit}`).
+2. **TypeScript Interfaces:** Update `ProductsApiResponse` in the service to perfectly match the nested JSON structure above (`success`, `data.products`, `data.pagination`).
+3. **Data Mapping:** In `fetchProducts`, extract the array from the JSON response (`json.data.products`). Make sure to map the backend's `onhand` property to the specific stock property that the `ProductCard` UI component expects.
+4. **Update Hook:** Ensure `useProducts.ts` extracts the data correctly from the new service return type so `Products.tsx` can render the grid without throwing an undefined error.
+
+# Output Format
+Output the complete, updated code for `productService.ts` and `useProducts.ts`.
 
 ## USER PROMPT 13
 
