@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingCart, Check } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import defaultProductImage from "@/assets/default-product.png";
 
 interface ProductCardProps {
   product: Product;
@@ -24,7 +25,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-lg">
       <Link to={`/products/${product.id}`} className="aspect-square overflow-hidden bg-muted">
         <img
-          src={product.image_url}
+          src={product.image_url || defaultProductImage}
           alt={product.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"

@@ -42,8 +42,8 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.2.1.1** | **[Backend] Public Product List Endpoint** | **Desc:** Create `GET /api/products` endpoint.<br>**AC:**<br>1. Returns JSON array of products from `lpa_stock`.<br>2. Supports pagination: `?page=1&limit=12`.<br>3. Returns only Active products (status='A').<br>4. Each product includes: id, sku, name, price, onhand, image_url.<br>5. Returns count and hasMore for pagination. | 3 | Backend | `API` |
-| [ ] | **1.2.1.2** | **[Frontend] Product Grid UI** | **Desc:** Build responsive product grid component.<br>**AC:**<br>1. Displays products in responsive grid (4 cols desktop, 2 mobile).<br>2. Each card shows: image, name, price, stock status.<br>3. Out-of-stock items grayed out but visible.<br>4. Pagination buttons or "Load More".<br>5. Loading state displayed during fetch. | 5 | Frontend | `UI` |
+| [x] | **1.2.1.1** | **[Backend] Public Product List Endpoint** | **Desc:** Create `GET /api/products` endpoint.<br>**AC:**<br>1. Returns JSON array of products from `lpa_stock`.<br>2. Supports pagination: `?page=1&limit=12`.<br>3. Returns only Active products (status='A').<br>4. Each product includes: id, sku, name, description, price, onhand, image_url.<br>5. Returns count and hasMore for pagination. | 3 | Backend | `API` |
+| [x] | **1.2.1.2** | **[Frontend] Product Grid UI** | **Desc:** Build responsive product grid component.<br>**AC:**<br>1. Displays products in responsive grid (4 cols desktop, 2 mobile).<br>2. Each product card displays product image at the top.<br>3. Below image: product `sku` in small, muted text.<br>4. Product `name` displayed as bold heading.<br>5. Product `description` truncated to 2 lines.<br>6. Card footer: `price` (bolded) and `stock` count (e.g., "45 in stock") stacked on the left; "Add to Cart" button with cart icon on the right.<br>7. Out-of-stock items grayed out but visible.<br>8. Pagination buttons or "Load More".<br>9. Loading state displayed during fetch. | 5 | Frontend | `UI` |
 
 ---
 

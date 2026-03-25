@@ -1,6 +1,6 @@
 # PROMPTS
 
-E-commerce website LPA Ecomms - Dev
+E-commerce website LPA Ecomms - General configurations
 
 ## USER PROMPT 1
 
@@ -148,66 +148,3 @@ Extract ONLY the following User Stories and their associated implementation tick
 5. **Data Accuracy:** Copy the exact wording, IDs, and point estimations directly from the source files. Do not summarize or alter the technical details.
 
 Please output the entire markdown content in a single code block and save it into my new `sprint-1.md` file.
-
-## USER PROMPT 8
-
-@workspace #file:doc/sprints/sprint-1.md #file:doc/tickets.md #file:backend/prisma/schema.prisma
-
-# Role & Context
-You are a Senior TypeScript Engineer strictly following Layered Clean Architecture and Domain-Driven Design (DDD). We are executing **Ticket 1.2.1.1: [Backend] Public Product List Endpoint**.
-
-# Architectural Mapping & Task
-You must split the implementation across our existing folder structure. Do not create new root folders. Apply SOLID, DRY, and KISS principles.
-
-1. **Domain Layer (`backend/src/domain/`):**
-   - Create `repositories/IProductRepository.ts`: Define an interface for fetching paginated products (needs to return active products, total count, and a `hasMore` boolean).
-   - Create `entities/Product.ts` (if necessary for typing the return layer, or just use Prisma types in the infra layer and map to a custom DTO).
-
-2. **Infrastructure Layer (`backend/src/infrastructure/`):**
-   - Create `persistence/PrismaProductRepository.ts`: Implement `IProductRepository` using the Prisma client. It must query the `Stock` (or `lpa_stock`) table where `status='A'`. Apply pagination logic (`skip` and `take`).
-
-3. **Application Layer (`backend/src/application/`):**
-   - Create `use-cases/GetProductsUseCase.ts`: This class should accept `IProductRepository` via dependency injection. It handles the business logic of validating pagination inputs (defaults to page=1, limit=12) and executing the repository call.
-
-4. **Presentation Layer (`backend/src/presentation/`):**
-   - Create `controllers/ProductController.ts`: Handle the Express `Request` and `Response`. Instantiate/inject the use case, extract query parameters, and return the JSON payload.
-   - Create `routes/product.routes.ts`: Define the `GET /api/products` route and bind it to the controller.
-
-# Output
-Output the complete TypeScript code for each file sequentially. Ensure all imports use correct relative paths based on the provided folder structure.
-
-## USER PROMPT 9
-
-@workspace #file:frontend-static/src/main.tsx #file:frontend-static/src/App.tsx #file:frontend-static/src/index.css #file:frontend-static/tailwind.config.ts #file:frontend-static/components.json
-
-# Role & Context
-You are a Lead Frontend React Architect. Before we build specific feature pages, we need to establish the global App Shell in our active `frontend` directory using the Lovable-generated `frontend-static` directory as our exact blueprint.
-
-# The Task
-Migrate the core architectural shell, routing, providers, and global design tokens from `frontend-static` to our active `frontend` directory.
-
-# Execution Steps:
-1. **Design System & Configs:** - Copy the exact contents of `tailwind.config.ts`, `components.json` (for shadcn/ui), and `tsconfig.json` (specifically the path aliases like `@/*`) from the static folder to the active frontend folder.
-   - Copy the global CSS variables and base styles from `frontend-static/src/index.css` to `frontend/src/index.css`.
-2. **Core Providers & Entry:**
-   - Replicate `frontend-static/src/main.tsx` into the active folder.
-   - Replicate `frontend-static/src/App.tsx`. Ensure `react-router-dom` (BrowserRouter, Routes, Route) and `@tanstack/react-query` (QueryClientProvider) are set up exactly as they are in the static version.
-3. **The Layout Shell:**
-   - Locate the main layout component (usually `src/components/Layout.tsx`, `Navbar.tsx`, or similar) in the static folder and port it over to the active folder. 
-   - Keep all `lucide-react` icons and `shadcn/ui` structural classes intact.
-   - For any placeholder pages in the routes (like `/products`, `/cart`, `/login`), just create dummy placeholder components for now (e.g., `const Products = () => <div>Products Page</div>`). We will build the real ones in the upcoming tickets.
-
-# Output Format
-Please provide the terminal commands needed to install the core layout dependencies (like `react-router-dom`, `@tanstack/react-query`, `lucide-react`, `tailwindcss-animate`, etc.), followed by a summary of the files you are creating/updating. Use the "Apply in Editor" capability where possible.
-
-## USER PROMPT 10
-
-## USER PROMPT 11
-
-## USER PROMPT 12
-
-## USER PROMPT 13
-
-## USER PROMPT 14
-
-## USER PROMPT 15
