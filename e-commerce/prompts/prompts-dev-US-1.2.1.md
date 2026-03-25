@@ -193,3 +193,25 @@ Generate comprehensive Jest unit tests for the Application and Presentation laye
 Please output the complete TypeScript code for both `GetProductsUseCase.test.ts` and `ProductController.test.ts` sequentially.
 
 ## USER PROMPT 8
+
+@workspace #file:frontend/src/pages/Products.tsx #file:frontend/src/components/ProductCard.tsx #file:frontend/src/hooks/useProducts.ts
+
+# Role & Context
+You are a Lead Frontend SDET. We need to write enterprise-grade unit and integration tests for our Product List feature using React Testing Library and Vitest/Jest.
+
+# The Task
+Generate test files for `ProductCard.tsx` and `Products.tsx` using the co-location standard (e.g., `ProductCard.test.tsx` in the same directory).
+
+# Strict Testing Standards (Arrange-Act-Assert):
+1. **`ProductCard.test.tsx`:**
+   - **Test 1:** Render a mock product and assert that the title, price, SKU, and stock count are visible in the document.
+   - **Test 2:** Render a product with `imageUrl: null` and assert that the fallback default image is used in the `src` attribute.
+
+2. **`Products.test.tsx`:**
+   - **Important:** Mock the `useProducts` hook so we don't make real API calls or need a `QueryClientProvider` wrapper for these specific UI tests.
+   - **Test 1 (Loading):** Mock the hook to return `{ isLoading: true }`. Assert that a loading skeleton, spinner, or "Loading..." text is visible.
+   - **Test 2 (Error):** Mock the hook to return `{ isError: true, error: new Error('Network failed') }`. Assert that the error message is rendered.
+   - **Test 3 (Success):** Mock the hook to return `{ data: mockProductsArray, isLoading: false }`. Assert that the correct number of `ProductCard` elements are rendered on the screen.
+
+# Output Format
+Please output the complete TypeScript code for `ProductCard.test.tsx` and `Products.test.tsx` sequentially.
