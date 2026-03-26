@@ -23,7 +23,28 @@ Output the fully updated tables for each file in distinct markdown code blocks s
 
 ## USER PROMPT 2
 
+@workspace #file:backend/src/domain/repositories/IProductRepository.ts #file:backend/src/infrastructure/persistence/PrismaProductRepository.ts #file:backend/src/presentation/controllers/ProductController.ts #file:backend/src/presentation/routes/product.routes.ts
+
+# Role & Context
+You are a Senior TypeScript Engineer. We need to validate and implement the backend endpoint for a Single Product Detail View (Ticket 1.2.2.1) following our established Layered Clean Architecture.
+
+# The Task
+Implement a `GET /api/products/:id` endpoint. 
+
+# Execution Steps by Layer:
+1. **Domain (`IProductRepository.ts`):** - Add a method signature: `findById(id: number): Promise<Product | null>;`
+2. **Infrastructure (`PrismaProductRepository.ts`):** - Implement `findById` using Prisma. Ensure it fetches the product where `id` matches and `status='A'`.
+3. **Application (`backend/src/application/use-cases/GetProductByIdUseCase.ts`):** - Create this new use case file. It should take the `IProductRepository` via dependency injection, accept an `id`, and throw a 404-style error (or return null) if the product is not found.
+4. **Presentation (`ProductController.ts` & `product.routes.ts`):**
+   - Add a `getProductById` method to the controller that extracts the `id` from `req.params`, parses it to a number, calls the use case, and returns the product or a 404 status.
+   - Register the `GET /products/:id` route in your routes file.
+
+# Output Format
+Please output the updated code for `IProductRepository.ts`, `PrismaProductRepository.ts`, the new `GetProductByIdUseCase.ts`, `ProductController.ts`, and `product.routes.ts` sequentially.
+
 ## USER PROMPT 3
+
+
 
 ## USER PROMPT 4
 
