@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { Request, Response, NextFunction } from 'express';
 import { ProductController } from './ProductController';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';
+import { GetProductByIdUseCase, ProductNotFoundError } from '../../application/use-cases/GetProductByIdUseCase';
 import { ProductListResult, ProductData } from '../../domain/repositories/IProductRepository';
 import { z } from 'zod';
 
@@ -13,10 +14,15 @@ type MockResponse = {
 
 type MockRequest = {
   query: Record<string, string | undefined>;
+  params: Record<string, string>;
 };
 
-const createMockRequest = (query: Record<string, string | undefined> = {}): MockRequest => ({
-  query
+const createMockRequest = (
+  query: Record<string, string | undefined> = {},
+  params: Record<string, string> = {}
+): MockRequest => ({
+  query,
+  params
 });
 
 const createMockResponse = (): MockResponse => {
@@ -32,17 +38,22 @@ const createMockNextFunction = (): jest.Mock => jest.fn();
 describe('ProductController', () => {
   let controller: ProductController;
   let mockGetProductsUseCase: jest.Mocked<GetProductsUseCase>;
+  let mockGetProductByIdUseCase: jest.Mocked<GetProductByIdUseCase>;
   let mockRequest: MockRequest;
   let mockResponse: MockResponse;
   let mockNext: jest.Mock;
 
   beforeEach(() => {
-    // Create a mock use case with jest.fn() for execute method
+    // Create mock use cases with jest.fn() for execute method
     mockGetProductsUseCase = {
       execute: jest.fn()
     } as any;
 
-    controller = new ProductController(mockGetProductsUseCase);
+    mockGetProductByIdUseCase = {
+      execute: jest.fn()
+    } as any;
+
+    controller = new ProductController(mockGetProductsUseCase, mockGetProductByIdUseCase);
     mockRequest = createMockRequest();
     mockResponse = createMockResponse();
     mockNext = createMockNextFunction();
@@ -527,6 +538,284 @@ describe('ProductController', () => {
         page: 2, // Should be parsed as integer (2.9 -> 2)
         limit: 12
       });
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('getProductById', () => {
+    it('should return 200 OK with product data when a valid id is provided and use case succeeds', async () => {
+      // Arrange
+      const mockProduct: ProductData = {
+        id: 1,
+        sku: 'PROD-001',
+        name: 'Test Product',
+        description: 'Test description',
+        price: 99.99,
+        onhand: 50,
+        imageUrl: 'https://example.com/image.jpg'
+      };
+
+      mockRequest.params = { id: '1' };
+      mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledWith({ id: 1 });
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          product: mockProduct
+        }
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should return 404 Not Found when use case throws ProductNotFoundError', async () => {
+      // Arrange
+      mockRequest.params = { id: '999' };
+      const notFoundError = new ProductNotFoundError(999);
+
+      mockGetProductByIdUseCase.execute.mockRejectedValue(notFoundError);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledWith({ id: 999 });
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Product with id 999 not found',
+        code: 'PRODUCT_NOT_FOUND'
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 Bad Request when id is not a valid number', async () => {
+      // Arrange
+      mockRequest.params = { id: 'abc' };
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Invalid product ID. Must be a positive integer.',
+        code: 'INVALID_ID'
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 Bad Request when id is zero', async () => {
+      // Arrange
+      mockRequest.params = { id: '0' };
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Invalid product ID. Must be a positive integer.',
+        code: 'INVALID_ID'
+      });
+    });
+
+    it('should return 400 Bad Request when id is negative', async () => {
+      // Arrange
+      mockRequest.params = { id: '-5' };
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+    });
+
+    it('should pass unexpected errors to error handling middleware', async () => {
+      // Arrange
+      mockRequest.params = { id: '1' };
+      const internalError = new Error('Database connection failed');
+
+      mockGetProductByIdUseCase.execute.mockRejectedValue(internalError);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(mockNext).toHaveBeenCalledWith(internalError);
+      expect(mockResponse.status).not.toHaveBeenCalled();
+      expect(mockResponse.json).not.toHaveBeenCalled();
+    });
+
+    it('should handle ZodError from use case and return 400 Bad Request with validation details', async () => {
+      // Arrange
+      mockRequest.params = { id: '1' };
+
+      const zodError = new z.ZodError([
+        {
+          code: 'too_small',
+          minimum: 1,
+          type: 'number',
+          inclusive: true,
+          exact: false,
+          message: 'Number must be greater than or equal to 1',
+          path: ['id']
+        }
+      ]);
+
+      mockGetProductByIdUseCase.execute.mockRejectedValue(zodError);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledTimes(1);
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Validation failed',
+        details: zodError.errors,
+        code: 'VALIDATION_ERROR'
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should correctly parse string id to number', async () => {
+      // Arrange
+      const mockProduct: ProductData = {
+        id: 42,
+        sku: 'PROD-042',
+        name: 'Product 42',
+        description: 'Test',
+        price: 49.99,
+        onhand: 10,
+        imageUrl: null
+      };
+
+      mockRequest.params = { id: '42' };
+      mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledWith({ id: 42 });
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should handle decimal values in id parameter by parsing as integer', async () => {
+      // Arrange
+      mockRequest.params = { id: '5.9' };
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      // parseInt('5.9', 10) returns 5, which should be valid
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledWith({ id: 5 });
+    });
+
+    it('should return 200 OK with product data including null fields', async () => {
+      // Arrange
+      const mockProduct: ProductData = {
+        id: 5,
+        sku: 'PROD-005',
+        name: 'Product Without Image',
+        description: null,
+        price: 29.99,
+        onhand: 0,
+        imageUrl: null
+      };
+
+      mockRequest.params = { id: '5' };
+      mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          product: mockProduct
+        }
+      });
+    });
+
+    it('should handle large product ids correctly', async () => {
+      // Arrange
+      const mockProduct: ProductData = {
+        id: 999999,
+        sku: 'PROD-999999',
+        name: 'Product Large ID',
+        description: 'Test',
+        price: 199.99,
+        onhand: 100,
+        imageUrl: 'https://example.com/image.jpg'
+      };
+
+      mockRequest.params = { id: '999999' };
+      mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
+
+      // Act
+      await controller.getProductById(
+        mockRequest as Request,
+        mockResponse as any as Response,
+        mockNext as NextFunction
+      );
+
+      // Assert
+      expect(mockGetProductByIdUseCase.execute).toHaveBeenCalledWith({ id: 999999 });
       expect(mockResponse.status).toHaveBeenCalledWith(200);
     });
   });

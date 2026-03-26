@@ -12,6 +12,10 @@ class MockProductRepository implements IProductRepository {
   async findActiveProducts(params: { page: number; limit: number }): Promise<ProductListResult> {
     throw new Error('Method not implemented - should be mocked in tests');
   }
+
+  async findById(id: number): Promise<ProductData | null> {
+    throw new Error('Method not implemented - should be mocked in tests');
+  }
 }
 
 describe('GetProductsUseCase', () => {

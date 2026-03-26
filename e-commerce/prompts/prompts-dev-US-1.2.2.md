@@ -44,7 +44,30 @@ Please output the updated code for `IProductRepository.ts`, `PrismaProductReposi
 
 ## USER PROMPT 3
 
+@workspace #file:backend/src/application/use-cases/GetProductByIdUseCase.ts #file:backend/src/presentation/controllers/ProductController.ts #file:backend/src/presentation/controllers/ProductController.test.ts
 
+# Role & Context
+You are a Lead Backend SDET. We just implemented the Single Product Detail endpoint (Ticket 1.2.2.1) and need to write the corresponding unit tests following our co-located Jest testing standards.
+
+# The Task
+1. Create a new test file for the Use Case: `backend/src/application/use-cases/GetProductByIdUseCase.test.ts`.
+2. Update the existing Controller test file: `backend/src/presentation/controllers/ProductController.test.ts` to include a new `describe` block for `getProductById`.
+
+# Strict Testing Standards (Arrange-Act-Assert):
+1. **`GetProductByIdUseCase.test.ts`:**
+   - Mock `IProductRepository`.
+   - **Test 1:** Should return the product when a valid `id` is provided and the repository finds it.
+   - **Test 2:** Should return `null` (or throw a 404 error, depending on the implementation) when the repository does not find the product.
+
+2. **`ProductController.test.ts` (Additions):**
+   - Mock the Express `Request` and `Response` objects.
+   - **Test 1:** Should return `200 OK` and the product JSON when a valid `req.params.id` is provided and the use case succeeds.
+   - **Test 2:** Should return `404 Not Found` when the use case cannot find the product.
+   - **Test 3:** Should return `400 Bad Request` if `req.params.id` is not a valid number (e.g., a string like "abc").
+   - **Test 4:** Should return `500 Internal Server Error` if the use case throws an unexpected exception.
+
+# Output Format
+Output the complete TypeScript code for `GetProductByIdUseCase.test.ts`, followed by the fully updated `ProductController.test.ts` file.
 
 ## USER PROMPT 4
 
