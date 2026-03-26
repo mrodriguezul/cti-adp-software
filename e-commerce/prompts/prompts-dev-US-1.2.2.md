@@ -71,4 +71,78 @@ Output the complete TypeScript code for `GetProductByIdUseCase.test.ts`, followe
 
 ## USER PROMPT 4
 
+@workspace #file:doc/tickets.md #file:frontend-static/src/pages/ProductDetails.tsx #file:frontend/src/services/productService.ts 
+
+# Role & Context
+You are a Lead Frontend React Architect. We are executing **Ticket 1.2.2.1: [Frontend] Product Detail Page**.
+We must strictly follow our established 3-layer architecture and utilize our existing design system (`shadcn/ui` and `lucide-react`).
+
+# API Response Structure (Reference):
+```json
+{
+  "success": true,
+  "data": {
+    "product": {
+      "id": 1001,
+      "sku": "SKU-CTI-LAP-1001",
+      "name": "Lenovo ThinkPad E14 Gen 5",
+      "description": "14-inch business laptop...",
+      "price": 1299.99,
+      "onhand": 18,
+      "imageUrl": null
+    }
+  }
+}
+```
+# Execution Steps:
+
+1. **Service Layer (`frontend/src/services/productService.ts`):**
+   - Add a new function `fetchProductById(id: string | number)`.
+   - Make a GET request to `${import.meta.env.VITE_API_URL}/products/${id}`.
+   - Accurately extract and return the single product from the JSON payload (it will be nested under `json.data.product`).
+
+2. **Hook Layer (`frontend/src/hooks/useProduct.ts`):**
+   - Create this new file.
+   - Use `@tanstack/react-query` (`useQuery`) to fetch the product by ID. 
+   - The query key must include the `id` (e.g., `queryKey: ['product', id]`).
+
+3. **Presentation Layer (`frontend/src/pages/ProductDetails.tsx`):**
+   - Use `useParams` from `react-router-dom` to extract the `id` from the URL.
+   - **UI Components:** You MUST use the existing components from our library via path aliases (e.g., `import { Button } from "@/components/ui/button"`, `import { Input } from "@/components/ui/input"`). Do not use raw HTML buttons or inputs.
+   - **Icons:** Use `lucide-react` for the back arrow and the shopping cart icon.
+   - **Image Fallback:** Import `defaultProductImage` from `@/assets/default-product.jpg` (or `.png`) and use it as a fallback if `product.imageUrl` is falsy.
+   - **Layout & AC:** Replicate the visual layout from the `frontend-static` reference.
+     - Add a `Link` component for "<- Back to Products".
+     - Two-column layout (image left, details right) on desktop.
+     - Map `product.sku` (muted text), `product.name` (bold heading), and `product.description`.
+     - Map `product.price` and `product.onhand` (format as "X in stock").
+     - Include a "Qty" label with a controlled `Input` field (type="number", min="1", default "1").
+     - Include the "Add to Cart" `Button`.
+   - Handle `isLoading` and `isError` gracefully.
+
+# Output Format
+Output the updated `productService.ts`, the new `useProduct.ts`, and the new `ProductDetails.tsx` sequentially.
+
 ## USER PROMPT 5
+
+@workspace #file:frontend/src/pages/ProductDetails.tsx #file:frontend/src/hooks/useProduct.ts
+
+# Role & Context
+You are a Lead Frontend SDET. We have just completed Ticket 1.2.2.1 (Product Detail Page) and need to write enterprise-grade unit and integration tests using React Testing Library and Vitest.
+
+# The Task
+Generate the test file `frontend/src/pages/ProductDetails.test.tsx` using the co-location standard.
+
+# Strict Testing Standards (Arrange-Act-Assert):
+1. **Mocking Dependencies:**
+   - Mock the `useProduct` hook so we can strictly control the loading, error, and success states without making real API calls.
+   - You MUST wrap the `ProductDetails` component in a `<MemoryRouter>` during the `render` step, otherwise the `<Link>` component and `useParams` hook will throw errors.
+
+2. **Test Cases (`ProductDetails.test.tsx`):**
+   - **Test 1 (Loading State):** Mock `useProduct` to return `{ isLoading: true }`. Assert that the loading indicator or text is visible in the document.
+   - **Test 2 (Error State):** Mock `useProduct` to return `{ isError: true, error: new Error('Network failed') }`. Assert that the error message is rendered.
+   - **Test 3 (Success State):** Mock `useProduct` to return `{ data: mockProduct, isLoading: false, isError: false }`. Provide a robust `mockProduct` object. Assert that the product name, SKU, price, description, and "Add to Cart" button are successfully rendered on the screen.
+   - **Test 4 (Image Fallback):** Mock `useProduct` to return a product where `imageUrl` is `null`. Assert that the rendered `<img>` tag uses the default fallback image in its `src` attribute.
+
+# Output Format
+Please output the complete TypeScript code for `ProductDetails.test.tsx`.
