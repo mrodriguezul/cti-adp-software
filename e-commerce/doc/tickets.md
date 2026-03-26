@@ -52,7 +52,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.2.2.1** | **[Frontend] Product Detail Page** | **Desc:** Build single product detail page (`/product/:id`).<br>**AC:**<br>1. Fetches product data from `GET /api/products/:id`.<br>2. Displays: image gallery, name, description, price, stock level.<br>3. "Add to Cart" button visible and functional.<br>4. Breadcrumb navigation back to listing.<br>5. Loading and error states handled. | 3 | Frontend | `UI` |
+| [x] | **1.2.2.1** | **[Frontend] Product Detail Page** | **Desc:** Build single product detail page (`/product/:id`).<br>**AC:**<br>1. Include a "<- Back to Products" navigation link at the top of the page.<br>2. Implement a two-column layout for desktop screens.<br>3. Left Column: Display a large, rounded product image.<br>4. Right Column (Top): Display the product `sku` in small muted text, followed by the `name` as a large bold heading, and then the `description`.<br>5. Right Column (Pricing): Display the `price` prominently, with the `stock` count (e.g., "X in stock") stacked below it in muted text.<br>6. Right Column (Actions): Include a "Qty" label and a number input field (defaulting to 1), positioned next to a primary "Add to Cart" button that features a shopping cart icon.<br>7. Fetches product data from `GET /api/products/:id`.<br>8. Loading and error states handled. | 3 | Frontend | `UI` |
 
 ---
 

@@ -61,4 +61,34 @@ export class PrismaProductRepository implements IProductRepository {
       hasMore
     };
   }
+
+  async findById(id: number): Promise<ProductData | null> {
+    const stock = await this.prisma.stock.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        sku: true,
+        name: true,
+        description: true,
+        price: true,
+        onhand: true,
+        imageUrl: true,
+        status: true
+      }
+    });
+
+    if (!stock || stock.status !== 'A') {
+      return null;
+    }
+
+    return {
+      id: stock.id,
+      sku: stock.sku,
+      name: stock.name,
+      description: stock.description,
+      price: Number(stock.price),
+      onhand: stock.onhand,
+      imageUrl: stock.imageUrl
+    };
+  }
 }

@@ -21,4 +21,5 @@ export interface ProductListResult {
 
 export interface IProductRepository {
   findActiveProducts(params: PaginationParams): Promise<ProductListResult>;
+  findById(id: number): Promise<ProductData | null>;
 }

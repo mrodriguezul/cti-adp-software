@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase.js';
+import { GetProductByIdUseCase, ProductNotFoundError } from '../../application/use-cases/GetProductByIdUseCase.js';
 
 export class ProductController {
-  constructor(private readonly getProductsUseCase: GetProductsUseCase) {}
+  constructor(
+    private readonly getProductsUseCase: GetProductsUseCase,
+    private readonly getProductByIdUseCase: GetProductByIdUseCase
+  ) {}
 
   public getProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -46,6 +50,55 @@ export class ProductController {
         }
       });
     } catch (error) {
+      // Handle validation errors
+      if (error instanceof z.ZodError) {
+        res.status(400).json({
+          error: 'Validation failed',
+          details: error.errors,
+          code: 'VALIDATION_ERROR'
+        });
+        return;
+      }
+
+      // Pass other errors to error handling middleware
+      next(error);
+    }
+  };
+
+  public getProductById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // Extract and parse id from route parameters
+      const id = parseInt(req.params.id, 10);
+
+      // Validate id
+      if (isNaN(id) || id < 1) {
+        res.status(400).json({
+          error: 'Invalid product ID. Must be a positive integer.',
+          code: 'INVALID_ID'
+        });
+        return;
+      }
+
+      // Execute use case
+      const product = await this.getProductByIdUseCase.execute({ id });
+
+      // Return successful response
+      res.status(200).json({
+        success: true,
+        data: {
+          product
+        }
+      });
+    } catch (error) {
+      // Handle product not found
+      if (error instanceof ProductNotFoundError) {
+        res.status(404).json({
+          error: error.message,
+          code: 'PRODUCT_NOT_FOUND'
+        });
+        return;
+      }
+
       // Handle validation errors
       if (error instanceof z.ZodError) {
         res.status(400).json({

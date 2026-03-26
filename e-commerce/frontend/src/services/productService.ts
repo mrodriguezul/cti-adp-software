@@ -83,7 +83,7 @@ export async function fetchProducts(
  * @param id - Product ID
  * @returns Promise with product data or null if not found
  */
-export async function fetchProductById(id: number): Promise<Product | null> {
+export async function fetchProductById(id: string | number): Promise<Product | null> {
   // @ts-ignore - import.meta.env is provided by Vite
   const apiUrl = (import.meta as any).env.VITE_API_URL || "http://localhost:3000/api";
   const response = await fetch(`${apiUrl}/products/${id}`);
@@ -98,15 +98,17 @@ export async function fetchProductById(id: number): Promise<Product | null> {
   const json = await response.json();
 
   // Map backend response to frontend Product type
-  if (json.success && json.data) {
+  // Extract product from json.data.product nested structure
+  if (json.success && json.data && json.data.product) {
+    const backendProduct = json.data.product;
     return {
-      id: json.data.id,
-      sku: json.data.sku,
-      name: json.data.name,
-      description: json.data.description,
-      price: json.data.price,
-      onhand: json.data.onhand,
-      image_url: json.data.imageUrl,
+      id: backendProduct.id,
+      sku: backendProduct.sku,
+      name: backendProduct.name,
+      description: backendProduct.description,
+      price: backendProduct.price,
+      onhand: backendProduct.onhand,
+      image_url: backendProduct.imageUrl || "",
     };
   }
 
