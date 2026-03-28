@@ -61,7 +61,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.1.1** | **[Frontend] Cart State Management** | **Desc:** Build global cart state using Context API or Redux.<br>**AC:**<br>1. Cart stores: itemId, quantity, price snapshot.<br>2. `addToCart(itemId, qty)` function prevents qty > stock.<br>3. Cart persists across page navigation (LocalStorage).<br>4. Cart persists on page refresh.<br>5. Events trigger for cart updates (e.g., navbar counter). | 5 | Frontend | `State` `Logic` |
+| [x] | **1.3.1.1** | **[Frontend] Cart State Management** | **Desc:** Build global cart state using Context API or Redux.<br>**AC:**<br>1. Cart stores: itemId, quantity, price snapshot.<br>2. `addToCart(itemId, qty)` function prevents qty > stock.<br>3. Cart persists across page navigation (LocalStorage).<br>4. Cart persists on page refresh.<br>5. Events trigger for cart updates (e.g., navbar counter). | 5 | Frontend | `State` `Logic` |
 
 ---
 
