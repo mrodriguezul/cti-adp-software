@@ -70,7 +70,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.2.1** | **[Frontend] Shopping Cart Page** | **Desc:** Build cart review page (`/cart`).<br>**AC:**<br>1. Lists all cart items: thumbnail, name, unit price, quantity, subtotal.<br>2. Displays Subtotal, Estimated Tax (if enabled), Grand Total.<br>3. Empty cart shows message with "Continue Shopping" button.<br>4. "Checkout" button accessible and functional.<br>5. Cart counter in navbar shows current item count. | 3 | Frontend | `UI` |
+| [ ] | **1.3.2.1** | **[Frontend] Shopping Cart Page** | **Desc:** Build cart review page (`/cart`).<br>**AC:**<br>1. Render a table-style layout with headers: Product, Price, Qty, Amount.<br>2. Product Column: Display a rounded thumbnail image, the product name, and the product `sku` positioned underneath the name in small, muted text.<br>3. Interactive Controls: Display a number input field for the Quantity, and a red trash can icon on the far right of the row for item removal.<br>4. Totals: Calculate and display the row "Amount" (Price * Qty) in bold. At the bottom of the list, display a single "Total" row with the final sum.<br>5. Primary Action: Render a right-aligned "Proceed to Checkout" primary button featuring a right-arrow icon below the cart total.<br>6. Empty State: If the cart is empty, display a friendly message with a "Continue Shopping" button. | 3 | Frontend | `UI` |
 
 ---
 
