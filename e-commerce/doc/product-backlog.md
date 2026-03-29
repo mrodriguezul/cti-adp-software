@@ -20,11 +20,11 @@ The backlog is ordered based on the **"Dependency & Value Chain"** method:
 | [ ] | **1** | **1.1.3** | **Password Encryption** | MVP | IAM | Critical | 3 | **Risk & Foundation:** Security is a hard constraint for data protection (GDPR compliance). Implementation must precede all other auth features. |
 | [ ] | **2** | **1.1.1** | **Register Account** | MVP | IAM | High | 5 | **Dependency:** Checkout requires registered users. Early user data capture enables personalization and repeat purchases. |
 | [ ] | **3** | **1.1.2** | **Login** | MVP | IAM | High | 3 | **Dependency:** Prerequisite for cart persistence, order history, and profile management. Unblocks all member-only features. |
-| [ ] | **4** | **1.2.1** | **View Product List** | MVP | Catalog | Critical | 5 | **User Impact:** The primary entry point. If customers cannot see products, the site has no value and users bounce immediately. |
-| [ ] | **5** | **1.2.2** | **Product Detail View** | MVP | Catalog | High | 3 | **User Impact:** Essential for informed purchasing. Customers need full specs, images, and availability to decide whether to buy. |
-| [ ] | **6** | **1.3.1** | **Add to Cart** | MVP | Cart | High | 3 | **Business Value:** Captures purchase intent. First step of conversion funnel; directly impacts revenue. |
-| [ ] | **7** | **1.3.2** | **View Cart** | MVP | Cart | High | 2 | **UX & Compliance:** Users need to review items, verify pricing, and see totals before committing. Reduces checkout friction. |
-| [ ] | **8** | **1.3.3** | **Edit Cart Items** | MVP | Cart | Medium | 3 | **UX:** Allows quantity adjustments and item removal without re-browsing. Essential for cart flexibility and conversion. |
+| [x] | **4** | **1.2.1** | **View Product List** | MVP | Catalog | Critical | 5 | **User Impact:** The primary entry point. If customers cannot see products, the site has no value and users bounce immediately. |
+| [x] | **5** | **1.2.2** | **Product Detail View** | MVP | Catalog | High | 3 | **User Impact:** Essential for informed purchasing. Customers need full specs, images, and availability to decide whether to buy. |
+| [x] | **6** | **1.3.1** | **Add to Cart** | MVP | Cart | High | 3 | **Business Value:** Captures purchase intent. First step of conversion funnel; directly impacts revenue. |
+| [x] | **7** | **1.3.2** | **View Cart** | MVP | Cart | High | 2 | **UX & Compliance:** Users need to review items, verify pricing, and see totals before committing. Reduces checkout friction. |
+| [x] | **8** | **1.3.3** | **Edit Cart Items** | MVP | Cart | Medium | 3 | **UX:** Allows quantity adjustments and item removal without re-browsing. Essential for cart flexibility and conversion. |
 | [ ] | **9** | **1.4.1** | **Checkout: Shipping Address** | MVP | Checkout | High | 3 | **Business Value:** Captures critical fulfillment data. Essential for invoice creation and order delivery. |
 | [ ] | **10** | **1.4.2** | **Simulate Payment** | MVP | Checkout | Critical | 5 | **Risk & Revenue:** High technical complexity (payment gateway integration). Must validate early to ensure transaction processing works under load. |
 | [ ] | **11** | **1.4.3** | **Order Review** | MVP | Checkout | High | 3 | **UX & Risk:** Final verification step prevents accidental orders and builds customer confidence. Reduces disputes/cancellations. |
