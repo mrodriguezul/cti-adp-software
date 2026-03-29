@@ -14,7 +14,7 @@ Build secure user registration, login, and authentication flows, enabling custom
 | :---: | :--- | :--- | :--- | :--- |
 | [ ] | **1.1.1** | **As a New Visitor**, I want to **register for an account** so that I can buy items and track my orders later. | High | 5 |
 | [ ] | **1.1.2** | **As a Registered Customer**, I want to **log in with my credentials** so that I can access my saved details and complete purchases. | High | 3 |
-| [ ] | **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 |
+| [x] | **1.1.3** | **As a Security-Conscious User**, I want my **password to be hidden and encrypted** so that my account is safe even if the database is leaked. | High | 3 |
 | [ ] | **1.1.4** | **As a Guest Shopper**, I want to **add items to my cart and browse without logging in** so that I can make a quick purchase. | High | 5 |
 
 ---
@@ -23,7 +23,7 @@ Build secure user registration, login, and authentication flows, enabling custom
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Domain | Effort |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.1.3.1** | **[Backend] Setup Password Hashing Service** | **Desc:** Implement Bcrypt hashing utility module.<br>**AC:**<br>1. `hashPassword(str)` function returns salted hash.<br>2. `comparePassword(str, hash)` returns boolean.<br>3. Unit tests validate both functions.<br>4. Salting uses 12 rounds (secure default). | Backend | 3 |
+| [x] | **1.1.3.1** | **[Backend] Setup Password Hashing Service** | **Desc:** Implement Bcrypt hashing utility module.<br>**AC:**<br>1. `hashPassword(str)` function returns salted hash.<br>2. `comparePassword(str, hash)` returns boolean.<br>3. Unit tests validate both functions.<br>4. Salting uses 12 rounds (secure default). | Backend | 3 |
 | [ ] | **1.1.1.1** | **[API] User Registration Endpoint** | **Desc:** Create `POST /api/auth/register` endpoint.<br>**AC:**<br>1. Accepts Email, Password, Name, Phone.<br>2. Validates email format (RFC 5322).<br>3. Prevents duplicate emails (returns 409 Conflict).<br>4. Hashes password using 1.1.3.1 service.<br>5. Inserts record into `lpa_clients` table.<br>6. Returns 201 Created with client ID. | Backend | 5 |
 | [ ] | **1.1.1.2** | **[Frontend] Registration Form & Page** | **Desc:** Build registration UI with React form.<br>**AC:**<br>1. Form fields: Email, Password, Confirm Password, Name, Phone.<br>2. Client-side validation: password min 8 chars, email format.<br>3. Submit button calls 1.1.1.1 API.<br>4. Success redirects to Login page with confirmation message.<br>5. Error displays validation message. | Frontend | 5 |
 | [ ] | **1.1.2.1** | **[API] Login & JWT Token Generation** | **Desc:** Create `POST /api/auth/login` endpoint.<br>**AC:**<br>1. Accepts Email and Password.<br>2. Queries `lpa_clients` by email.<br>3. Uses 1.1.3.1 to compare password hash.<br>4. On success: generates JWT token (expires 24h), returns token and user data.<br>5. On failure: returns 401 Unauthorized with generic message. | Backend | 5 |

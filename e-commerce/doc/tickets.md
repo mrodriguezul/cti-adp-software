@@ -13,7 +13,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.1.3.1** | **[Backend] Setup Password Hashing Service** | **Desc:** Implement Bcrypt hashing utility module.<br>**AC:**<br>1. `hashPassword(str)` function returns salted hash.<br>2. `comparePassword(str, hash)` returns boolean.<br>3. Unit tests validate both functions.<br>4. Salting uses 12 rounds (secure default). | 3 | Backend | `Security` `Auth` |
+| [x] | **1.1.3.1** | **[Backend] Setup Password Hashing Service** | **Desc:** Implement Bcrypt hashing utility module.<br>**AC:**<br>1. `hashPassword(str)` function returns salted hash.<br>2. `comparePassword(str, hash)` returns boolean.<br>3. Unit tests validate both functions.<br>4. Salting uses 12 rounds (secure default). | 3 | Backend | `Security` `Auth` |
 
 ---
 
