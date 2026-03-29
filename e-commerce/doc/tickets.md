@@ -61,7 +61,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.1.1** | **[Frontend] Cart State Management** | **Desc:** Build global cart state using Context API or Redux.<br>**AC:**<br>1. Cart stores: itemId, quantity, price snapshot.<br>2. `addToCart(itemId, qty)` function prevents qty > stock.<br>3. Cart persists across page navigation (LocalStorage).<br>4. Cart persists on page refresh.<br>5. Events trigger for cart updates (e.g., navbar counter). | 5 | Frontend | `State` `Logic` |
+| [x] | **1.3.1.1** | **[Frontend] Cart State Management** | **Desc:** Build global cart state using Context API or Redux.<br>**AC:**<br>1. Cart stores: itemId, quantity, price snapshot.<br>2. `addToCart(itemId, qty)` function prevents qty > stock.<br>3. Cart persists across page navigation (LocalStorage).<br>4. Cart persists on page refresh.<br>5. Events trigger for cart updates (e.g., navbar counter). | 5 | Frontend | `State` `Logic` |
 
 ---
 
@@ -70,7 +70,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.2.1** | **[Frontend] Shopping Cart Page** | **Desc:** Build cart review page (`/cart`).<br>**AC:**<br>1. Lists all cart items: thumbnail, name, unit price, quantity, subtotal.<br>2. Displays Subtotal, Estimated Tax (if enabled), Grand Total.<br>3. Empty cart shows message with "Continue Shopping" button.<br>4. "Checkout" button accessible and functional.<br>5. Cart counter in navbar shows current item count. | 3 | Frontend | `UI` |
+| [x] | **1.3.2.1** | **[Frontend] Shopping Cart Page** | **Desc:** Build cart review page (`/cart`).<br>**AC:**<br>1. Render a table-style layout with headers: Product, Price, Qty, Amount.<br>2. Product Column: Display a rounded thumbnail image, the product name, and the product `sku` positioned underneath the name in small, muted text.<br>3. Interactive Controls: Display a number input field for the Quantity, and a red trash can icon on the far right of the row for item removal.<br>4. Totals: Calculate and display the row "Amount" (Price * Qty) in bold. At the bottom of the list, display a single "Total" row with the final sum.<br>5. Primary Action: Render a right-aligned "Proceed to Checkout" primary button featuring a right-arrow icon below the cart total.<br>6. Empty State: If the cart is empty, display a friendly message with a "Continue Shopping" button. | 3 | Frontend | `UI` |
 
 ---
 
@@ -79,7 +79,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.3.1** | **[Frontend] Cart Item Editing Controls** | **Desc:** Build quantity adjustment and removal UI.<br>**AC:**<br>1. `+` and `-` buttons adjust quantity dynamically.<br>2. Direct quantity input field with validation.<br>3. Setting quantity to 0 or clicking "Remove" deletes item.<br>4. Totals update immediately (no page reload).<br>5. Stock limit prevents quantity > onhand. | 3 | Frontend | `UI` `Logic` |
+| [x] | **1.3.3.1** | **[Frontend] Cart Item Editing Controls** | **Desc:** Build quantity adjustment and removal UI.<br>**AC:**<br>1. Use a native HTML number input field for quantity adjustment (built-in up/down arrows).<br>2. Input validation enforces `min="1"` (preventing 0 or negative inputs) and `max={stockLimit}`.<br>3. Clicking the dedicated "Remove" (Trash) button deletes the item from the cart.<br>4. Cart totals update immediately via React Context without a page reload.<br>5. Context logic and UI notifications (Toasts) prevent users from exceeding available `onhand` stock limits. | 3 | Frontend | `UI` `Logic` |
 
 ---
 
@@ -107,7 +107,7 @@
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
 | [ ] | **1.4.3.1** | **[Frontend] Checkout Step 3: Order Review** | **Desc:** Build order summary and confirmation page.<br>**AC:**<br>1. Displays: cart items (name, qty, price), shipping address, total.<br>2. "Edit" links allow returning to previous steps.<br>3. "Agree to Terms" checkbox required.<br>4. "Place Order" button calls 1.4.3.2 API.<br>5. Back button revisits payment form. | 3 | Frontend | `UI` |
-| [ ] | **1.4.3.2** | **[API] Create Order Transaction** | **Desc:** Create `POST /api/checkout/orders` endpoint.<br>**AC:**<br>1. Auth required (or guest checkout with token).<br>2. Verifies cart items stock availability.<br>3. Atomic transaction: creates `lpa_invoices` and `lpa_invoice_items`.<br>4. Updates `lpa_stock.onhand` for each item.<br>5. Clears cart on success.<br>6. Returns invoice ID and 201 Created.<br>7. Rollback on any failure. | 8 | Backend | `API` `DB` `Transaction` |
+| [ ] | **1.4.3.2** | **[API] Create Order Transaction** | **Desc:** Create `POST /api/checkout/orders` endpoint.<br>**AC:**<br>1. Auth required (or guest checkout with token).<br>2. Verifies cart items stock availability.<br>3. Atomic transaction: creates `lpa_invoices` and `lpa_invoice_items`.<br>4. Updates `lpa_stock.onhand` for each item.<br>5. Clears cart on success.<br>6. Returns invoice ID and 201 Created.<br>7. Rollback on any failure.<br>8. **SECURITY: The backend MUST NOT trust product prices sent from the frontend. The API must independently fetch the current, authoritative price for each `productId` directly from the `lpa_stock` database table to calculate the final invoice total.** | 8 | Backend | `API` `DB` `Transaction` `Security` |
 
 ---
 
