@@ -79,7 +79,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.3.3.1** | **[Frontend] Cart Item Editing Controls** | **Desc:** Build quantity adjustment and removal UI.<br>**AC:**<br>1. `+` and `-` buttons adjust quantity dynamically.<br>2. Direct quantity input field with validation.<br>3. Setting quantity to 0 or clicking "Remove" deletes item.<br>4. Totals update immediately (no page reload).<br>5. Stock limit prevents quantity > onhand. | 3 | Frontend | `UI` `Logic` |
+| [x] | **1.3.3.1** | **[Frontend] Cart Item Editing Controls** | **Desc:** Build quantity adjustment and removal UI.<br>**AC:**<br>1. Use a native HTML number input field for quantity adjustment (built-in up/down arrows).<br>2. Input validation enforces `min="1"` (preventing 0 or negative inputs) and `max={stockLimit}`.<br>3. Clicking the dedicated "Remove" (Trash) button deletes the item from the cart.<br>4. Cart totals update immediately via React Context without a page reload.<br>5. Context logic and UI notifications (Toasts) prevent users from exceeding available `onhand` stock limits. | 3 | Frontend | `UI` `Logic` |
 
 ---
 
