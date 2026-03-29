@@ -148,3 +148,21 @@ Extract ONLY the following User Stories and their associated implementation tick
 5. **Data Accuracy:** Copy the exact wording, IDs, and point estimations directly from the source files. Do not summarize or alter the technical details.
 
 Please output the entire markdown content in a single code block and save it into my new `sprint-1.md` file.
+
+## USER PROMPT 8
+
+@workspace #file:doc/tickets.md #file:doc/phase-1-user-stories.md
+
+# The Task
+Create a new file `doc/sprints/sprint-2.md` to track our work for Epic-01: Identity & Access Management (IAM). 
+
+# Formatting Requirements
+The structure MUST perfectly match the format of `sprint-1.md`. It needs the following sections:
+1. **Sprint Goal & Scope Summary:** Define the goal (building secure user registration, login, and guest checkout flows).
+2. **Sprint 2 User Stories:** A markdown table pulling in Stories 1.1.1, 1.1.2, 1.1.3, and 1.1.4 from `phase-1-user-stories.md`. Include columns for Status `[ ]`, ID, User Story, Priority, and Est. (Pts).
+3. **Sprint 2 Implementation Tickets:** A markdown table pulling in the 6 tickets associated with those stories from `tickets.md` (1.1.3.1, 1.1.1.1, 1.1.1.2, 1.1.2.1, 1.1.2.2, 1.1.4.1). Include columns for Status `[ ]`, Ticket ID, Title, Details & AC, Domain, and Effort.
+4. **Sprint Metrics:** A summary table calculating Total Stories, Total Tickets, Total Story Points, and Total Ticket Effort.
+5. **Dependencies & Notes:** List any architectural decisions (e.g., using JWTs for sessions, Bcrypt for hashing) and testing plans.
+
+# Output Format
+Output the complete markdown text for `sprint-2.md` in a single code block so I can create the new file and paste it in.
