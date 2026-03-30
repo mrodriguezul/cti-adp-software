@@ -38,10 +38,12 @@ describe('AuthController', () => {
   describe('Test 1: Return 201 and client ID on successful registration', () => {
     it('should return 201 Created with clientId on successful registration', async () => {
       mockRequest.body = {
-        email: 'newuser@example.com',
-        password: 'SecurePass123',
-        name: 'John Doe',
-        phone: '1234567890'
+        firstname: 'Miguel',
+        lastname: 'Smith',
+        email: 'test@test.com',
+        password: 'password123',
+        phone: '+61400000000',
+        address: '123 Main St'
       };
 
       (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 42 });
@@ -60,19 +62,23 @@ describe('AuthController', () => {
         }
       });
       expect(mockUseCase.execute).toHaveBeenCalledWith({
-        email: 'newuser@example.com',
-        password: 'SecurePass123',
-        name: 'John Doe',
-        phone: '1234567890'
+        firstname: 'Miguel',
+        lastname: 'Smith',
+        email: 'test@test.com',
+        password: 'password123',
+        phone: '+61400000000',
+        address: '123 Main St'
       });
       expect(mockNext).not.toHaveBeenCalled();
     });
 
     it('should handle registration without phone number', async () => {
       mockRequest.body = {
-        email: 'user@example.com',
+        firstname: 'Alice',
+        lastname: 'Johnson',
+        email: 'alice@example.com',
         password: 'SecurePass123',
-        name: 'Alice Smith'
+        address: '456 Oak Ave'
       };
 
       (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 99 });
@@ -94,10 +100,12 @@ describe('AuthController', () => {
 
     it('should pass through all request body fields to use case', async () => {
       mockRequest.body = {
-        email: 'test@test.com',
+        firstname: 'John',
+        lastname: 'Doe',
+        email: 'john@test.com',
         password: 'TestPass999',
-        name: 'Test User',
-        phone: '9876543210'
+        phone: '+61412345678',
+        address: '789 Pine Rd'
       };
 
       (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 100 });
@@ -109,10 +117,12 @@ describe('AuthController', () => {
       );
 
       expect(mockUseCase.execute).toHaveBeenCalledWith({
-        email: 'test@test.com',
+        firstname: 'John',
+        lastname: 'Doe',
+        email: 'john@test.com',
         password: 'TestPass999',
-        name: 'Test User',
-        phone: '9876543210'
+        phone: '+61412345678',
+        address: '789 Pine Rd'
       });
     });
   });
@@ -120,9 +130,11 @@ describe('AuthController', () => {
   describe('Test 2: Return 409 if use case throws duplicate email conflict error', () => {
     it('should return 409 Conflict when DuplicateEmailError is thrown', async () => {
       mockRequest.body = {
+        firstname: 'Miguel',
+        lastname: 'Smith',
         email: 'existing@example.com',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '123 Main St'
       };
 
       const error = new DuplicateEmailError('existing@example.com');
@@ -145,9 +157,11 @@ describe('AuthController', () => {
     it('should include the correct error message from exception', async () => {
       const email = 'duplicate@example.com';
       mockRequest.body = {
+        firstname: 'Jane',
+        lastname: 'Doe',
         email,
         password: 'SecurePass123',
-        name: 'Test'
+        address: '456 Oak Ave'
       };
 
       const error = new DuplicateEmailError(email);
@@ -169,9 +183,11 @@ describe('AuthController', () => {
   describe('Test 3: Return 400 on validation failures (missing fields, bad email)', () => {
     it('should return 400 when InvalidEmailError is thrown', async () => {
       mockRequest.body = {
+        firstname: 'John',
+        lastname: 'Doe',
         email: 'invalidemail',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '789 Pine Rd'
       };
 
       const error = new InvalidEmailError('invalidemail');
@@ -191,8 +207,9 @@ describe('AuthController', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should return 400 when ZodError is thrown (e.g., missing required field)', async () => {
+    it('should return 400 when ZodError is thrown (e.g., missing first name)', async () => {
       mockRequest.body = {
+        lastname: 'Doe',
         email: 'user@example.com',
         password: 'SecurePass123'
       };
@@ -204,8 +221,8 @@ describe('AuthController', () => {
           type: 'string',
           inclusive: true,
           exact: false,
-          message: 'Name is required',
-          path: ['name']
+          message: 'First name is required',
+          path: ['firstname']
         }
       ]);
 
@@ -229,9 +246,11 @@ describe('AuthController', () => {
 
     it('should return 400 when password is too short', async () => {
       mockRequest.body = {
+        firstname: 'Miguel',
+        lastname: 'Smith',
         email: 'user@example.com',
         password: 'Short',
-        name: 'John'
+        address: '123 Main St'
       };
 
       const zodError = new z.ZodError([
@@ -266,6 +285,7 @@ describe('AuthController', () => {
 
     it('should return 400 with details array from ZodError', async () => {
       mockRequest.body = {
+        firstname: 'John',
         email: 'invalid-email',
         password: 'pass'
       };

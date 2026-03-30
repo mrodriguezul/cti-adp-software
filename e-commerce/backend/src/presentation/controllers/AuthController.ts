@@ -8,14 +8,16 @@ export class AuthController {
   public register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Extract from request body
-      const { email, password, name, phone } = req.body;
+      const { firstname, lastname, email, password, phone, address } = req.body;
 
       // Call the use case
       const result = await this.registerClientUseCase.execute({
+        firstname,
+        lastname,
         email,
         password,
-        name,
-        phone
+        phone,
+        address
       });
 
       // Return 201 Created with success response

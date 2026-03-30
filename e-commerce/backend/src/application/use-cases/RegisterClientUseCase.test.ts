@@ -27,18 +27,21 @@ describe('RegisterClientUseCase', () => {
   describe('Test 1: Successfully register a user and return an ID with valid data', () => {
     it('should create a new client and return the ID', async () => {
       const input = {
-        email: 'john.doe@example.com',
-        password: 'SecurePass123',
-        name: 'John Doe',
-        phone: '1234567890'
+        firstname: 'Miguel',
+        lastname: 'Smith',
+        email: 'test@test.com',
+        password: 'password123',
+        phone: '+61400000000',
+        address: '123 Main St'
       };
 
       const mockClient: Client = {
         id: 42,
-        firstname: 'John',
-        lastname: 'Doe',
-        email: 'john.doe@example.com',
-        phone: '1234567890',
+        firstname: 'Miguel',
+        lastname: 'Smith',
+        email: 'test@test.com',
+        phone: '+61400000000',
+        address: '123 Main St',
         password: 'hashed_password_123',
         status: 'A',
         createdAt: new Date(),
@@ -51,30 +54,34 @@ describe('RegisterClientUseCase', () => {
       const result = await useCase.execute(input);
 
       expect(result).toEqual({ id: 42 });
-      expect(mockRepository.findByEmail).toHaveBeenCalledWith('john.doe@example.com');
+      expect(mockRepository.findByEmail).toHaveBeenCalledWith('test@test.com');
       expect(mockRepository.create).toHaveBeenCalledWith({
-        firstname: 'John',
-        lastname: 'Doe',
-        email: 'john.doe@example.com',
+        firstname: 'Miguel',
+        lastname: 'Smith',
+        email: 'test@test.com',
         password: 'hashed_password_123',
-        phone: '1234567890'
+        phone: '+61400000000',
+        address: '123 Main St'
       });
-      expect(PasswordService.hashPassword).toHaveBeenCalledWith('SecurePass123');
+      expect(PasswordService.hashPassword).toHaveBeenCalledWith('password123');
     });
 
-    it('should handle single word names by splitting correctly', async () => {
+    it('should handle registration without phone number', async () => {
       const input = {
+        firstname: 'Alice',
+        lastname: 'Johnson',
         email: 'alice@example.com',
         password: 'SecurePass123',
-        name: 'Alice'
+        address: '456 Oak Ave'
       };
 
       const mockClient: Client = {
         id: 100,
         firstname: 'Alice',
-        lastname: 'Alice',
+        lastname: 'Johnson',
         email: 'alice@example.com',
         phone: null,
+        address: '456 Oak Ave',
         password: 'hashed_password_123',
         status: 'A',
         createdAt: new Date(),
@@ -89,27 +96,30 @@ describe('RegisterClientUseCase', () => {
       expect(result).toEqual({ id: 100 });
       expect(mockRepository.create).toHaveBeenCalledWith({
         firstname: 'Alice',
-        lastname: 'Alice',
+        lastname: 'Johnson',
         email: 'alice@example.com',
         password: 'hashed_password_123',
-        phone: null
+        phone: null,
+        address: '456 Oak Ave'
       });
     });
 
-    it('should handle multi-word names correctly', async () => {
+    it('should handle registration without address', async () => {
       const input = {
-        email: 'maria@example.com',
+        firstname: 'Bob',
+        lastname: 'Williams',
+        email: 'bob@example.com',
         password: 'SecurePass123',
-        name: 'Maria Garcia Lopez',
-        phone: '5555555'
+        phone: '+61412345678'
       };
 
       const mockClient: Client = {
         id: 50,
-        firstname: 'Maria',
-        lastname: 'Garcia Lopez',
-        email: 'maria@example.com',
-        phone: '5555555',
+        firstname: 'Bob',
+        lastname: 'Williams',
+        email: 'bob@example.com',
+        phone: '+61412345678',
+        address: null,
         password: 'hashed_password_123',
         status: 'A',
         createdAt: new Date(),
@@ -122,11 +132,12 @@ describe('RegisterClientUseCase', () => {
       await useCase.execute(input);
 
       expect(mockRepository.create).toHaveBeenCalledWith({
-        firstname: 'Maria',
-        lastname: 'Garcia Lopez',
-        email: 'maria@example.com',
+        firstname: 'Bob',
+        lastname: 'Williams',
+        email: 'bob@example.com',
         password: 'hashed_password_123',
-        phone: '5555555'
+        phone: '+61412345678',
+        address: null
       });
     });
   });
@@ -134,9 +145,11 @@ describe('RegisterClientUseCase', () => {
   describe('Test 2: Throw error if email format is invalid', () => {
     it('should throw InvalidEmailError for email without @', async () => {
       const input = {
+        firstname: 'John',
+        lastname: 'Doe',
         email: 'invalidemail.com',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '789 Pine Rd'
       };
 
       await expect(useCase.execute(input)).rejects.toThrow(InvalidEmailError);
@@ -146,9 +159,11 @@ describe('RegisterClientUseCase', () => {
 
     it('should throw InvalidEmailError for email without domain', async () => {
       const input = {
+        firstname: 'Jane',
+        lastname: 'Smith',
         email: 'user@',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '321 Elm St'
       };
 
       await expect(useCase.execute(input)).rejects.toThrow(InvalidEmailError);
@@ -156,9 +171,11 @@ describe('RegisterClientUseCase', () => {
 
     it('should throw InvalidEmailError for email without TLD', async () => {
       const input = {
+        firstname: 'Mark',
+        lastname: 'Brown',
         email: 'user@domain',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '654 Maple Dr'
       };
 
       await expect(useCase.execute(input)).rejects.toThrow(InvalidEmailError);
@@ -166,9 +183,11 @@ describe('RegisterClientUseCase', () => {
 
     it('should throw InvalidEmailError for email with spaces', async () => {
       const input = {
+        firstname: 'Sarah',
+        lastname: 'Green',
         email: 'user @domain.com',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '987 Birch Ln'
       };
 
       await expect(useCase.execute(input)).rejects.toThrow(InvalidEmailError);
@@ -178,9 +197,11 @@ describe('RegisterClientUseCase', () => {
   describe('Test 3: Throw conflict error if repository.findByEmail returns existing user', () => {
     it('should throw DuplicateEmailError when client already exists', async () => {
       const input = {
+        firstname: 'David',
+        lastname: 'Jones',
         email: 'existing@example.com',
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '147 Cedar St'
       };
 
       const existingClient: Client = {
@@ -189,6 +210,7 @@ describe('RegisterClientUseCase', () => {
         lastname: 'User',
         email: 'existing@example.com',
         phone: null,
+        address: '999 Old St',
         password: 'some_hash',
         status: 'A',
         createdAt: new Date(),
@@ -205,9 +227,11 @@ describe('RegisterClientUseCase', () => {
     it('should throw DuplicateEmailError with correct email in message', async () => {
       const email = 'duplicate@example.com';
       const input = {
+        firstname: 'Emma',
+        lastname: 'White',
         email,
         password: 'SecurePass123',
-        name: 'John Doe'
+        address: '555 Rock Ave'
       };
 
       mockRepository.findByEmail.mockResolvedValueOnce({
@@ -216,6 +240,7 @@ describe('RegisterClientUseCase', () => {
         lastname: 'User',
         email,
         phone: null,
+        address: '111 Test Blvd',
         password: 'hash',
         status: 'A',
         createdAt: new Date(),

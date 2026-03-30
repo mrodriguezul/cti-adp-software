@@ -22,6 +22,7 @@ export class PrismaClientRepository implements IClientRepository {
       lastname: client.lastname,
       email: client.email,
       phone: client.phone,
+      address: client.address,
       password: client.password,
       status: client.status,
       createdAt: client.createdAt,
@@ -35,6 +36,7 @@ export class PrismaClientRepository implements IClientRepository {
     email: string;
     password: string;
     phone?: string | null;
+    address?: string | null;
   }): Promise<Client> {
     const client = await this.prisma.client.create({
       data: {
@@ -42,7 +44,8 @@ export class PrismaClientRepository implements IClientRepository {
         lastname: clientData.lastname,
         email: clientData.email,
         password: clientData.password,
-        phone: clientData.phone || null
+        phone: clientData.phone || null,
+        address: clientData.address || null
       }
     });
 
@@ -52,6 +55,7 @@ export class PrismaClientRepository implements IClientRepository {
       lastname: client.lastname,
       email: client.email,
       phone: client.phone,
+      address: client.address,
       password: client.password,
       status: client.status,
       createdAt: client.createdAt,

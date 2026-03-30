@@ -20,10 +20,12 @@ export class InvalidEmailError extends Error {
 
 // Input validation schema
 export const RegisterClientInputSchema = z.object({
+  firstname: z.string().min(1, 'First name is required'),
+  lastname: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  name: z.string().min(1, 'Name is required'),
-  phone: z.string().optional()
+  phone: z.string().optional(),
+  address: z.string().optional()
 });
 
 export type RegisterClientInput = z.infer<typeof RegisterClientInputSchema>;
@@ -47,18 +49,14 @@ export class RegisterClientUseCase {
     // Step C: Hash the password
     const hashedPassword = await PasswordService.hashPassword(input.password);
 
-    // Parse name into firstname and lastname
-    const nameParts = input.name.trim().split(/\s+/);
-    const firstname = nameParts[0];
-    const lastname = nameParts.slice(1).join(' ') || nameParts[0];
-
     // Step D: Create the client
     const newClient = await this.clientRepository.create({
-      firstname,
-      lastname,
+      firstname: input.firstname,
+      lastname: input.lastname,
       email: input.email,
       password: hashedPassword,
-      phone: input.phone || null
+      phone: input.phone || null,
+      address: input.address || null
     });
 
     // Step E: Return the newly created client's id

@@ -4,6 +4,7 @@ export interface Client {
   lastname: string;
   email: string;
   phone: string | null;
+  address: string | null;
   password: string;
   status: string;
   createdAt: Date;
@@ -18,5 +19,6 @@ export interface IClientRepository {
     email: string;
     password: string;
     phone?: string | null;
+    address?: string | null;
   }): Promise<Client>;
 }
