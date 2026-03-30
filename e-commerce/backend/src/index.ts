@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { createProductRoutes } from './presentation/routes/product.routes.js';
+import { createAuthRoutes } from './presentation/routes/auth.routes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/products', createProductRoutes(prisma));
+app.use('/api/auth', createAuthRoutes(prisma));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
