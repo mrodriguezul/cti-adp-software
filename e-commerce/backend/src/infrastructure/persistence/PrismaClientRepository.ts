@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import {
-  IClientRepository,
-  Client
-} from '../../domain/repositories/IClientRepository.js';
+import { IClientRepository } from '../../domain/repositories/IClientRepository.js';
+import { Client } from '../../domain/entities/Client.js';
 
 export class PrismaClientRepository implements IClientRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -16,18 +14,16 @@ export class PrismaClientRepository implements IClientRepository {
       return null;
     }
 
-    return {
-      id: client.id,
-      firstname: client.firstname,
-      lastname: client.lastname,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
-      password: client.password,
-      status: client.status,
-      createdAt: client.createdAt,
-      updatedAt: client.updatedAt
-    };
+    return new Client(
+      client.id,
+      client.firstname,
+      client.lastname,
+      client.email,
+      client.password,
+      client.status,
+      client.phone,
+      client.address
+    );
   }
 
   async create(clientData: {
@@ -49,17 +45,15 @@ export class PrismaClientRepository implements IClientRepository {
       }
     });
 
-    return {
-      id: client.id,
-      firstname: client.firstname,
-      lastname: client.lastname,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
-      password: client.password,
-      status: client.status,
-      createdAt: client.createdAt,
-      updatedAt: client.updatedAt
-    };
+    return new Client(
+      client.id,
+      client.firstname,
+      client.lastname,
+      client.email,
+      client.password,
+      client.status,
+      client.phone,
+      client.address
+    );
   }
 }

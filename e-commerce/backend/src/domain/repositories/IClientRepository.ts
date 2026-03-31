@@ -1,15 +1,4 @@
-export interface Client {
-  id: number;
-  firstname: string;
-  lastname: string;
-  email: string;
-  phone: string | null;
-  address: string | null;
-  password: string;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Client } from '../entities/Client.js';
 
 export interface IClientRepository {
   findByEmail(email: string): Promise<Client | null>;

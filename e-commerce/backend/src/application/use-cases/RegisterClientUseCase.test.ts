@@ -3,7 +3,8 @@ import {
   DuplicateEmailError,
   InvalidEmailError
 } from './RegisterClientUseCase.js';
-import { IClientRepository, Client } from '../../domain/repositories/IClientRepository.js';
+import { IClientRepository } from '../../domain/repositories/IClientRepository.js';
+import { Client } from '../../domain/entities/Client.js';
 import { PasswordService } from '../../infrastructure/security/PasswordService.js';
 
 jest.mock('../../infrastructure/security/PasswordService.js');
@@ -35,18 +36,16 @@ describe('RegisterClientUseCase', () => {
         address: '123 Main St'
       };
 
-      const mockClient: Client = {
-        id: 42,
-        firstname: 'Miguel',
-        lastname: 'Smith',
-        email: 'test@test.com',
-        phone: '+61400000000',
-        address: '123 Main St',
-        password: 'hashed_password_123',
-        status: 'A',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      const mockClient = new Client(
+        42,
+        'Miguel',
+        'Smith',
+        'test@test.com',
+        'hashed_password_123',
+        'A',
+        '+61400000000',
+        '123 Main St'
+      );
 
       mockRepository.findByEmail.mockResolvedValueOnce(null);
       mockRepository.create.mockResolvedValueOnce(mockClient);
@@ -75,18 +74,16 @@ describe('RegisterClientUseCase', () => {
         address: '456 Oak Ave'
       };
 
-      const mockClient: Client = {
-        id: 100,
-        firstname: 'Alice',
-        lastname: 'Johnson',
-        email: 'alice@example.com',
-        phone: null,
-        address: '456 Oak Ave',
-        password: 'hashed_password_123',
-        status: 'A',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      const mockClient = new Client(
+        100,
+        'Alice',
+        'Johnson',
+        'alice@example.com',
+        'hashed_password_123',
+        'A',
+        null,
+        '456 Oak Ave'
+      );
 
       mockRepository.findByEmail.mockResolvedValueOnce(null);
       mockRepository.create.mockResolvedValueOnce(mockClient);
@@ -113,18 +110,16 @@ describe('RegisterClientUseCase', () => {
         phone: '+61412345678'
       };
 
-      const mockClient: Client = {
-        id: 50,
-        firstname: 'Bob',
-        lastname: 'Williams',
-        email: 'bob@example.com',
-        phone: '+61412345678',
-        address: null,
-        password: 'hashed_password_123',
-        status: 'A',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      const mockClient = new Client(
+        50,
+        'Bob',
+        'Williams',
+        'bob@example.com',
+        'hashed_password_123',
+        'A',
+        '+61412345678',
+        null
+      );
 
       mockRepository.findByEmail.mockResolvedValueOnce(null);
       mockRepository.create.mockResolvedValueOnce(mockClient);
@@ -204,18 +199,16 @@ describe('RegisterClientUseCase', () => {
         address: '147 Cedar St'
       };
 
-      const existingClient: Client = {
-        id: 1,
-        firstname: 'Existing',
-        lastname: 'User',
-        email: 'existing@example.com',
-        phone: null,
-        address: '999 Old St',
-        password: 'some_hash',
-        status: 'A',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      const existingClient = new Client(
+        1,
+        'Existing',
+        'User',
+        'existing@example.com',
+        'some_hash',
+        'A',
+        null,
+        '999 Old St'
+      );
 
       mockRepository.findByEmail.mockResolvedValueOnce(existingClient);
 
@@ -234,18 +227,18 @@ describe('RegisterClientUseCase', () => {
         address: '555 Rock Ave'
       };
 
-      mockRepository.findByEmail.mockResolvedValueOnce({
-        id: 1,
-        firstname: 'Test',
-        lastname: 'User',
+      const existingClient = new Client(
+        1,
+        'Test',
+        'User',
         email,
-        phone: null,
-        address: '111 Test Blvd',
-        password: 'hash',
-        status: 'A',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+        'hash',
+        'A',
+        null,
+        '111 Test Blvd'
+      );
+
+      mockRepository.findByEmail.mockResolvedValueOnce(existingClient);
 
       await expect(useCase.execute(input)).rejects.toThrow(
         `A client with email ${email} already exists`

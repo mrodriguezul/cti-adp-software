@@ -123,3 +123,31 @@ For Ticket 1.1.1.1, explicitly mention that the API payload must map to `firstna
 
 # Output Format
 Output the fully updated tables for each file in distinct markdown code blocks so I can easily apply the changes. Do not alter any other tickets.
+
+## USER PROMPT 5
+
+@workspace #file:backend/src/domain/repositories/IClientRepository.ts #file:backend/src/infrastructure/persistence/PrismaClientRepository.ts #file:backend/src/application/use-cases/RegisterClientUseCase.ts
+
+# Role & Context
+You are a Lead Backend Architect. We are fixing a Domain-Driven Design inconsistency. We need to extract the `Client` interface from the repository into a proper Domain Entity class.
+
+# The Task
+1. **Create `backend/src/domain/entities/Client.ts`**:
+   - Create and export a `Client` class.
+   - It should have a constructor that takes: `id`, `firstname`, `lastname`, `email`, `password`, `status`, and optional `phone` and `address`.
+   - Add a business method: `public isActive(): boolean { return this.status === 'A'; }`
+   - Add a `toJSON()` method to safely return data without the password.
+
+2. **Update `IClientRepository.ts`**:
+   - Remove the inline `Client` interface.
+   - Import the new `Client` entity class.
+   - `findByEmail` and `create` must return `Promise<Client | null>` and `Promise<Client>`.
+
+3. **Update `PrismaClientRepository.ts`**:
+   - When returning data from Prisma, instantiate the `Client` class (e.g., `return new Client(data.id, data.firstname, ...)`) before returning it.
+
+4. **Update `RegisterClientUseCase.ts`**:
+   - Ensure it imports the new `Client` entity if it references the type.
+
+# Output Format
+Output the code for `Client.ts`, then the updated `IClientRepository.ts` and `PrismaClientRepository.ts`.
