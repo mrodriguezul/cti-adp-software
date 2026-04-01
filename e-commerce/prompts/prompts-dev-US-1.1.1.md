@@ -151,3 +151,5 @@ You are a Lead Backend Architect. We are fixing a Domain-Driven Design inconsist
 
 # Output Format
 Output the code for `Client.ts`, then the updated `IClientRepository.ts` and `PrismaClientRepository.ts`.
+
+## USER PROMPT 6
