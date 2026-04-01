@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { GetProductsUseCase, GetProductsInputSchema } from './GetProductsUseCase';
 import {
   IProductRepository,
-  ProductListResult,
-  ProductData
+  ProductListResult
 } from '../../domain/repositories/IProductRepository.js';
+import { Product } from '../../domain/entities/Product.js';
 import { z } from 'zod';
 
 // Mock repository
@@ -13,7 +13,7 @@ class MockProductRepository implements IProductRepository {
     throw new Error('Method not implemented - should be mocked in tests');
   }
 
-  async findById(id: number): Promise<ProductData | null> {
+  async findById(id: number): Promise<Product | null> {
     throw new Error('Method not implemented - should be mocked in tests');
   }
 }
@@ -31,25 +31,9 @@ describe('GetProductsUseCase', () => {
     it('should successfully return paginated products and map the data correctly', async () => {
       // Arrange
       const input = { page: 2, limit: 10 };
-      const mockProducts: ProductData[] = [
-        {
-          id: 1,
-          sku: 'PROD-001',
-          name: 'Test Product 1',
-          description: 'Test description 1',
-          price: 99.99,
-          onhand: 50,
-          imageUrl: 'https://example.com/image1.jpg'
-        },
-        {
-          id: 2,
-          sku: 'PROD-002',
-          name: 'Test Product 2',
-          description: 'Test description 2',
-          price: 149.99,
-          onhand: 25,
-          imageUrl: 'https://example.com/image2.jpg'
-        }
+      const mockProducts: Product[] = [
+        new Product(1, 'PROD-001', 'Test Product 1', 'Test description 1', 99.99, 50, 'https://example.com/image1.jpg', 'A'),
+        new Product(2, 'PROD-002', 'Test Product 2', 'Test description 2', 149.99, 25, 'https://example.com/image2.jpg', 'A')
       ];
       const expectedResult: ProductListResult = {
         products: mockProducts,
@@ -255,15 +239,18 @@ describe('GetProductsUseCase', () => {
     it('should handle large result sets correctly', async () => {
       // Arrange
       const input = { page: 1, limit: 100 }; // Maximum allowed limit
-      const mockProducts: ProductData[] = Array.from({ length: 100 }, (_, i) => ({
-        id: i + 1,
-        sku: `PROD-${String(i + 1).padStart(3, '0')}`,
-        name: `Test Product ${i + 1}`,
-        description: `Description for product ${i + 1}`,
-        price: 99.99 + i,
-        onhand: 10 + i,
-        imageUrl: `https://example.com/image${i + 1}.jpg`
-      }));
+      const mockProducts: Product[] = Array.from({ length: 100 }, (_, i) =>
+        new Product(
+          i + 1,
+          `PROD-${String(i + 1).padStart(3, '0')}`,
+          `Test Product ${i + 1}`,
+          `Description for product ${i + 1}`,
+          99.99 + i,
+          10 + i,
+          `https://example.com/image${i + 1}.jpg`,
+          'A'
+        )
+      );
       const expectedResult: ProductListResult = {
         products: mockProducts,
         totalCount: 500,

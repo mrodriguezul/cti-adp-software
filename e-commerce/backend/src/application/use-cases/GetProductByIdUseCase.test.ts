@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { GetProductByIdUseCase, GetProductByIdInputSchema, ProductNotFoundError } from './GetProductByIdUseCase';
 import {
-  IProductRepository,
-  ProductData
+  IProductRepository
 } from '../../domain/repositories/IProductRepository.js';
+import { Product } from '../../domain/entities/Product.js';
 
 // Mock repository
 class MockProductRepository implements IProductRepository {
@@ -11,7 +11,7 @@ class MockProductRepository implements IProductRepository {
     throw new Error('Method not implemented - should be mocked in tests');
   }
 
-  async findById(id: number): Promise<ProductData | null> {
+  async findById(id: number): Promise<Product | null> {
     throw new Error('Method not implemented - should be mocked in tests');
   }
 }
@@ -29,15 +29,7 @@ describe('GetProductByIdUseCase', () => {
     it('should return a product when a valid id is provided and repository finds it', async () => {
       // Arrange
       const input = { id: 1 };
-      const mockProduct: ProductData = {
-        id: 1,
-        sku: 'PROD-001',
-        name: 'Test Product',
-        description: 'Test description',
-        price: 99.99,
-        onhand: 50,
-        imageUrl: 'https://example.com/image.jpg'
-      };
+      const mockProduct: Product = new Product(1, 'PROD-001', 'Test Product', 'Test description', 99.99, 50, 'https://example.com/image.jpg', 'A');
 
       const findByIdSpy = jest
         .spyOn(mockRepository, 'findById')
@@ -110,15 +102,7 @@ describe('GetProductByIdUseCase', () => {
     it('should correctly handle product with null description', async () => {
       // Arrange
       const input = { id: 5 };
-      const mockProduct: ProductData = {
-        id: 5,
-        sku: 'PROD-005',
-        name: 'Product Without Description',
-        description: null,
-        price: 49.99,
-        onhand: 10,
-        imageUrl: null
-      };
+      const mockProduct: Product = new Product(5, 'PROD-005', 'Product Without Description', null, 49.99, 10, null, 'A');
 
       const findByIdSpy = jest
         .spyOn(mockRepository, 'findById')
@@ -137,15 +121,7 @@ describe('GetProductByIdUseCase', () => {
     it('should handle large product ids correctly', async () => {
       // Arrange
       const input = { id: 999999 };
-      const mockProduct: ProductData = {
-        id: 999999,
-        sku: 'PROD-999999',
-        name: 'Product with Large ID',
-        description: 'Test',
-        price: 199.99,
-        onhand: 100,
-        imageUrl: 'https://example.com/image.jpg'
-      };
+      const mockProduct: Product = new Product(999999, 'PROD-999999', 'Product with Large ID', 'Test', 199.99, 100, 'https://example.com/image.jpg', 'A');
 
       const findByIdSpy = jest
         .spyOn(mockRepository, 'findById')
