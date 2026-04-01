@@ -153,3 +153,95 @@ You are a Lead Backend Architect. We are fixing a Domain-Driven Design inconsist
 Output the code for `Client.ts`, then the updated `IClientRepository.ts` and `PrismaClientRepository.ts`.
 
 ## USER PROMPT 6
+
+@workspace #file:frontend-static/src/context/AuthContext.tsx #file:frontend-static/src/services/authService.ts #file:frontend-static/src/pages/Register.tsx #file:frontend/src/pages/Register.tsx 
+
+# Role & Context
+You are a Lead Frontend React Architect. We are executing **Ticket 1.1.1.2: [Frontend] Registration Form & Page**.
+We need to migrate the static Auth files to connect to our real backend, drop the mock data, and wire up the UI using `react-hook-form` and `zod`.
+
+# The Task
+Implement the real `authService.ts`, update `AuthContext.tsx`, and build `Register.tsx`.
+
+# Execution Steps:
+
+1. **API Service (`frontend/src/services/authService.ts`):**
+   - REMOVE all mock data, delays, and fake arrays.
+   - Define the base API URL: `const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';`
+   - Create `export async function registerUser(data: Omit<Client, "id"> & { password: string }): Promise<void>`.
+   - Use `fetch` to POST to `${API_URL}/auth/register`. 
+   - If `!response.ok`, `await response.json()` and throw an Error with the backend's message (crucial for handling 409 Email Conflicts).
+
+2. **Auth Context (`frontend/src/context/AuthContext.tsx`):**
+   - Copy the structure from the static version.
+   - Update the `register` function in the context to simply call `await authService.registerUser(data)`. 
+   - **Crucial:** Do NOT call `persist(result)` inside the `register` context function, because our backend registration endpoint does not log the user in or return a JWT. It only creates the account.
+
+3. **UI Component (`frontend/src/pages/Register.tsx`):**
+   - Migrate the exact visual structure from the static template.
+   - Define `registerSchema` using `zod` to match the backend payload: `firstname`, `lastname`, `email`, `password`, `phone` (optional), `address` (optional).
+   - Setup `useForm` with `zodResolver`.
+   - Extract `register` from `useAuth()`.
+   - In the `onSubmit` handler, call `await register(data)`.
+   - **On Success:** Call `toast({ title: "Account created", description: "You can now log in." })` and `Maps('/login')`.
+   - **On Error:** Catch the error and call `toast({ variant: "destructive", title: "Registration failed", description: error.message })`.
+
+# Output Format
+Output the complete, production-ready TypeScript code for `authService.ts`, then `AuthContext.tsx`, then `Register.tsx` in distinct markdown code blocks.
+
+## USER PROMPT 7
+
+@workspace #file:frontend/src/pages/Register.tsx
+
+# Role & Context
+You are a Lead Frontend React Architect. We are cleaning up tech debt in our Registration page by standardizing our UI components.
+
+# The Task
+Refactor `Register.tsx` to remove the `sonner` dependency and exclusively use our local `shadcn/ui` toast system.
+
+# Execution Steps:
+1. **Remove Sonner:** Delete `import { toast } from "sonner";`.
+2. **Import Hook:** Add `import { useToast } from "@/hooks/use-toast";` at the top.
+3. **Initialize Hook:** Inside the `Register` component, add `const { toast } = useToast();` alongside `useNavigate()`.
+4. **Update Toast Calls:** Inside the `onSubmit` function, rewrite the toast payloads to match the `shadcn/ui` object signature:
+   - Success: `toast({ title: "Account created", description: "You can now log in." });`
+   - Error: `toast({ variant: "destructive", title: "Registration failed", description: error.message });`
+
+# Output Format
+Output the fully updated TypeScript code for `Register.tsx`.
+
+## USER PROMPT 8
+
+@workspace #file:frontend/src/services/authService.ts #file:frontend/src/context/AuthContext.tsx #file:frontend/src/pages/Register.tsx
+
+# Role & Context
+You are a Lead Frontend SDET. We have completed the code for Ticket 1.1.1.2 (Registration Flow) and need to lock it down with enterprise-grade tests using Vitest and React Testing Library.
+
+# The Task
+Generate three test files: `authService.test.ts`, `AuthContext.test.tsx`, and `Register.test.tsx`.
+
+# Execution Steps:
+
+1. **Service Tests (`frontend/src/services/authService.test.ts`):**
+   - Mock `global.fetch`.
+   - **Test 1:** `registerUser` should call `fetch` with the correct POST method, URL, headers, and stringified body.
+   - **Test 2:** Should throw an Error with the backend's message if the response is not `ok` (e.g., a 409 conflict).
+
+2. **Context Tests (`frontend/src/context/AuthContext.test.tsx`):**
+   - Mock `authService.ts` (`vi.mock('@/services/authService')`).
+   - Create a dummy component to consume `useAuth`. Wrap it in `<AuthProvider>`.
+   - **Test 1:** Calling `register` from the context should call `authService.registerUser` with the provided data.
+   - **Test 2:** Ensure `register` does NOT automatically set the user state or `localStorage` (since registration only creates the account, it doesn't log them in).
+
+3. **UI Tests (`frontend/src/pages/Register.test.tsx`):**
+   - Mock `useAuth` to return a mocked `register` function.
+   - Mock `useToast` from `@/hooks/use-toast`.
+   - Mock `react-router-dom` (specifically `useNavigate`).
+   - Wrap the rendered component in a `<MemoryRouter>`.
+   - **Test 1:** Should render all form fields (First Name, Last Name, Email, Password, Phone, Address).
+   - **Test 2:** Should show validation errors (via Zod) if the form is submitted empty.
+   - **Test 3:** On valid submission, should call `register`, trigger a success toast, and navigate to `/login`.
+   - **Test 4:** If `register` throws an error, should trigger a destructive toast with the error message.
+
+# Output Format
+Output the complete TypeScript code for `authService.test.ts`, then `AuthContext.test.tsx`, then `Register.test.tsx` in distinct markdown code blocks.
