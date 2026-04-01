@@ -2,9 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import {
   IProductRepository,
   ProductListResult,
-  PaginationParams,
-  ProductData
+  PaginationParams
 } from '../../domain/repositories/IProductRepository.js';
+import { Product } from '../../domain/entities/Product.js';
 
 export class PrismaProductRepository implements IProductRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -32,7 +32,8 @@ export class PrismaProductRepository implements IProductRepository {
         description: true,
         price: true,
         onhand: true,
-        imageUrl: true
+        imageUrl: true,
+        status: true
       },
       skip,
       take: limit,
@@ -41,16 +42,19 @@ export class PrismaProductRepository implements IProductRepository {
       }
     });
 
-    // Map to ProductData
-    const products: ProductData[] = stocks.map(stock => ({
-      id: stock.id,
-      sku: stock.sku,
-      name: stock.name,
-      description: stock.description,
-      price: Number(stock.price),
-      onhand: stock.onhand,
-      imageUrl: stock.imageUrl
-    }));
+    // Map to Product entities
+    const products: Product[] = stocks.map(stock => 
+      new Product(
+        stock.id,
+        stock.sku,
+        stock.name,
+        stock.description,
+        Number(stock.price),
+        stock.onhand,
+        stock.imageUrl,
+        stock.status
+      )
+    );
 
     // Calculate hasMore
     const hasMore = skip + stocks.length < totalCount;
@@ -62,7 +66,7 @@ export class PrismaProductRepository implements IProductRepository {
     };
   }
 
-  async findById(id: number): Promise<ProductData | null> {
+  async findById(id: number): Promise<Product | null> {
     const stock = await this.prisma.stock.findUnique({
       where: { id },
       select: {
@@ -81,14 +85,15 @@ export class PrismaProductRepository implements IProductRepository {
       return null;
     }
 
-    return {
-      id: stock.id,
-      sku: stock.sku,
-      name: stock.name,
-      description: stock.description,
-      price: Number(stock.price),
-      onhand: stock.onhand,
-      imageUrl: stock.imageUrl
-    };
+    return new Product(
+      stock.id,
+      stock.sku,
+      stock.name,
+      stock.description,
+      Number(stock.price),
+      stock.onhand,
+      stock.imageUrl,
+      stock.status
+    );
   }
 }

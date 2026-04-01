@@ -3,7 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import { ProductController } from './ProductController';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';
 import { GetProductByIdUseCase, ProductNotFoundError } from '../../application/use-cases/GetProductByIdUseCase';
-import { ProductListResult, ProductData } from '../../domain/repositories/IProductRepository';
+import { ProductListResult } from '../../domain/repositories/IProductRepository';
+import { Product } from '../../domain/entities/Product';
 import { z } from 'zod';
 
 // Mock Request, Response, and NextFunction
@@ -64,25 +65,9 @@ describe('ProductController', () => {
       // Arrange
       mockRequest.query = { page: '2', limit: '10' };
 
-      const mockProducts: ProductData[] = [
-        {
-          id: 1,
-          sku: 'PROD-001',
-          name: 'Test Product 1',
-          description: 'Test description 1',
-          price: 99.99,
-          onhand: 50,
-          imageUrl: 'https://example.com/image1.jpg'
-        },
-        {
-          id: 2,
-          sku: 'PROD-002',
-          name: 'Test Product 2',
-          description: 'Test description 2',
-          price: 149.99,
-          onhand: 25,
-          imageUrl: 'https://example.com/image2.jpg'
-        }
+      const mockProducts: Product[] = [
+        new Product(1, 'PROD-001', 'Test Product 1', 'Test description 1', 99.99, 50, 'https://example.com/image1.jpg', 'A'),
+        new Product(2, 'PROD-002', 'Test Product 2', 'Test description 2', 149.99, 25, 'https://example.com/image2.jpg', 'A')
       ];
 
       const mockUseCaseResult: ProductListResult = {
@@ -545,15 +530,7 @@ describe('ProductController', () => {
   describe('getProductById', () => {
     it('should return 200 OK with product data when a valid id is provided and use case succeeds', async () => {
       // Arrange
-      const mockProduct: ProductData = {
-        id: 1,
-        sku: 'PROD-001',
-        name: 'Test Product',
-        description: 'Test description',
-        price: 99.99,
-        onhand: 50,
-        imageUrl: 'https://example.com/image.jpg'
-      };
+      const mockProduct: Product = new Product(1, 'PROD-001', 'Test Product', 'Test description', 99.99, 50, 'https://example.com/image.jpg', 'A');
 
       mockRequest.params = { id: '1' };
       mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
@@ -719,15 +696,7 @@ describe('ProductController', () => {
 
     it('should correctly parse string id to number', async () => {
       // Arrange
-      const mockProduct: ProductData = {
-        id: 42,
-        sku: 'PROD-042',
-        name: 'Product 42',
-        description: 'Test',
-        price: 49.99,
-        onhand: 10,
-        imageUrl: null
-      };
+      const mockProduct: Product = new Product(42, 'PROD-042', 'Product 42', 'Test', 49.99, 10, null, 'A');
 
       mockRequest.params = { id: '42' };
       mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
@@ -762,15 +731,7 @@ describe('ProductController', () => {
 
     it('should return 200 OK with product data including null fields', async () => {
       // Arrange
-      const mockProduct: ProductData = {
-        id: 5,
-        sku: 'PROD-005',
-        name: 'Product Without Image',
-        description: null,
-        price: 29.99,
-        onhand: 0,
-        imageUrl: null
-      };
+      const mockProduct: Product = new Product(5, 'PROD-005', 'Product Without Image', null, 29.99, 0, null, 'A');
 
       mockRequest.params = { id: '5' };
       mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);
@@ -794,15 +755,7 @@ describe('ProductController', () => {
 
     it('should handle large product ids correctly', async () => {
       // Arrange
-      const mockProduct: ProductData = {
-        id: 999999,
-        sku: 'PROD-999999',
-        name: 'Product Large ID',
-        description: 'Test',
-        price: 199.99,
-        onhand: 100,
-        imageUrl: 'https://example.com/image.jpg'
-      };
+      const mockProduct: Product = new Product(999999, 'PROD-999999', 'Product Large ID', 'Test', 199.99, 100, 'https://example.com/image.jpg', 'A');
 
       mockRequest.params = { id: '999999' };
       mockGetProductByIdUseCase.execute.mockResolvedValue(mockProduct);

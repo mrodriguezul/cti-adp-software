@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import {
-  IProductRepository,
-  ProductData
+  IProductRepository
 } from '../../domain/repositories/IProductRepository.js';
+import { Product } from '../../domain/entities/Product.js';
 
 // Input validation schema
 export const GetProductByIdInputSchema = z.object({
@@ -21,7 +21,7 @@ export class ProductNotFoundError extends Error {
 export class GetProductByIdUseCase {
   constructor(private readonly productRepository: IProductRepository) {}
 
-  async execute(input: GetProductByIdInput): Promise<ProductData> {
+  async execute(input: GetProductByIdInput): Promise<Product> {
     // Validate and sanitize input
     const validatedInput = GetProductByIdInputSchema.parse(input);
 

@@ -1,12 +1,4 @@
-export interface ProductData {
-  id: number;
-  sku: string;
-  name: string;
-  description: string | null;
-  price: number;
-  onhand: number;
-  imageUrl: string | null;
-}
+import { Product } from '../entities/Product.js';
 
 export interface PaginationParams {
   page: number;
@@ -14,12 +6,12 @@ export interface PaginationParams {
 }
 
 export interface ProductListResult {
-  products: ProductData[];
+  products: Product[];
   totalCount: number;
   hasMore: boolean;
 }
 
 export interface IProductRepository {
   findActiveProducts(params: PaginationParams): Promise<ProductListResult>;
-  findById(id: number): Promise<ProductData | null>;
+  findById(id: number): Promise<Product | null>;
 }
