@@ -32,8 +32,8 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.1.2.1** | **[API] Login & JWT Token Generation** | **Desc:** Create `POST /api/auth/login` endpoint.<br>**AC:**<br>1. Accepts Email and Password.<br>2. Queries `lpa_clients` by email.<br>3. Uses 1.1.3.1 to compare password hash.<br>4. On success: generates JWT token (expires 24h), returns token and user data.<br>5. On failure: returns 401 Unauthorized with generic message. | 5 | Backend | `API` `Auth` |
-| [ ] | **1.1.2.2** | **[Frontend] Login Page & Auth Context** | **Desc:** Build login UI and global auth state management.<br>**AC:**<br>1. Form fields: Email, Password.<br>2. Submit calls 1.1.2.1 API.<br>3. On success: stores token in LocalStorage, sets AuthContext, redirects to Home.<br>4. On failure: displays error message.<br>5. "Remember me" checkbox optional (future). | 3 | Frontend | `UI` `Auth` `State` |
+| [x] | **1.1.2.1** | **[API] Login & JWT Token Generation** | **Desc:** Create `POST /api/auth/login` endpoint.<br>**AC:**<br>1. Accepts Email and Password.<br>2. Queries `lpa_clients` by email.<br>3. Uses 1.1.3.1 to compare password hash.<br>4. On success: generates JWT token (expires 24h), returns token and user data.<br>5. On failure: returns 401 Unauthorized with generic message. | 5 | Backend | `API` `Auth` |
+| [x] | **1.1.2.2** | **[Frontend] Login Modal & Auth Context** | **Desc:** Build login UI as a Modal/Dialog and global auth state management.<br>**AC:**<br>1. Implement the login UI as a pop-up Modal/Dialog triggered by the "Login" navbar button.<br>2. Form fields: Email and Password.<br>3. Submit button ("Sign In") calls the `POST /api/auth/login` endpoint (Ticket 1.1.2.1).<br>4. On success: stores JWT token in LocalStorage, updates `AuthContext` to set the user as authenticated, closes the modal, and triggers a success Toast.<br>5. On failure (401 Unauthorized): displays a destructive Toast ("Invalid email or password").<br>6. Includes a link to switch to the Registration page. | 3 | Frontend | `UI` `Auth` `State` |
 
 ---
 
@@ -126,7 +126,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.1.4.1** | **[Frontend] Guest Cart & Forced Checkout Login** | **Desc:** Enable guest cart browsing with login at checkout.<br>**AC:**<br>1. Guests can browse products and add to cart without login.<br>2. Cart persists in LocalStorage.<br>3. At checkout step 1, system prompts: "Please log in or create account".<br>4. Guest redirected to login page with query param `?redirect=checkout`.<br>5. After login, cart is preserved and merged with any existing cart.<br>6. Checkout continues seamlessly. | 5 | Frontend | `UI` `Auth` `Logic` |
+| [x] | **1.1.4.1** | **[Frontend] Guest Cart & Forced Checkout Login** | **Desc:** Enable guest cart browsing with login at checkout via modal.<br>**AC:**<br>1. Guests can browse products and add to cart without login.<br>2. Cart persists in LocalStorage.<br>3. At checkout step 1, if user is unauthenticated, the Login Dialog/Modal is triggered.<br>4. User completes login via the modal form.<br>5. On successful login, the modal closes and the user remains on the checkout page, ready to continue.<br>6. Cart is preserved and accessible after login for seamless checkout. | 5 | Frontend | `UI` `Auth` `Logic` |
 
 ---
 

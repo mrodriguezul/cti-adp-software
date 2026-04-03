@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import Cart from './Cart';
 import * as CartContextModule from '@/context/CartContext';
 import * as AuthContextModule from '@/context/AuthContext';
@@ -8,8 +9,45 @@ import * as AuthContextModule from '@/context/AuthContext';
 // Mock the contexts
 vi.mock('@/context/CartContext');
 vi.mock('@/context/AuthContext');
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: vi.fn(),
+    dismiss: vi.fn(),
+    toasts: [],
+  }),
+}));
+
+// Mock useNavigate from react-router-dom
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+// Mock LoginDialog to capture open state
 vi.mock('@/components/LoginDialog', () => ({
-  LoginDialog: () => null,
+  LoginDialog: ({ open, onLoginSuccess }: any) => {
+    if (!open) return null;
+    return (
+      <div role="dialog" data-testid="login-dialog">
+        <div className="space-y-4">
+          <input type="email" placeholder="email@example.com" data-testid="login-email" />
+          <input type="password" placeholder="password" data-testid="login-password" />
+          <button
+            onClick={() => {
+              onLoginSuccess?.();
+            }}
+            data-testid="dialog-sign-in-button"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  },
 }));
 
 describe('Cart', () => {
@@ -18,6 +56,7 @@ describe('Cart', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigate.mockClear();
   });
 
   const renderCart = () => {
@@ -47,6 +86,7 @@ describe('Cart', () => {
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
@@ -109,29 +149,33 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
       renderCart();
 
       // Assert - Check each product row
-      const productRows = screen.getAllByText(/SKU-/).map(node => node.closest('.sm\\:grid'));
-      
+      const productRows = screen.getAllByText(/SKU-/).map(node => node.closest('.sm\\:grid') as HTMLElement | null);
+
       // Laptop
       const laptopRow = productRows[0];
-      expect(within(laptopRow).getByText('Laptop')).toBeInTheDocument();
-      expect(within(laptopRow).getByText('SKU-001')).toBeInTheDocument();
-      expect(within(laptopRow).getByText('$999.99')).toBeInTheDocument();
-      
+      expect(within(laptopRow as HTMLElement).getByText('Laptop')).toBeInTheDocument();
+      expect(within(laptopRow as HTMLElement).getByText('SKU-001')).toBeInTheDocument();
+      expect(within(laptopRow as HTMLElement).getByText('$999.99')).toBeInTheDocument();
+
       // Headphones
       const headphonesRow = productRows[1];
-      expect(within(headphonesRow).getByText('Headphones')).toBeInTheDocument();
-      expect(within(headphonesRow).getByText('SKU-002')).toBeInTheDocument();
-      expect(within(headphonesRow).getAllByText('$149.99')).toHaveLength(2);
+      expect(within(headphonesRow as HTMLElement).getByText('Headphones')).toBeInTheDocument();
+      expect(within(headphonesRow as HTMLElement).getByText('SKU-002')).toBeInTheDocument();
+      expect(within(headphonesRow as HTMLElement).getAllByText('$149.99')).toHaveLength(2);
 
       // Assert - Total amount
       expect(screen.getByText(`$${totalAmount.toFixed(2)}`)).toBeInTheDocument();
@@ -172,10 +216,14 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
@@ -236,10 +284,14 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
@@ -248,11 +300,11 @@ describe('Cart', () => {
       // Find the trash icon button for the first item (Laptop)
       // Navigate from product name to row div, then find the delete button
       const laptopText = screen.getByText('Laptop');
-      const rowDiv = laptopText.parentElement?.parentElement?.parentElement;
-      const deleteButton = within(rowDiv!).getByRole('button');
+      const rowDiv = laptopText.parentElement?.parentElement?.parentElement as HTMLElement;
+      const deleteButton = within(rowDiv).getByRole('button');
 
       // Click the delete button
-      await fireEvent.click(deleteButton);
+      fireEvent.click(deleteButton);
 
       // Assert
       expect(mockRemoveFromCart).toHaveBeenCalledWith(1);
@@ -290,10 +342,14 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
@@ -338,10 +394,14 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
@@ -387,18 +447,283 @@ describe('Cart', () => {
 
       vi.mocked(AuthContextModule.useAuth).mockReturnValue({
         isAuthenticated: true,
-        user: { id: 1, email: 'test@example.com' },
+        user: {
+          token: 'test-token',
+          client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'test@example.com', phone: '', address: '' },
+        } as any,
         login: vi.fn(),
         logout: vi.fn(),
         register: vi.fn(),
+        updateProfile: vi.fn(),
       });
 
       // Act
       renderCart();
 
       // Assert - Line item amount should be $2999.97 (999.99 × 3)
-      const productRow = screen.getByText('Laptop').closest('.sm\\:grid');
+      const productRow = screen.getByText('Laptop').closest('.sm\\:grid') as HTMLElement;
       expect(within(productRow).getByText(`$${expectedAmount.toFixed(2)}`)).toBeInTheDocument();
+    });
+  });
+
+  describe('Checkout Login Interception - Unauthenticated User', () => {
+    beforeEach(() => {
+      mockNavigate.mockClear();
+
+      const mockCartItems = [
+        {
+          product: {
+            id: 1,
+            name: 'Laptop',
+            sku: 'SKU-001',
+            price: 999.99,
+            image_url: 'https://example.com/laptop.jpg',
+            onhand: 10,
+            description: 'High performance laptop',
+            status: 'A' as const,
+          },
+          quantity: 1,
+        },
+      ];
+
+      vi.mocked(CartContextModule.useCart).mockReturnValue({
+        items: mockCartItems,
+        totalAmount: 999.99,
+        totalItems: 1,
+        addToCart: vi.fn(),
+        removeFromCart: mockRemoveFromCart,
+        updateQuantity: mockUpdateQuantity,
+        clearCart: vi.fn(),
+      });
+
+      vi.mocked(AuthContextModule.useAuth).mockReturnValue({
+        isAuthenticated: false,
+        user: null,
+        login: vi.fn(),
+        logout: vi.fn(),
+        register: vi.fn(),
+        updateProfile: vi.fn(),
+      });
+    });
+
+    it('should NOT navigate when unauthenticated user clicks "Proceed to Checkout"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('should open LoginDialog when unauthenticated user clicks "Proceed to Checkout"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert
+      await waitFor(() => {
+        expect(screen.getByTestId('login-dialog')).toBeInTheDocument();
+      });
+    });
+
+    it('should display login form in the intercepted dialog', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert
+      await waitFor(() => {
+        expect(screen.getByTestId('login-dialog')).toBeInTheDocument();
+        expect(screen.getByTestId('login-email')).toBeInTheDocument();
+        expect(screen.getByTestId('login-password')).toBeInTheDocument();
+      });
+    });
+
+    it('should keep user on cart page while LoginDialog is open', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Verify we're on the cart page
+      expect(screen.getByRole('heading', { name: /shopping cart/i })).toBeInTheDocument();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert - Should still see cart content and dialog
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: /shopping cart/i })).toBeInTheDocument();
+        expect(screen.getByText('Laptop')).toBeInTheDocument();
+        expect(screen.getByTestId('login-dialog')).toBeInTheDocument();
+      });
+    });
+
+    it('should navigate to checkout after successful login via dialog', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('login-dialog')).toBeInTheDocument();
+      });
+
+      const signInButton = screen.getByTestId('dialog-sign-in-button');
+      await user.click(signInButton);
+
+      // Assert - After successful login, should navigate to checkout
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/checkout');
+      });
+    });
+
+    it('should preserve cart items while LoginDialog is open', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert - Cart items and dialog should still be visible
+      await waitFor(() => {
+        expect(screen.getByTestId('login-dialog')).toBeInTheDocument();
+        expect(screen.getByText('Laptop')).toBeInTheDocument();
+        expect(screen.getByText('SKU-001')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Checkout Navigation - Authenticated User', () => {
+    beforeEach(() => {
+      mockNavigate.mockClear();
+
+      const mockCartItems = [
+        {
+          product: {
+            id: 1,
+            name: 'Laptop',
+            sku: 'SKU-001',
+            price: 999.99,
+            image_url: 'https://example.com/laptop.jpg',
+            onhand: 10,
+            description: 'High performance laptop',
+            status: 'A' as const,
+          },
+          quantity: 1,
+        },
+      ];
+
+      vi.mocked(CartContextModule.useCart).mockReturnValue({
+        items: mockCartItems,
+        totalAmount: 999.99,
+        totalItems: 1,
+        addToCart: vi.fn(),
+        removeFromCart: mockRemoveFromCart,
+        updateQuantity: mockUpdateQuantity,
+        clearCart: vi.fn(),
+      });
+
+      vi.mocked(AuthContextModule.useAuth).mockReturnValue({
+        isAuthenticated: true,
+        user: {
+          token: 'test-token',
+          client: {
+            id: 1,
+            firstname: 'John',
+            lastname: 'Doe',
+            email: 'john@example.com',
+            phone: '555-1234',
+            address: '123 Main St',
+          },
+        },
+        login: vi.fn(),
+        logout: vi.fn(),
+        register: vi.fn(),
+        updateProfile: vi.fn(),
+      });
+    });
+
+    it('should navigate directly to /checkout when authenticated user clicks button', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert - Should navigate immediately
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledOnce();
+        expect(mockNavigate).toHaveBeenCalledWith('/checkout');
+      });
+    });
+
+    it('should NOT open LoginDialog when authenticated user clicks button', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert - Dialog should NOT be visible
+      const dialog = screen.queryByTestId('login-dialog');
+      expect(dialog).not.toBeInTheDocument();
+    });
+
+    it('should navigate immediately without showing login form', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Act
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      await user.click(checkoutButton);
+
+      // Assert - Should navigate immediately
+      expect(mockNavigate).toHaveBeenCalledWith('/checkout');
+
+      // Login form should not exist
+      expect(screen.queryByTestId('login-email')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('login-password')).not.toBeInTheDocument();
+    });
+
+    it('should allow authenticated user to proceed to checkout without friction', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderCart();
+
+      // Assert - User can see cart is populated
+      expect(screen.getByText('Laptop')).toBeInTheDocument();
+
+      // Act - Click checkout
+      const checkoutButton = screen.getByRole('button', { name: /proceed to checkout/i });
+      expect(checkoutButton).toBeEnabled();
+      await user.click(checkoutButton);
+
+      // Assert - Single navigation to checkout, no dialog shown
+      expect(mockNavigate).toHaveBeenCalledOnce();
+      expect(mockNavigate).toHaveBeenCalledWith('/checkout');
     });
   });
 });

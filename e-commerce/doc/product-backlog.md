@@ -17,9 +17,9 @@ The backlog is ordered based on the **"Dependency & Value Chain"** method:
 
 | Status | Rank | ID | Story Name | Phase | Epic | Value | Effort | Strategic Rationale |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1** | **1.1.3** | **Password Encryption** | MVP | IAM | Critical | 3 | **Risk & Foundation:** Security is a hard constraint for data protection (GDPR compliance). Implementation must precede all other auth features. |
-| [ ] | **2** | **1.1.1** | **Register Account** | MVP | IAM | High | 5 | **Dependency:** Checkout requires registered users. Early user data capture enables personalization and repeat purchases. |
-| [ ] | **3** | **1.1.2** | **Login** | MVP | IAM | High | 3 | **Dependency:** Prerequisite for cart persistence, order history, and profile management. Unblocks all member-only features. |
+| [x] | **1** | **1.1.3** | **Password Encryption** | MVP | IAM | Critical | 3 | **Risk & Foundation:** Security is a hard constraint for data protection (GDPR compliance). Implementation must precede all other auth features. |
+| [x] | **2** | **1.1.1** | **Register Account** | MVP | IAM | High | 5 | **Dependency:** Checkout requires registered users. Early user data capture enables personalization and repeat purchases. |
+| [x] | **3** | **1.1.2** | **Login** | MVP | IAM | High | 3 | **Dependency:** Prerequisite for cart persistence, order history, and profile management. Unblocks all member-only features. |
 | [x] | **4** | **1.2.1** | **View Product List** | MVP | Catalog | Critical | 5 | **User Impact:** The primary entry point. If customers cannot see products, the site has no value and users bounce immediately. |
 | [x] | **5** | **1.2.2** | **Product Detail View** | MVP | Catalog | High | 3 | **User Impact:** Essential for informed purchasing. Customers need full specs, images, and availability to decide whether to buy. |
 | [x] | **6** | **1.3.1** | **Add to Cart** | MVP | Cart | High | 3 | **Business Value:** Captures purchase intent. First step of conversion funnel; directly impacts revenue. |
@@ -29,7 +29,7 @@ The backlog is ordered based on the **"Dependency & Value Chain"** method:
 | [ ] | **10** | **1.4.2** | **Simulate Payment** | MVP | Checkout | Critical | 5 | **Risk & Revenue:** High technical complexity (payment gateway integration). Must validate early to ensure transaction processing works under load. |
 | [ ] | **11** | **1.4.3** | **Order Review** | MVP | Checkout | High | 3 | **UX & Risk:** Final verification step prevents accidental orders and builds customer confidence. Reduces disputes/cancellations. |
 | [ ] | **12** | **1.4.4** | **Order Confirmation** | MVP | Checkout | Critical | 5 | **Revenue Realization:** The "handshake" moment. Finalizes revenue, generates invoice, and creates audit trail. Email confirmation provides customer record. |
-| [ ] | **13** | **1.1.4** | **Guest Shopping with Checkout Login** | MVP | IAM | Medium | 5 | **Conversion & UX:** Allows guests to browse and cart without friction. Forced login at checkout captures user data while removing pre-checkout barriers. Increases conversion by reducing initial registration friction. |
+| [x] | **13** | **1.1.4** | **Guest Shopping with Checkout Login** | MVP | IAM | Medium | 5 | **Conversion & UX:** Allows guests to browse and cart without friction. Forced login at checkout captures user data while removing pre-checkout barriers. Increases conversion by reducing initial registration friction. |
 | [ ] | **14** | **2.5.1** | **Keyword Search** | V1 | Discovery | High | 5 | **UX Impact:** As catalog grows, Search becomes highest ROI feature. Reduces browsing fatigue and improves purchase velocity. |
 | [ ] | **15** | **2.5.2** | **Filter by Price** | V1 | Discovery | Medium | 3 | **UX & Conversion:** Critical for budget-conscious electronics shoppers. Highly relevant filters reduce bounce rate by 20-30%. |
 | [ ] | **16** | **2.5.3** | **Sort Products** | V1 | Discovery | Low | 2 | **UX:** Low effort, useful utility. Enables common sorting expectations (Price, Newest, Relevance). |
