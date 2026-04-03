@@ -6,10 +6,12 @@ import {
   DuplicateEmailError,
   InvalidEmailError
 } from '../../application/use-cases/RegisterClientUseCase.js';
+import { LoginClientUseCase } from '../../application/use-cases/LoginClientUseCase.js';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let mockUseCase: jest.Mocked<RegisterClientUseCase>;
+  let mockRegisterUseCase: jest.Mocked<RegisterClientUseCase>;
+  let mockLoginUseCase: jest.Mocked<LoginClientUseCase>;
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
@@ -17,11 +19,15 @@ describe('AuthController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockUseCase = {
+    mockRegisterUseCase = {
       execute: jest.fn()
     } as any;
 
-    controller = new AuthController(mockUseCase);
+    mockLoginUseCase = {
+      execute: jest.fn()
+    } as any;
+
+    controller = new AuthController(mockRegisterUseCase, mockLoginUseCase);
 
     mockResponse = {
       status: jest.fn().mockReturnThis() as jest.Mock,
@@ -46,7 +52,7 @@ describe('AuthController', () => {
         address: '123 Main St'
       };
 
-      (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 42 });
+      (mockRegisterUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 42 });
 
       await controller.register(
         mockRequest as Request,
@@ -61,7 +67,7 @@ describe('AuthController', () => {
           clientId: 42
         }
       });
-      expect(mockUseCase.execute).toHaveBeenCalledWith({
+      expect(mockRegisterUseCase.execute).toHaveBeenCalledWith({
         firstname: 'Miguel',
         lastname: 'Smith',
         email: 'test@test.com',
@@ -81,7 +87,7 @@ describe('AuthController', () => {
         address: '456 Oak Ave'
       };
 
-      (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 99 });
+      (mockRegisterUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 99 });
 
       await controller.register(
         mockRequest as Request,
@@ -108,7 +114,7 @@ describe('AuthController', () => {
         address: '789 Pine Rd'
       };
 
-      (mockUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 100 });
+      (mockRegisterUseCase.execute as jest.Mock).mockResolvedValueOnce({ id: 100 });
 
       await controller.register(
         mockRequest as Request,
@@ -116,7 +122,7 @@ describe('AuthController', () => {
         mockNext
       );
 
-      expect(mockUseCase.execute).toHaveBeenCalledWith({
+      expect(mockRegisterUseCase.execute).toHaveBeenCalledWith({
         firstname: 'John',
         lastname: 'Doe',
         email: 'john@test.com',
@@ -138,7 +144,7 @@ describe('AuthController', () => {
       };
 
       const error = new DuplicateEmailError('existing@example.com');
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
 
       await controller.register(
         mockRequest as Request,
@@ -165,7 +171,7 @@ describe('AuthController', () => {
       };
 
       const error = new DuplicateEmailError(email);
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
 
       await controller.register(
         mockRequest as Request,
@@ -191,7 +197,7 @@ describe('AuthController', () => {
       };
 
       const error = new InvalidEmailError('invalidemail');
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
 
       await controller.register(
         mockRequest as Request,
@@ -226,7 +232,7 @@ describe('AuthController', () => {
         }
       ]);
 
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
 
       await controller.register(
         mockRequest as Request,
@@ -265,7 +271,7 @@ describe('AuthController', () => {
         }
       ]);
 
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
 
       await controller.register(
         mockRequest as Request,
@@ -308,7 +314,7 @@ describe('AuthController', () => {
         }
       ] as any);
 
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(zodError);
 
       await controller.register(
         mockRequest as Request,
@@ -333,7 +339,7 @@ describe('AuthController', () => {
       };
 
       const unexpectedError = new Error('Database connection failed');
-      (mockUseCase.execute as jest.Mock).mockRejectedValueOnce(unexpectedError);
+      (mockRegisterUseCase.execute as jest.Mock).mockRejectedValueOnce(unexpectedError);
 
       await controller.register(
         mockRequest as Request,
@@ -343,6 +349,249 @@ describe('AuthController', () => {
 
       expect(mockNext).toHaveBeenCalledWith(unexpectedError);
       expect(mockResponse.status).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Login - Test 1: Return 200 with token and user data on successful login', () => {
+    it('should return 200 OK with token and user data on successful login', async () => {
+      mockRequest.body = {
+        email: 'test@test.com',
+        password: 'password123'
+      };
+
+      const mockLoginResult = {
+        token: 'jwt_token_abc123',
+        client: {
+          id: 42,
+          firstname: 'Miguel',
+          lastname: 'Smith',
+          email: 'test@test.com',
+          phone: '+61400000000',
+          address: '123 Main St',
+          status: 'A'
+        }
+      };
+
+      (mockLoginUseCase.execute as jest.Mock).mockResolvedValueOnce(mockLoginResult);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          token: 'jwt_token_abc123',
+          client: mockLoginResult.client
+        }
+      });
+      expect(mockLoginUseCase.execute).toHaveBeenCalledWith({
+        email: 'test@test.com',
+        password: 'password123'
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should extract email and password from request body', async () => {
+      mockRequest.body = {
+        email: 'alice@example.com',
+        password: 'securepass'
+      };
+
+      const mockLoginResult = {
+        token: 'token_xyz',
+        client: {
+          id: 99,
+          firstname: 'Alice',
+          lastname: 'Johnson',
+          email: 'alice@example.com',
+          phone: '+61412345678',
+          address: '456 Oak Ave',
+          status: 'A'
+        }
+      };
+
+      (mockLoginUseCase.execute as jest.Mock).mockResolvedValueOnce(mockLoginResult);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockLoginUseCase.execute).toHaveBeenCalledWith({
+        email: 'alice@example.com',
+        password: 'securepass'
+      });
+    });
+
+    it('should return token in response data', async () => {
+      mockRequest.body = {
+        email: 'user@example.com',
+        password: 'pass'
+      };
+
+      const mockLoginResult = {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        client: {
+          id: 1,
+          firstname: 'John',
+          lastname: 'Doe',
+          email: 'user@example.com',
+          phone: null,
+          address: null,
+          status: 'A'
+        }
+      };
+
+      (mockLoginUseCase.execute as jest.Mock).mockResolvedValueOnce(mockLoginResult);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      const jsonCall = (mockResponse.json as jest.Mock).mock.calls[0][0];
+      expect(jsonCall.data.token).toBe('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+    });
+  });
+
+  describe('Login - Test 2: Return 401 Unauthorized if invalid credentials', () => {
+    it('should return 401 when use case throws "Invalid email or password" error', async () => {
+      mockRequest.body = {
+        email: 'wrong@example.com',
+        password: 'wrongpassword'
+      };
+
+      const error = new Error('Invalid email or password');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Invalid email or password',
+        code: 'INVALID_CREDENTIALS'
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when email does not exist', async () => {
+      mockRequest.body = {
+        email: 'nonexistent@example.com',
+        password: 'somepassword'
+      };
+
+      const error = new Error('Invalid email or password');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Invalid email or password',
+          code: 'INVALID_CREDENTIALS'
+        })
+      );
+    });
+
+    it('should return 401 when password is incorrect', async () => {
+      mockRequest.body = {
+        email: 'test@example.com',
+        password: 'wrongpassword'
+      };
+
+      const error = new Error('Invalid email or password');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Invalid email or password',
+        code: 'INVALID_CREDENTIALS'
+      });
+    });
+  });
+
+  describe('Login - Test 3: Return 500 for unexpected errors', () => {
+    it('should return 500 for unexpected server errors', async () => {
+      mockRequest.body = {
+        email: 'user@example.com',
+        password: 'password123'
+      };
+
+      const unexpectedError = new Error('Database connection failed');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(unexpectedError);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      });
+    });
+
+    it('should return 500 for non-"Invalid email or password" errors', async () => {
+      mockRequest.body = {
+        email: 'user@example.com',
+        password: 'password'
+      };
+
+      const error = new Error('Token generation failed');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      });
+    });
+
+    it('should not call next() when handling server errors', async () => {
+      mockRequest.body = {
+        email: 'test@example.com',
+        password: 'test'
+      };
+
+      const error = new Error('Some internal error');
+      (mockLoginUseCase.execute as jest.Mock).mockRejectedValueOnce(error);
+
+      await controller.login(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockNext).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { RegisterClientUseCase, DuplicateEmailError, InvalidEmailError } from '../../application/use-cases/RegisterClientUseCase.js';
+import { LoginClientUseCase } from '../../application/use-cases/LoginClientUseCase.js';
 
 export class AuthController {
-  constructor(private readonly registerClientUseCase: RegisterClientUseCase) {}
+  constructor(
+    private readonly registerClientUseCase: RegisterClientUseCase,
+    private readonly loginClientUseCase: LoginClientUseCase
+  ) {}
 
   public register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -56,8 +60,44 @@ export class AuthController {
         return;
       }
 
-      // Pass other errors to error handling middleware
       next(error);
+    }
+  };
+
+  public login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // Extract from request body
+      const { email, password } = req.body;
+
+      // Call the use case
+      const result = await this.loginClientUseCase.execute({
+        email,
+        password
+      });
+
+      // Return 200 OK with success response
+      res.status(200).json({
+        success: true,
+        data: {
+          token: result.token,
+          client: result.client
+        }
+      });
+    } catch (error) {
+      // Handle invalid email or password
+      if (error instanceof Error && error.message === 'Invalid email or password') {
+        res.status(401).json({
+          error: error.message,
+          code: 'INVALID_CREDENTIALS'
+        });
+        return;
+      }
+
+      // Handle other errors
+      res.status(500).json({
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      });
     }
   };
 }
