@@ -72,4 +72,107 @@ Output the complete TypeScript code for `JwtService.test.ts`, then `LoginClientU
 
 ## USER PROMPT 3
 
+@workspace #file:doc/tickets.md #file:doc/phase-1-user-stories.md #file:doc/sprints/sprint-2.md
+
+# The Task
+Update the Acceptance Criteria for **User Story 1.1.2** and **Ticket 1.1.2.2 ([Frontend] Login Page & Auth Context)** to reflect that the login UI is a Modal/Dialog, not a separate page.
+
+# Updates to Apply:
+Across all three files, modify the title of 1.1.2.2 to **"[Frontend] Login Modal & Auth Context"** and update the Acceptance Criteria to the following:
+1. Implement the login UI as a pop-up Modal/Dialog triggered by the "Login" navbar button.
+2. Form fields: Email and Password.
+3. Submit button ("Sign In") calls the `POST /api/auth/login` endpoint (Ticket 1.1.2.1).
+4. On success: stores JWT token in LocalStorage, updates `AuthContext` to set the user as authenticated, closes the modal, and triggers a success Toast.
+5. On failure (401 Unauthorized): displays a destructive Toast ("Invalid email or password").
+6. Includes a link to switch to the Registration page.
+
+# Output Format
+Output the fully updated tables for each file in distinct markdown code blocks so I can apply the changes directly. Do not alter any other tickets.
+
 ## USER PROMPT 4
+
+@workspace #file:frontend/src/services/authService.ts #file:frontend/src/context/AuthContext.tsx #file:frontend/src/components/ui/LoginDialog.tsx
+
+# Role & Context
+You are a Lead Frontend React Architect. We are connecting our Login Dialog to the real backend, but we must strictly preserve the existing `AuthUser` type shape (`{ client: Client, token: string }`) so we do not break the Navbar dropdown.
+
+# The Task
+Update `authService.ts`, `AuthContext.tsx`, and `LoginDialog.tsx` to use the real API while maintaining perfect type compatibility with the rest of the app.
+
+# Execution Steps:
+
+1. **API Service (`frontend/src/services/authService.ts`):**
+   - Implement `export async function loginUser(email, password): Promise<AuthUser>`.
+   - `fetch` from `POST ${API_URL}/auth/login`.
+   - Our backend returns: `{ success: boolean, data: { token: string, client: Client } }`.
+   - **Crucial:** You must extract and return ONLY the `data` object so the return value exactly matches the `AuthUser` interface (`{ client, token }`). Do not return the `success` wrapper.
+   - Throw an error if `!response.ok`.
+
+2. **Auth Context (`frontend/src/context/AuthContext.tsx`):**
+   - Keep the existing `persist` and state logic exactly as it is (it already handles `{ client, token }` correctly).
+   - Update the `login` function to simply call `const result = await authService.loginUser(email, password); persist(result);`.
+
+3. **UI Component (`frontend/src/components/ui/LoginDialog.tsx`):**
+   - Connect the form to `useAuth().login`.
+   - Ensure the form uses `zod` and `react-hook-form`.
+   - On successful login: `toast` a success message and close the dialog. Do NOT try to navigate away (the user should stay on the current page).
+   - On error: `toast` the error message.
+
+# Output Format
+Output the updated code for `authService.ts`, `AuthContext.tsx`, and `LoginDialog.tsx` sequentially.
+
+## USER PROMPT 5
+
+@workspace #file:frontend/src/components/ui/LoginDialog.tsx
+
+# Role & Context
+You are a Lead Frontend React Architect. We are standardizing our UI components and need to remove the `sonner` dependency from our login modal.
+
+# The Task
+Refactor `LoginDialog.tsx` to use our local `shadcn/ui` toast system instead of `sonner`.
+
+# Execution Steps:
+1. **Remove Sonner:** Delete `import { toast } from "@/components/ui/sonner";` (or wherever `sonner` is imported from).
+2. **Import Hook:** Add `import { useToast } from "@/hooks/use-toast";` at the top of the file.
+3. **Initialize Hook:** Inside the `LoginDialog` component definition, add `const { toast } = useToast();`.
+4. **Update Toast Calls:** Inside your `onSubmit` or login handler, rewrite the toast payloads to match the `shadcn/ui` object signature:
+   - Success: `toast({ title: "Welcome back!", description: "You have successfully logged in." });`
+   - Error: `toast({ variant: "destructive", title: "Login failed", description: error.message });`
+
+# Output Format
+Output the fully updated TypeScript code for `LoginDialog.tsx`.
+
+## USER PROMPT 6
+
+@workspace #file:frontend/src/services/authService.ts #file:frontend/src/services/authService.test.ts #file:frontend/src/context/AuthContext.tsx #file:frontend/src/context/AuthContext.test.tsx #file:frontend/src/components/ui/LoginDialog.tsx
+
+# Role & Context
+You are a Lead Frontend SDET. We have completed the code for Ticket 1.1.2.2 (Login Modal & Auth Context) and need to add isolated unit tests for this flow using Vitest and React Testing Library.
+
+# The Task
+Update the existing `authService.test.ts` and `AuthContext.test.tsx` to include login tests, and create a new test file `LoginDialog.test.tsx`. 
+**CRUCIAL:** Do NOT delete the existing registration tests in the service or context files. Append the new tests.
+
+# Execution Steps:
+
+1. **Service Tests (Update `frontend/src/services/authService.test.ts`):**
+   - Add a `describe('loginUser')` block.
+   - **Test 1 (Success):** Should call `fetch` with POST, the correct URL, headers, and body. It must mock a successful backend response (`{ success: true, data: { token: '123', client: {...} } }`) and assert that the function unwraps and returns ONLY the `data` object (`{ token, client }`).
+   - **Test 2 (Failure):** Should throw an Error with the backend's message if the response is not `ok` (e.g., 401 Unauthorized).
+
+2. **Context Tests (Update `frontend/src/context/AuthContext.test.tsx`):**
+   - Add a `describe('login')` block.
+   - **Test 1:** Calling `login` should call `authService.loginUser` with the provided email and password.
+   - **Test 2:** Ensure successful login updates the `user` state and saves the result to `localStorage` (since it calls `persist`).
+
+3. **UI Component (Create `frontend/src/components/ui/LoginDialog.test.tsx`):**
+   - Mock `useAuth` to return a fake `login` function.
+   - Mock `useToast` from `@/hooks/use-toast`.
+   - **Setup:** Render the `LoginDialog`. Since it's a dialog, you may need to pass a mocked `open={true}` prop or render a trigger button to open it in the test.
+   - **Test 1:** Should render the Email and Password fields.
+   - **Test 2:** Should show Zod validation errors if the form is submitted empty.
+   - **Test 3:** On valid submission, should call `login`, trigger a success toast, and call the `onOpenChange(false)` function to close the dialog.
+   - **Test 4:** If `login` throws an error, should trigger a destructive toast with the error message.
+
+# Output Format
+Output the updated code for `authService.test.ts` and `AuthContext.test.tsx`, followed by the complete code for the new `LoginDialog.test.tsx` in distinct markdown code blocks.
