@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -20,6 +21,7 @@ interface LoginDialogProps {
 
 export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogProps) {
   const { login } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -35,12 +37,15 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
     setError("");
     try {
       await login(email, password);
+      toast({ title: "Welcome back!", description: "You have successfully logged in." });
       onOpenChange(false);
       setEmail("");
       setPassword("");
       onLoginSuccess?.();
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      const errorMessage = err.message || "Login failed";
+      setError(errorMessage);
+      toast({ variant: "destructive", title: "Login failed", description: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -84,9 +89,6 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: LoginDialogP
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            Demo: john.doe@email.com / password123
-          </p>
           <p className="text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link
