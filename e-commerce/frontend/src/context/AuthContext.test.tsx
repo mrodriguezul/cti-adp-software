@@ -5,6 +5,9 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import * as authService from '@/services/authService';
 
 vi.mock('@/services/authService');
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({ toast: vi.fn() }),
+}));
 
 function TestRegisterButton() {
   const { register } = useAuth();
@@ -22,6 +25,17 @@ function TestRegisterButton() {
       }
     >
       Register
+    </button>
+  );
+}
+
+function TestLoginButton() {
+  const { login } = useAuth();
+  return (
+    <button
+      onClick={() => login('john@example.com', 'password123')}
+    >
+      Login
     </button>
   );
 }
@@ -81,6 +95,61 @@ describe('AuthContext', () => {
     await waitFor(() => {
       expect(screen.getByText('Not Authenticated')).toBeInTheDocument();
       expect(localStorage.getItem('lpa_auth')).toBeNull();
+    });
+  });
+
+  describe('login', () => {
+    it('should call authService.loginUser with email and password', async () => {
+      const mockLoginUser = vi.fn().mockResolvedValue({
+        token: 'test-token',
+        client: { id: 1, firstname: 'John', lastname: 'Doe', email: 'john@example.com', phone: '', address: '' },
+      });
+      vi.mocked(authService.loginUser).mockImplementation(mockLoginUser);
+
+      const user = userEvent.setup();
+      render(
+        <AuthProvider>
+          <TestLoginButton />
+        </AuthProvider>
+      );
+
+      const button = screen.getByRole('button', { name: /login/i });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(mockLoginUser).toHaveBeenCalledOnce();
+        expect(mockLoginUser).toHaveBeenCalledWith('john@example.com', 'password123');
+      });
+    });
+
+    it('should persist user state after successful login', async () => {
+      const mockClient = { id: 1, firstname: 'John', lastname: 'Doe', email: 'john@example.com', phone: '', address: '' };
+      const mockToken = 'test-token-123';
+
+      vi.mocked(authService.loginUser).mockResolvedValue({
+        token: mockToken,
+        client: mockClient,
+      });
+
+      const user = userEvent.setup();
+      render(
+        <AuthProvider>
+          <TestLoginButton />
+          <AuthConsumer />
+        </AuthProvider>
+      );
+
+      const loginButton = screen.getByRole('button', { name: /login/i });
+      await user.click(loginButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Authenticated')).toBeInTheDocument();
+        const stored = localStorage.getItem('lpa_auth');
+        expect(stored).not.toBeNull();
+        const parsedAuth = JSON.parse(stored!);
+        expect(parsedAuth.token).toBe(mockToken);
+        expect(parsedAuth.client).toEqual(mockClient);
+      });
     });
   });
 });
