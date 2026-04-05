@@ -75,18 +75,22 @@ function AddressStep({
   onSubmit,
   fullName,
   defaultAddress,
+  initialData,
 }: {
   onSubmit: (data: AddressFormData) => void;
   fullName: string;
   defaultAddress?: string;
+  initialData?: AddressFormData;
 }) {
-  const [formData, setFormData] = useState<AddressFormData>({
-    address: defaultAddress || '',
-    city: '',
-    state: '',
-    postal: '',
-    country: '',
-  });
+  const [formData, setFormData] = useState<AddressFormData>(
+    initialData || {
+      address: defaultAddress || '',
+      city: '',
+      state: '',
+      postal: '',
+      country: '',
+    }
+  );
   const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +143,7 @@ function AddressStep({
             <Input
               id="city"
               name="city"
-              placeholder="New York"
+              placeholder="Your City"
               value={formData.city}
               onChange={handleChange}
               className={`mt-1 ${errors.city ? 'border-destructive' : ''}`}
@@ -153,7 +157,7 @@ function AddressStep({
             <Input
               id="state"
               name="state"
-              placeholder="NY"
+              placeholder="Your State"
               value={formData.state}
               onChange={handleChange}
               className={`mt-1 ${errors.state ? 'border-destructive' : ''}`}
@@ -170,7 +174,7 @@ function AddressStep({
             <Input
               id="postal"
               name="postal"
-              placeholder="10001"
+              placeholder="Your postal code"
               value={formData.postal}
               onChange={handleChange}
               className={`mt-1 ${errors.postal ? 'border-destructive' : ''}`}
@@ -184,7 +188,7 @@ function AddressStep({
             <Input
               id="country"
               name="country"
-              placeholder="United States"
+              placeholder="Your Country"
               value={formData.country}
               onChange={handleChange}
               className={`mt-1 ${errors.country ? 'border-destructive' : ''}`}
@@ -207,17 +211,21 @@ function AddressStep({
 function PaymentStep({
   onSubmit,
   onBack,
+  initialData,
 }: {
-  onSubmit: (token: string) => void;
+  onSubmit: (token: string, data: CreditCardFormData) => void;
   onBack: () => void;
+  initialData?: CreditCardFormData;
 }) {
   const [activeTab, setActiveTab] = useState('cc');
-  const [formData, setFormData] = useState<CreditCardFormData>({
-    nameOnCard: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
-  });
+  const [formData, setFormData] = useState<CreditCardFormData>(
+    initialData || {
+      nameOnCard: '',
+      cardNumber: '',
+      expiry: '',
+      cvv: '',
+    }
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -239,13 +247,13 @@ function PaymentStep({
     }
     setIsProcessing(true);
     const token = `mock_cc_${Date.now()}`;
-    onSubmit(token);
+    onSubmit(token, formData);
   };
 
   const handlePayPalClick = () => {
     setIsProcessing(true);
     const token = `mock_paypal_${Date.now()}`;
-    onSubmit(token);
+    onSubmit(token, formData);
   };
 
   return (
@@ -298,7 +306,7 @@ function PaymentStep({
                 <Input
                   id="expiry"
                   name="expiry"
-                  placeholder="12/25"
+                  placeholder="12/26"
                   value={formData.expiry}
                   onChange={handleChange}
                   maxLength={5}
@@ -500,6 +508,8 @@ export default function Checkout() {
   const [clientAddress, setClientAddress] = useState('');
   const [paymentToken, setPaymentToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [addressData, setAddressData] = useState<AddressFormData | null>(null);
+  const [paymentData, setPaymentData] = useState<CreditCardFormData | null>(null);
 
   if (!user) {
     return (
@@ -528,12 +538,19 @@ export default function Checkout() {
   const fullName = `${user.client.firstname} ${user.client.lastname}`;
 
   const handleAddressSubmit = (data: AddressFormData) => {
+    // Save the form data for persistence
+    setAddressData(data);
+
+    // Concatenate for API payload
     const concatenatedAddress = `${data.address}, ${data.city}, ${data.state}, ${data.postal}, ${data.country}`;
     setClientAddress(concatenatedAddress);
     setStep(2);
   };
 
-  const handlePaymentSubmit = (token: string) => {
+  const handlePaymentSubmit = (token: string, data: CreditCardFormData) => {
+    // Save the form data for persistence
+    setPaymentData(data);
+
     setPaymentToken(token);
     setStep(3);
   };
@@ -638,11 +655,16 @@ export default function Checkout() {
             onSubmit={handleAddressSubmit}
             defaultAddress={user.client.address}
             fullName={fullName}
+            initialData={addressData || undefined}
           />
         )}
 
         {step === 2 && (
-          <PaymentStep onSubmit={handlePaymentSubmit} onBack={() => setStep(1)} />
+          <PaymentStep
+            onSubmit={handlePaymentSubmit}
+            onBack={() => setStep(1)}
+            initialData={paymentData || undefined}
+          />
         )}
 
         {step === 3 && (
