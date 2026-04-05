@@ -98,3 +98,57 @@ Generate unit tests for the Auth Middleware, Create Order Use Case, and Order Co
 
 # Output Format
 Output the complete TypeScript code for `authMiddleware.test.ts`, `CreateOrderUseCase.test.ts`, and `OrderController.test.ts` in distinct markdown code blocks.
+
+## USER PROMPT 4
+
+@workspace #file:frontend/src/context/CartContext.tsx #file:frontend/src/context/AuthContext.tsx 
+
+# Role & Context
+You are a Lead Frontend React Architect. We are building the multi-step Checkout engine (Tickets 1.4.1.1, 1.4.2.1, and 1.4.3.1). 
+We must follow strict Separation of Concerns: API calls go in services, and UI/State go in pages.
+
+# The Task
+1. Create `frontend/src/services/orderService.ts` to handle the API call.
+2. Create `frontend/src/pages/Checkout.tsx` as a stateful parent component managing 3 step sub-components (Address, Payment, Review).
+
+# Execution Steps:
+
+### 1. API Service (`frontend/src/services/orderService.ts`)
+- Create `createOrder(payload: { clientAddress: string; paymentToken: string; items: { productId: number; quantity: number }[] })`.
+- Fetch `POST ${API_URL}/checkout/orders`. Include the `Authorization: Bearer <token>` header from LocalStorage (`lpa_auth`).
+- Throw an error if `!response.ok`. Return the parsed `data` object on success.
+
+### 2. Main Page Setup (`frontend/src/pages/Checkout.tsx`)
+- Import `useCart` (for items, total, and `clearCart`) and `useAuth` (for the user's JWT and profile).
+- If the cart is empty, render a friendly message and a button navigating to `/products`.
+- Manage state for `step` (1, 2, or 3), `clientAddress` (string), and `paymentToken` (string).
+- Define 3 internal sub-components: `AddressStep`, `PaymentStep`, and `ReviewStep` to render conditionally based on `step`.
+
+### 3. Sub-Component: `AddressStep`
+- Read-only label showing the logged-in user's Full Name (from `useAuth` context).
+- Use `zod` and `react-hook-form` for: Address, City, State/Province, Zip/Postal, Country.
+- Make all fields required.
+- Pre-fill fields if the user object has a saved address (optional).
+- On valid submit: Concatenate the fields into a single string (e.g., "123 St, City, State, Zip, Country"), call `setClientAddress()`, and `setStep(2)`.
+
+### 4. Sub-Component: `PaymentStep`
+- Use Shadcn Tabs or Radio Group to toggle between "Credit Card" and "PayPal".
+- **Credit Card:** Zod schema for Name on Card, Card Number (16 chars), Exp (MM/YY), CVV (3 chars). Include a "Continue to Review" submit button.
+- **PayPal:** A mock "Log in to PayPal" button.
+- On CC submit OR PayPal click: Call `setPaymentToken('mock_token_' + Date.now())` and `setStep(3)`.
+- Include a "Back" button calling `setStep(1)`.
+
+### 5. Sub-Component: `ReviewStep`
+- Display `clientAddress`.
+- Render a read-only list of cart items (Image, Name, Price, Qty, Subtotal) matching the Cart visual style. 
+- Include an "Edit Cart" `<Link>` pointing to `/cart`.
+- Add a "Terms and Conditions" required checkbox (via local state or form).
+- "Place Order" button logic:
+  - Map `cartItems` into the required API format: `[{ productId, quantity }]`.
+  - Call `await orderService.createOrder({ clientAddress, paymentToken, items })`.
+  - On success: call `clearCart()`, trigger a success `toast`, and `Maps('/checkout-complete', { state: { invoice: result } })`.
+  - On error: trigger a destructive `toast`.
+- Include a "Back" button calling `setStep(2)`.
+
+# Output Format
+Output `orderService.ts` first, followed by the complete `Checkout.tsx` code in distinct markdown code blocks.
