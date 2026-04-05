@@ -152,3 +152,76 @@ We must follow strict Separation of Concerns: API calls go in services, and UI/S
 
 # Output Format
 Output `orderService.ts` first, followed by the complete `Checkout.tsx` code in distinct markdown code blocks.
+
+## USER PROMPT 5
+
+@workspace #file:frontend/src/pages/Checkout.tsx
+
+# Role & Context
+You are a Lead Frontend React Architect. Our multi-step checkout form works, but it loses user input when navigating backwards because the step components unmount and lose their local `react-hook-form` state.
+
+# The Task
+Refactor `Checkout.tsx` to preserve the raw form data in the parent component's state and pass it down as `defaultValues`.
+
+# Execution Steps:
+
+1. **Update Parent State (`Checkout` component):**
+   - Add state to store the raw form data objects: 
+     `const [addressData, setAddressData] = useState<any>(null);`
+     `const [paymentData, setPaymentData] = useState<any>(null);`
+
+2. **Update `AddressStep` Component:**
+   - Add a prop: `initialData?: any`.
+   - In the `useForm` initialization, set `defaultValues: initialData || { address: '', city: '', ... }`.
+   - In the `onSubmit` function, before calling `setStep(2)`, add `setAddressData(data)`. (Keep your existing concatenation logic for `clientAddress` as well).
+
+3. **Update `PaymentStep` Component:**
+   - Add a prop: `initialData?: any`.
+   - In the `useForm` initialization for the credit card, set `defaultValues: initialData || { cardNumber: '', ... }`.
+   - In the `onSubmit` function, before calling `setStep(3)`, add `setPaymentData(data)`.
+
+4. **Update Parent Render Logic:**
+   - When rendering `<AddressStep />`, pass the prop: `initialData={addressData}`.
+   - When rendering `<PaymentStep />`, pass the prop: `initialData={paymentData}`.
+
+# Output Format
+Output the updated `Checkout.tsx` code. You only need to show the modified sections if it is too long, but ensure the prop wiring and state changes are crystal clear.
+
+## USER PROMPT 6
+
+@workspace #file:frontend/src/services/orderService.ts #file:frontend/src/pages/Checkout.tsx
+
+# Role & Context
+You are a Lead Frontend SDET. We have completed the multi-step `Checkout.tsx` flow and the `orderService.ts` API wrapper. We need to write isolated unit and integration tests using Vitest and React Testing Library.
+
+# The Task
+Create `frontend/src/services/orderService.test.ts` and `frontend/src/pages/Checkout.test.tsx`.
+
+# Execution Steps:
+
+### 1. Service Tests (`frontend/src/services/orderService.test.ts`)
+- Mock the global `fetch` function.
+- **Test 1:** Should successfully call the endpoint with `POST`, the `Authorization` header, and the correct body payload, returning the parsed data.
+- **Test 2:** Should throw an error if the response is not `ok`.
+
+### 2. Component Tests Setup (`frontend/src/pages/Checkout.test.tsx`)
+- Mock `useAuth` to return a logged-in user with a mock token.
+- Mock `useCart` to return a fake cart with 1 item, a total amount, and a mock `clearCart` function.
+- Mock `useNavigate` from `react-router-dom`.
+- Mock `orderService.createOrder` to resolve successfully with a mock invoice ID.
+- Mock `useToast` from Shadcn UI.
+
+### 3. Component Test Cases (`Checkout.test.tsx`)
+- **Test 1: Empty Cart Redirect:** If `useCart` returns an empty cart, it should display the empty cart message and not render the checkout forms.
+- **Test 2: Full Happy Path (Step 1 to Step 3):**
+  - *Step 1:* Render `Checkout`. Fill out the Address form fields. Click "Next".
+  - *Step 2:* Verify it moved to Payment Step. Fill out the Credit Card form (or click the mock PayPal button). Click "Continue to Review".
+  - *Step 3:* Verify it moved to Review Step. Check the "Terms and Conditions" checkbox. Click "Place Order".
+  - *Assertion:* Verify `orderService.createOrder` was called with the concatenated address, payment token, and mapped cart items. Verify `clearCart` was called, and `Maps` was called to `/checkout-complete`.
+- **Test 3: State Retention (The "Back" Button):**
+  - Fill out Step 1 and advance to Step 2. 
+  - Click the "Back" button to return to Step 1.
+  - Verify that the input fields in Step 1 still contain the data that was entered previously.
+
+# Output Format
+Output the complete TypeScript code for `orderService.test.ts` followed by `Checkout.test.tsx` in distinct markdown code blocks.
