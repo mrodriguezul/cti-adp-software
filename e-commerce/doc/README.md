@@ -491,7 +491,7 @@ This section provides sample user stories from the **30 customer-facing stories*
 | **1.1.2.2** | 1.1.2 | **[Frontend] Login Page & Auth Context** | Frontend | 3 | Login form with email/password; submit calls 1.1.2.1 API; stores JWT in LocalStorage; sets AuthContext; redirects to Home. |
 | **1.2.1.1** | 1.2.1 | **[Backend] Public Product List Endpoint** | Backend | 3 | `GET /api/products` returns `lpa_stock` records (Active only); supports `?page=1&limit=12` pagination; returns count and hasMore flag. |
 | **1.2.1.2** | 1.2.1 | **[Frontend] Product Grid UI** | Frontend | 5 | Responsive grid (4 cols desktop, 2 mobile); displays image, name, price, stock status; out-of-stock items grayed out; pagination controls. |
-| **1.4.3.2** | 1.4.3 | **[API] Create Order Transaction** | Backend | 8 | `POST /api/checkout/orders` validates stock availability, creates atomic transaction: `lpa_invoices` + `lpa_invoice_items` records, updates `lpa_stock.onhand`, clears cart on success. |
+| **1.4.3.2** | 1.4.3 | **[API] Create Order Transaction** | Backend | 8 | `POST /api/orders` validates stock availability, creates atomic transaction: `lpa_invoices` + `lpa_invoice_items` records, updates `lpa_stock.onhand`, clears cart on success. |
 | **1.4.4.2** | 1.4.4 | **[Backend] Order Confirmation Email** | Backend | 3 | Triggered after successful checkout (1.4.3.2); includes Invoice ID, items, total, tracking placeholder; uses SendGrid; error logging only (non-blocking). |
 
 **Sample Phase 2 Tickets (Search & Account Mgmt):**
