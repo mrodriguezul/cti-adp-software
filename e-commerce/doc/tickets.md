@@ -116,7 +116,7 @@
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | Labels |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| [ ] | **1.4.4.1** | **[Frontend] Order Confirmation Page** | **Desc:** Build success confirmation and thank you page.<br>**AC:**<br>1. Displays prominent "Order Confirmed" message.<br>2. Shows Invoice ID (e.g., INV-20260309-001).<br>3. Shows order summary: items, total, shipping address.<br>4. Displays estimated delivery date.<br>5. "Continue Shopping" button clears cart and navigates home.<br>6. For registered users: link to "View Order History".<br>7. Email confirmation sent (backend). | 5 | Frontend | `UI` |
+| [x] | **1.4.4.1** | **[Frontend] Order Confirmation Page** | **Desc:** Build success confirmation and thank you page.<br>**AC:**<br>1. Displays prominent "Order Confirmed" message.<br>2. Shows Invoice ID (e.g., INV-20260309-001).<br>3. Shows order summary: items, total, shipping address.<br>4. Displays estimated delivery date.<br>5. "Continue Shopping" button clears cart and navigates home.<br>6. For registered users: link to "View Order History".<br>7. Email confirmation sent (backend). | 5 | Frontend | `UI` |
 | [ ] | **1.4.4.2** | **[Backend] Order Confirmation Email** | **Desc:** Send email confirmation on successful order.<br>**AC:**<br>1. Triggered after 1.4.3.2 success.<br>2. Email includes: Invoice ID, items, total, tracking placeholder.<br>3. Recipient: customer email from `lpa_clients`.<br>4. Uses SendGrid or similar email service.<br>5. Error logging if send fails (does not block order). | 3 | Backend | `Email` `Integration` |
 
 ---
