@@ -1,5 +1,2 @@
-*.swp
-*.swo
 *.log
-**/log
-database_credentials.php
+*.idea
