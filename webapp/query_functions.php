@@ -8,7 +8,7 @@
 /**
  * Performs query against $db and if successful returns $result
  */
-function query_with_check(string $query) : mixed {
+function query_with_check(string $query) {
   global $db;
 
   $result = pg_query($db, $query);
@@ -24,7 +24,7 @@ function query_with_check(string $query) : mixed {
  * Searchs by name, date or address.
  */
 
-function search_sales(string $txt_search) : mixed {
+function search_sales(string $txt_search) {
 
   $query =
     "SELECT
