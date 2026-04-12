@@ -38,8 +38,10 @@
     <div>
       <table class="table table-bordered table-striped table-hover">
         <tr style="background: #eeeeee">
-          <td><b>Stock Code</b></td>
-          <td><b>Stock Name</b></td>
+          <td><b>Sku Code</b></td>
+          <td><b>Name</b></td>
+          <td><b>Available</b></td>
+          <td><b>Status</b></td>
           <td><b>Price</b></td>
         </tr>
     <?PHP
@@ -51,7 +53,8 @@
          FROM
             lpa_stock
          WHERE
-            name LIKE '%$txtSearch%' AND status <> 'D'
+            name LIKE '%$txtSearch%'
+            ORDER BY created_at DESC
          ";
       $result = pg_query($db, $query);
       $row_cnt = pg_num_rows($result);
@@ -62,14 +65,21 @@
           <tr class="hl">
             <td onclick="loadStockItem(<?PHP echo $sid; ?>,'Edit')"
                 style="cursor: pointer;">
-              <?PHP echo $sid; ?>
+              <?PHP echo $row['sku']; ?>
             </td>
             <td onclick="loadStockItem(<?PHP echo $sid; ?>,'Edit')"
                 style="cursor: pointer;">
                 <?PHP echo $row['name']; ?>
             </td>
+            <td onclick="loadStockItem(<?PHP echo $sid; ?>,'Edit')"
+                style="cursor: pointer;">
+                <?PHP echo $row['onhand']; ?>
+            </td>
+            <td style="text-align: left;">
+               <?PHP echo $row['status']; ?>
+            </td>
             <td style="text-align: right;">
-              <?PHP echo $row['price']; ?>
+               <?PHP echo $row['price']; ?>
             </td>
           </tr>
         <?PHP }
@@ -94,10 +104,6 @@
     }
     if(action == "recInsert") {
       alert("Record Added!");
-      navMan("stock.php?a=listStock&txtSearch=" + search);
-    }
-    if(action == "recDel") {
-      alert("Record Deleted!");
       navMan("stock.php?a=listStock&txtSearch=" + search);
     }
     function loadStockItem(ID,MODE) {

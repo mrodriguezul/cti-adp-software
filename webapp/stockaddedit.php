@@ -13,26 +13,7 @@
   if(!$txtSearch) {
     isset($_REQUEST['txtSearch'])? $txtSearch = $_REQUEST['txtSearch'] : $txtSearch = "";
   }
-  if($action == "delRec") {
-    $query =
-      "UPDATE lpa_stock SET
-         status = 'D'
-       WHERE
-         id = '$sid' LIMIT 1
-      ";
-    openDB();
-    global $db;
-    $result = pg_query($db, $query);
-    if(!$result) {
-      printf("Errormessage: %s\n", pg_last_error($db));
-      exit;
-    } else {
-      header("Location: stock.php?a=recDel&txtSearch=$txtSearch");
-      exit;
-    }
-  }
 
-  isset($_POST['txtStockID'])? $stockID = $_POST['txtStockID'] : $stockID = gen_ID();
   isset($_POST['txtSku'])? $sku = $_POST['txtSku'] : $sku = "";
   isset($_POST['txtStockName'])? $stockName = $_POST['txtStockName'] : $stockName = "";
   isset($_POST['txtStockDesc'])? $stockDesc = $_POST['txtStockDesc'] : $stockDesc = "";
@@ -44,15 +25,15 @@
   if($action == "updateRec") {
     $query =
       "UPDATE lpa_stock SET
-         id = '$stockID',
+         sku = '$sku',
          name = '$stockName',
          description = '$stockDesc',
          onhand = '$stockOnHand',
-         /*lpa_stock_image = '$stockImage',*/
+         image_url = '$stockImage',
          price = '$stockPrice',
          status = '$stockStatus'
        WHERE
-         id = '$sid' LIMIT 1
+         id = '$sid'
       ";
      openDB();
      $result = pg_query($db, $query);
@@ -67,21 +48,19 @@
   if($action == "insertRec") {
     $query =
       "INSERT INTO lpa_stock (
-         id,
          sku,
          name,
          description,
          onhand,
-         /*lpa_stock_image,*/
+         image_url,
          price,
          status
        ) VALUES (
-         '$stockID',
          '$sku',
          '$stockName',
          '$stockDesc',
          '$stockOnHand',
-         /*'$stockImage',*/
+         '$stockImage',
          '$stockPrice',
          '$stockStatus'
        )
@@ -92,7 +71,6 @@
       printf("Errormessage: %s\n", pg_last_error($db));
       exit;
     } else {
-      /*header("Location: stock.php?a=recInsert&txtSearch=".$stockID);*/
       header("Location: stock.php?a=recInsert&txtSearch=".$stockName);
       exit;
     }
@@ -104,11 +82,11 @@
     $row_cnt = pg_num_rows($result);
     $row = pg_fetch_assoc($result);
     if($result) pg_free_result($result);
-    $stockID     = $row['id'];
+    $sku     = $row['sku'];
     $stockName   = $row['name'];
     $stockDesc   = $row['description'];
     $stockOnHand = $row['onhand'];
-    /*$stockImage  = $row['lpa_stock_image'];*/
+    $stockImage  = $row['image_url'];
     $stockPrice  = $row['price'];
     $stockStatus = $row['status'];
     $mode = "updateRec";
@@ -122,7 +100,7 @@
     <div class="PageTitle">Stock Record Management (<?PHP echo $action; ?>)</div>
     <form name="frmStockRec" id="frmStockRec" method="post" action="<?PHP echo $_SERVER['PHP_SELF']; ?>">
       <div>
-        <input name="txtStockID" id="txtStockID" class="form-control" placeholder="Stock ID" readonly="readonly" value="<?PHP echo $stockID; ?>" style="width: 100px;" title="Stock ID">
+        <input name="txtSku" id="txtSku" class="form-control" placeholder="Stock SKU" value="<?PHP echo $sku; ?>" style="width: 300px;" title="Stock SKU">
       </div>
       <div style="margin-top: <?PHP echo $fieldSpacer; ?>">
         <input name="txtStockName" id="txtStockName" class="form-control" placeholder="Stock Name" value="<?PHP echo $stockName; ?>" style="width: 400px;"  title="Stock Name">
@@ -139,13 +117,16 @@
       <div style="margin-top: <?PHP echo $fieldSpacer; ?>">
         <div>Stock Status:</div>
           <div class="form-check">
-              <input class="form-check-input" name="txtStatus" id="txtStockStatusActive" type="radio" value="a">
+              <input class="form-check-input" name="txtStatus" id="txtStockStatusActive" type="radio" value="A">
               <label class="form-check-label" for="txtStockStatusActive">Active</label>
           </div>
           <div class="form-check">
-              <input class="form-check-input" name="txtStatus" id="txtStockStatusInactive" type="radio" value="i">
+              <input class="form-check-input" name="txtStatus" id="txtStockStatusInactive" type="radio" value="D">
               <label class="form-check-label" for="txtStockStatusInactive">Inactive</label>
           </div>
+      </div>
+      <div style="margin-top: <?PHP echo $fieldSpacer; ?>">
+        <input name="txtStockImage" id="txtStockImage" class="form-control" placeholder="Url Image" value="<?PHP echo $stockImage; ?>" style="width: 400px;"  title="Url Image">
       </div>
       <input name="a" id="a" value="<?PHP echo $mode; ?>" type="hidden">
       <input name="sid" id="sid" value="<?PHP echo $sid; ?>" type="hidden">
@@ -154,14 +135,11 @@
     <div class="optBar">
       <button type="button" class="btn btn-primary" id="btnStockSave">Save</button>
       <button type="button" class="btn btn-secondary" onclick="navMan('stock.php')">Close</button>
-      <?PHP if($action == "Edit") { ?>
-      <button type="button" class="btn btn-danger" onclick="delRec('<?PHP echo $sid; ?>')" style="color: darkred; margin-left: 20px">DELETE</button>
-      <?PHP } ?>
     </div>
   </div>
   <script>
     var stockRecStatus = "<?PHP echo $stockStatus; ?>";
-    if(stockRecStatus == "a") {
+    if(stockRecStatus == "A") {
       $('#txtStockStatusActive').prop('checked', true);
     } else {
       $('#txtStockStatusInactive').prop('checked', true);
@@ -169,11 +147,8 @@
     $("#btnStockSave").click(function(){
         $("#frmStockRec").submit();
     });
-    function delRec(ID) {
-      navMan("stockaddedit.php?sid=" + ID + "&a=delRec");
-    }
     setTimeout(function(){
-      $("#txtStockName").focus();
+      $("#txtSku").focus();
     },1);
   </script>
 <?PHP
