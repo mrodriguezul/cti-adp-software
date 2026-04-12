@@ -5,7 +5,6 @@ declare(strict_types=1);
 require_once('functions.php');
 require_once('database.php');
 require_once('query_functions.php');
-require_once('validation_functions.php');
 
 
 /**
@@ -82,9 +81,6 @@ if(isset($_REQUEST['killses']) == "true") {
   header("location: login.php");
 }
 
-
-
-
 /**
  *  Build the page header function
  */
@@ -93,7 +89,6 @@ function build_header() {
 
   include_once 'header.php';
 }
-
 
 /**
  * Build the Navigation block
@@ -112,57 +107,11 @@ function build_navBlock() {
 <?PHP
 }
 
-
-
 /**
  *  Build the page footer function
  */
 function build_footer() {
   include_once 'footer.php';
-}
-
-function build_client_row(array $client) : string {
-  $client = array_map('htmlentities', $client);
-  $id = $client['lpa_client_ID'];
-  $firstname = $client['lpa_client_firstname'];
-  $lastname = $client['lpa_client_lastname'];
-  $name = $firstname . ' ' . $lastname;
-  $address = $client['lpa_client_address'];
-  $phone = $client['lpa_client_phone'];
-
-  return "<tr class='hl client' data-id='$id'>
-	    <td>$id</td>
-	    <td>$name</td>
-	    <td>$address</td>
-	    <td>$phone</td>
-	  </tr>";
-}
-
-function build_clients_table($clients) : string {
-
-  $header = 
-    "<thead>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Address</th>
-      <th>Phone</th>
-    </thead>";
-
-  $rows = "";
-
-  while ($client = pg_fetch_assoc($clients)) {
-    $rows .= build_client_row($client);
-  }
-
-
-  return 
-    '<table id="clientsTable" class="table table-bordered table-striped table-hover clients-table">' .
-      ($rows ? $header : "") .
-      "<tbody>
-	$rows
-      </tbody>
-    </table>";
-
 }
 
 /**
@@ -181,7 +130,6 @@ function build_sale_row(array $sale) : string {
 	    <td>$date</td>
 	    <td>$amount</td>
 	  </tr>";
-  
 }
 
 
@@ -217,7 +165,6 @@ function build_sales_table($sales) : string {
 	      </tr>
 	    </tfoot>
 	  </table>";
-
 }
 
 
@@ -234,7 +181,6 @@ function build_layout_with_template(string $template, array $variables = []) : v
       if ($key) ${$key} = $value;
     }
   }
-
 ?>
 
   <div id="content"?> 
@@ -245,41 +191,6 @@ function build_layout_with_template(string $template, array $variables = []) : v
   <?php
   build_footer();
 }
-
-
-function build_cart($cart) { ?>
-    <table class="table table-bordered table-striped table-hover">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Amount</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody> <?php 
-        $total = 0;
-        foreach($cart as $item) {
-          $id = $item['lpa_stock_ID'];
-          $name = $item['lpa_stock_name'];
-          $price = $item['lpa_stock_price'];
-          $quantity = $item['quantity'];
-          $amount = $price * $quantity;
-          $total += $amount;
-          $btnRemove = "<button class='btn btn-danger' onclick='removeFromCart($id)'>Remove</button>";
-          echo "<tr><td>$id</td><td>$name</td><td>$price</td><td>$quantity</td><td>$amount</td><td>$btnRemove</td></tr>";
-        } ?>
-      <tfoot>
-        <tr>
-          <td colspan="4">Total</td><td><?= $total ?></td><td></td>
-        </tr>
-      </tfoot>
-      </table> <?php 
-}
-
-
 
 function lpa_log($log_msg) {
   $log_dir = 'log';
