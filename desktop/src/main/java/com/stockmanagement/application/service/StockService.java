@@ -24,8 +24,8 @@ public class StockService {
      * Create a new stock item
      */
     public Stock createStock(String productName, String description, Integer quantity, 
-                            BigDecimal price, String category) {
-        Stock stock = new Stock(productName, description, quantity, price, category);
+                            BigDecimal price, String sku) {
+        Stock stock = new Stock(productName, description, quantity, price, sku);
         return stockRepository.save(stock);
     }
 
@@ -33,7 +33,7 @@ public class StockService {
      * Update an existing stock item
      */
     public Stock updateStock(Integer id, String productName, String description, 
-                            Integer quantity, BigDecimal price, String category) {
+                            Integer quantity, BigDecimal price, String sku, String status) {
         Optional<Stock> existingStock = stockRepository.findById(id);
         
         if (existingStock.isEmpty()) {
@@ -45,8 +45,9 @@ public class StockService {
         stock.setDescription(description);
         stock.updateQuantity(quantity);
         stock.updatePrice(price);
-        stock.setCategory(category);
-        
+        stock.setSku(sku);
+        stock.setStatus(status);
+
         return stockRepository.update(stock);
     }
 
@@ -85,10 +86,10 @@ public class StockService {
     }
 
     /**
-     * Get stocks by category
+     * Get stocks by SKU
      */
-    public List<Stock> getStocksByCategory(String category) {
-        return stockRepository.findByCategory(category);
+    public List<Stock> getStocksBySku(String sku) {
+        return stockRepository.findBySku(sku);
     }
 
     /**

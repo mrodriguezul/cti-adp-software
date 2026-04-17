@@ -13,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,20 +23,20 @@ import java.util.Optional;
 public class StockController {
 
     @FXML private TableView<Stock> stockTable;
-    @FXML private TableColumn<Stock, Integer> idColumn;
+    @FXML private TableColumn<Stock, String> skuColumn;
     @FXML private TableColumn<Stock, String> productNameColumn;
     @FXML private TableColumn<Stock, String> descriptionColumn;
     @FXML private TableColumn<Stock, Integer> quantityColumn;
     @FXML private TableColumn<Stock, BigDecimal> priceColumn;
-    @FXML private TableColumn<Stock, String> categoryColumn;
-    @FXML private TableColumn<Stock, String> createdAtColumn;
-    @FXML private TableColumn<Stock, String> updatedAtColumn;
+    @FXML private TableColumn<Stock, String> statusColumn;
 
+    @FXML private TextField skuField;
     @FXML private TextField productNameField;
     @FXML private TextArea descriptionField;
     @FXML private TextField quantityField;
     @FXML private TextField priceField;
-    @FXML private TextField categoryField;
+    @FXML private TextField imageUrlField;
+    @FXML private ComboBox<String> statusComboBox;
     @FXML private TextField searchField;
 
     @FXML private Button saveButton;
@@ -46,10 +48,20 @@ public class StockController {
     private final ObservableList<Stock> stockList;
     private Stock selectedStock;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final Map<String, String> statusCodeMap = new HashMap<>();
+    private final Map<String, String> codeStatusMap = new HashMap<>();
 
     public StockController(StockService stockService) {
         this.stockService = stockService;
         this.stockList = FXCollections.observableArrayList();
+        initializeStatusMaps();
+    }
+
+    private void initializeStatusMaps() {
+        statusCodeMap.put("ACTIVE", "A");
+        statusCodeMap.put("INACTIVE", "D");
+        codeStatusMap.put("A", "ACTIVE");
+        codeStatusMap.put("D", "INACTIVE");
     }
 
     @FXML
@@ -57,28 +69,18 @@ public class StockController {
         setupTableColumns();
         setupTableSelection();
         setupButtonStates();
+        setupStatusComboBox();
         loadAllStocks();
         setupSearchListener();
     }
 
     private void setupTableColumns() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        skuColumn.setCellValueFactory(new PropertyValueFactory<>("sku"));
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        
-        // Custom cell factories for date formatting
-        createdAtColumn.setCellValueFactory(cellData -> {
-            LocalDateTime dateTime = cellData.getValue().getCreatedAt();
-            return new SimpleStringProperty(dateTime != null ? dateTime.format(dateFormatter) : "");
-        });
-        
-        updatedAtColumn.setCellValueFactory(cellData -> {
-            LocalDateTime dateTime = cellData.getValue().getUpdatedAt();
-            return new SimpleStringProperty(dateTime != null ? dateTime.format(dateFormatter) : "");
-        });
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Price formatting
         priceColumn.setCellFactory(col -> new TableCell<Stock, BigDecimal>() {
@@ -117,6 +119,14 @@ public class StockController {
         deleteButton.setDisable(true);
     }
 
+    private void setupStatusComboBox() {
+        ObservableList<String> statusOptions = FXCollections.observableArrayList(
+            "ACTIVE", "INACTIVE"
+        );
+        statusComboBox.setItems(statusOptions);
+        statusComboBox.setValue("ACTIVE");
+    }
+
     private void setupSearchListener() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleSearch();
@@ -128,14 +138,17 @@ public class StockController {
         try {
             validateInputs();
             
+            String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
             Integer quantity = Integer.parseInt(quantityField.getText().trim());
             BigDecimal price = new BigDecimal(priceField.getText().trim());
-            String category = categoryField.getText().trim();
+            String imageUrl = imageUrlField.getText().trim();
 
-            stockService.createStock(productName, description, quantity, price, category);
-            
+            Stock stock = stockService.createStock(productName, description, quantity, price, sku);
+            stock.setImageUrl(imageUrl);
+            stock.setStatus("A"); // Default to ACTIVE (A)
+
             showSuccess("Stock item created successfully!");
             clearFields();
             loadAllStocks();
@@ -159,15 +172,17 @@ public class StockController {
         try {
             validateInputs();
             
+            String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
             Integer quantity = Integer.parseInt(quantityField.getText().trim());
             BigDecimal price = new BigDecimal(priceField.getText().trim());
-            String category = categoryField.getText().trim();
+            String statusLabel = statusComboBox.getValue();
+            String statusCode = statusCodeMap.get(statusLabel);
 
             stockService.updateStock(selectedStock.getId(), productName, description, 
-                                   quantity, price, category);
-            
+                                   quantity, price, sku, statusCode);
+
             showSuccess("Stock item updated successfully!");
             clearFields();
             loadAllStocks();
@@ -245,25 +260,35 @@ public class StockController {
     }
 
     private void populateFields(Stock stock) {
+        skuField.setText(stock.getSku());
         productNameField.setText(stock.getProductName());
         descriptionField.setText(stock.getDescription());
         quantityField.setText(stock.getQuantity().toString());
         priceField.setText(stock.getPrice().toString());
-        categoryField.setText(stock.getCategory());
+        imageUrlField.setText(stock.getImageUrl() != null ? stock.getImageUrl() : "");
+
+        // Convert status code to label
+        String statusLabel = codeStatusMap.getOrDefault(stock.getStatus(), "ACTIVE");
+        statusComboBox.setValue(statusLabel);
     }
 
     private void clearFields() {
+        skuField.clear();
         productNameField.clear();
         descriptionField.clear();
         quantityField.clear();
         priceField.clear();
-        categoryField.clear();
+        imageUrlField.clear();
+        statusComboBox.setValue("ACTIVE");
         selectedStock = null;
         updateButton.setDisable(true);
         deleteButton.setDisable(true);
     }
 
     private void validateInputs() {
+        if (skuField.getText().trim().isEmpty()) {
+            throw new IllegalArgumentException("SKU is required");
+        }
         if (productNameField.getText().trim().isEmpty()) {
             throw new IllegalArgumentException("Product name is required");
         }

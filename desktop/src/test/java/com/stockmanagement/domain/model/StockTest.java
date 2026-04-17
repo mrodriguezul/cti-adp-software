@@ -21,7 +21,7 @@ class StockTest {
 
     @BeforeEach
     void setUp() {
-        stock = new Stock("Laptop", "Gaming Laptop", 10, testPrice, "Electronics");
+        stock = new Stock("Laptop", "Gaming Laptop", 10, testPrice, "SKU-001");
     }
 
     @Test
@@ -32,21 +32,21 @@ class StockTest {
         assertEquals("Gaming Laptop", stock.getDescription());
         assertEquals(10, stock.getQuantity());
         assertEquals(testPrice, stock.getPrice());
-        assertEquals("Electronics", stock.getCategory());
+        assertEquals("SKU-001", stock.getSku());
     }
 
     @Test
     @DisplayName("Should reject empty product name")
     void testEmptyProductName() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("", "Description", 10, testPrice, "Category"));
+            () -> new Stock("", "Description", 10, testPrice, "SKU-002"));
     }
 
     @Test
     @DisplayName("Should reject product name with only whitespace")
     void testWhitespaceProductName() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("   ", "Description", 10, testPrice, "Category"));
+            () -> new Stock("   ", "Description", 10, testPrice, "SKU-002"));
     }
 
     @Test
@@ -54,14 +54,14 @@ class StockTest {
     void testProductNameTooLong() {
         String longName = "a".repeat(256);
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock(longName, "Description", 10, testPrice, "Category"));
+            () -> new Stock(longName, "Description", 10, testPrice, "SKU-002"));
     }
 
     @Test
     @DisplayName("Should accept product name with exactly 255 characters")
     void testProductNameMaxLength() {
         String maxName = "a".repeat(255);
-        Stock testStock = new Stock(maxName, "Description", 10, testPrice, "Category");
+        Stock testStock = new Stock(maxName, "Description", 10, testPrice, "SKU-002");
         assertEquals(255, testStock.getProductName().length());
     }
 
@@ -69,20 +69,20 @@ class StockTest {
     @DisplayName("Should reject null product name")
     void testNullProductName() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock(null, "Description", 10, testPrice, "Category"));
+            () -> new Stock(null, "Description", 10, testPrice, "SKU-002"));
     }
 
     @Test
     @DisplayName("Should reject negative quantity")
     void testNegativeQuantity() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", -5, testPrice, "Category"));
+            () -> new Stock("Laptop", "Description", -5, testPrice, "SKU-002"));
     }
 
     @Test
     @DisplayName("Should accept quantity of zero")
     void testZeroQuantity() {
-        Stock testStock = new Stock("Laptop", "Description", 0, testPrice, "Category");
+        Stock testStock = new Stock("Laptop", "Description", 0, testPrice, "SKU-002");
         assertEquals(0, testStock.getQuantity());
     }
 
@@ -90,7 +90,7 @@ class StockTest {
     @DisplayName("Should reject null quantity")
     void testNullQuantity() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", null, testPrice, "Category"));
+            () -> new Stock("Laptop", "Description", null, testPrice, "SKU-002"));
     }
 
     @Test
@@ -98,13 +98,13 @@ class StockTest {
     void testNegativePrice() {
         BigDecimal negativePrice = new BigDecimal("-50.00");
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", 10, negativePrice, "Category"));
+            () -> new Stock("Laptop", "Description", 10, negativePrice, "SKU-002"));
     }
 
     @Test
     @DisplayName("Should accept price of zero")
     void testZeroPrice() {
-        Stock testStock = new Stock("Laptop", "Description", 10, BigDecimal.ZERO, "Category");
+        Stock testStock = new Stock("Laptop", "Description", 10, BigDecimal.ZERO, "SKU-002");
         assertEquals(0, testStock.getPrice().compareTo(BigDecimal.ZERO));
     }
 
@@ -112,7 +112,7 @@ class StockTest {
     @DisplayName("Should reject null price")
     void testNullPrice() {
         assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", 10, null, "Category"));
+            () -> new Stock("Laptop", "Description", 10, null, "SKU-002"));
     }
 
     @Test
@@ -240,25 +240,45 @@ class StockTest {
     }
 
     @Test
-    @DisplayName("Should update category")
-    void testSetCategory() {
-        stock.setCategory("Computers");
-        assertEquals("Computers", stock.getCategory());
+    @DisplayName("Should update SKU")
+    void testSetSku() {
+        stock.setSku("SKU-NEW");
+        assertEquals("SKU-NEW", stock.getSku());
+    }
+
+    @Test
+    @DisplayName("Should update image URL")
+    void testSetImageUrl() {
+        stock.setImageUrl("http://example.com/image.jpg");
+        assertEquals("http://example.com/image.jpg", stock.getImageUrl());
+    }
+
+    @Test
+    @DisplayName("Should update status")
+    void testSetStatus() {
+        stock.setStatus("INACTIVE");
+        assertEquals("INACTIVE", stock.getStatus());
+    }
+
+    @Test
+    @DisplayName("Should default status to ACTIVE")
+    void testDefaultStatus() {
+        assertEquals("ACTIVE", stock.getStatus());
     }
 
     @Test
     @DisplayName("Should consider stocks with same ID as equal")
     void testStockEqualitySameId() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "Electronics", null, null);
-        Stock stock2 = new Stock(1, "Desktop", "Different", 20, new BigDecimal("500"), "Computers", null, null);
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
+        Stock stock2 = new Stock(1, "Desktop", "Different", 20, new BigDecimal("500"), "SKU-002", null, "ACTIVE", null, null);
         assertEquals(stock1, stock2);
     }
 
     @Test
     @DisplayName("Should consider stocks with different IDs as not equal")
     void testStockEqualityDifferentId() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "Electronics", null, null);
-        Stock stock2 = new Stock(2, "Laptop", "Desc", 10, testPrice, "Electronics", null, null);
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
+        Stock stock2 = new Stock(2, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
         assertNotEquals(stock1, stock2);
     }
 
@@ -283,8 +303,8 @@ class StockTest {
     @Test
     @DisplayName("Should generate consistent hash code")
     void testStockHashCode() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "Electronics", null, null);
-        Stock stock2 = new Stock(1, "Laptop", "Desc", 10, testPrice, "Electronics", null, null);
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
+        Stock stock2 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
         assertEquals(stock1.hashCode(), stock2.hashCode());
     }
 
@@ -292,7 +312,7 @@ class StockTest {
     @DisplayName("Should create stock with all parameters including ID and timestamps")
     void testStockConstructorWithId() {
         LocalDateTime now = LocalDateTime.now();
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "Electronics", now, now);
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", now, now);
 
         assertEquals(1, stock1.getId());
         assertEquals(now, stock1.getCreatedAt());

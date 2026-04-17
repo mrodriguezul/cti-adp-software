@@ -36,10 +36,10 @@ class StockServiceTest {
     @Test
     @DisplayName("Should create stock successfully")
     void testCreateStock() {
-        Stock stock = new Stock("Laptop", "Gaming", 10, BigDecimal.TEN, "Electronics");
+        Stock stock = new Stock("Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
         when(mockRepository.save(any())).thenReturn(stock);
 
-        Stock result = stockService.createStock("Laptop", "Gaming", 10, BigDecimal.TEN, "Electronics");
+        Stock result = stockService.createStock("Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
 
         assertNotNull(result);
         assertEquals("Laptop", result.getProductName());
@@ -49,7 +49,7 @@ class StockServiceTest {
     @Test
     @DisplayName("Should retrieve stock by ID")
     void testGetStockById() {
-        Stock stock = new Stock(1, "Laptop", "Gaming", 10, BigDecimal.TEN, "Electronics", null, null);
+        Stock stock = new Stock(1, "Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
         when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
 
         Optional<Stock> result = stockService.getStockById(1);
@@ -81,7 +81,7 @@ class StockServiceTest {
     @Test
     @DisplayName("Should search stocks by product name")
     void testSearchByName() {
-        Stock stock = new Stock("Dell Laptop", "Gaming", 10, BigDecimal.TEN, "Electronics");
+        Stock stock = new Stock("Dell Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
         List<Stock> stocks = List.of(stock);
         when(mockRepository.findByProductNameContaining("Dell")).thenReturn(stocks);
 
@@ -92,10 +92,23 @@ class StockServiceTest {
     }
 
     @Test
+    @DisplayName("Should get stocks by SKU")
+    void testGetStocksBySku() {
+        Stock stock = new Stock(1, "Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
+        List<Stock> stocks = List.of(stock);
+        when(mockRepository.findBySku("SKU-001")).thenReturn(stocks);
+
+        List<Stock> result = stockService.getStocksBySku("SKU-001");
+
+        assertEquals(1, result.size());
+        assertEquals("SKU-001", result.get(0).getSku());
+    }
+
+    @Test
     @DisplayName("Should get all stocks")
     void testGetAllStocks() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "Electronics", null, null);
-        Stock stock2 = new Stock(2, "Mouse", "Desc", 20, BigDecimal.ONE, "Accessories", null, null);
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
+        Stock stock2 = new Stock(2, "Mouse", "Desc", 20, BigDecimal.ONE, "SKU-002", null, "ACTIVE", null, null);
         List<Stock> stocks = List.of(stock1, stock2);
 
         when(mockRepository.findAll()).thenReturn(stocks);
@@ -108,7 +121,7 @@ class StockServiceTest {
     @Test
     @DisplayName("Should filter low stock items")
     void testGetLowStockItems() {
-        Stock stock1 = new Stock(1, "Item1", "Desc", 5, BigDecimal.TEN, "Cat", null, null);
+        Stock stock1 = new Stock(1, "Item1", "Desc", 5, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
         List<Stock> stocks = List.of(stock1);
 
         when(mockRepository.findByQuantityBelow(10)).thenReturn(stocks);
@@ -122,7 +135,7 @@ class StockServiceTest {
     @Test
     @DisplayName("Should add quantity to stock")
     void testAddStockQuantity() {
-        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "Electronics", null, null);
+        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
         when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
         when(mockRepository.update(any())).thenReturn(stock);
 
@@ -135,11 +148,25 @@ class StockServiceTest {
     @Test
     @DisplayName("Should remove quantity from stock")
     void testRemoveStockQuantity() {
-        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "Electronics", null, null);
+        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
         when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
         when(mockRepository.update(any())).thenReturn(stock);
 
         Stock result = stockService.removeStockQuantity(1, 3);
+
+        assertNotNull(result);
+        verify(mockRepository).update(any());
+    }
+
+    @Test
+    @DisplayName("Should update stock with new values")
+    void testUpdateStock() {
+        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
+        when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
+        when(mockRepository.update(any())).thenReturn(stock);
+
+        Stock result = stockService.updateStock(1, "Updated Laptop", "Updated Desc", 15,
+                                               BigDecimal.valueOf(1500), "SKU-002", "INACTIVE");
 
         assertNotNull(result);
         verify(mockRepository).update(any());
@@ -155,4 +182,3 @@ class StockServiceTest {
         assertTrue(result);
     }
 }
-

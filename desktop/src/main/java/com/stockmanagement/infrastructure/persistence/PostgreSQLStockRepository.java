@@ -146,14 +146,13 @@ public class PostgreSQLStockRepository implements StockRepository {
     }
 
     @Override
-    public List<Stock> findByCategory(String category) {
-        // In the new schema, we use SKU as a category identifier
+    public List<Stock> findBySku(String sku) {
         List<Stock> stocks = new ArrayList<>();
 
         try (Connection conn = dbConfig.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_SKU_SQL)) {
 
-            stmt.setString(1, category);
+            stmt.setString(1, sku);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -161,7 +160,7 @@ public class PostgreSQLStockRepository implements StockRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding stocks by category: " + e.getMessage(), e);
+            throw new RuntimeException("Error finding stocks by SKU: " + e.getMessage(), e);
         }
 
         return stocks;
@@ -230,13 +229,13 @@ public class PostgreSQLStockRepository implements StockRepository {
     // Helper methods
     private void setStockParameters(PreparedStatement stmt, Stock stock, int startIndex) throws SQLException {
         // Mapping: sku, name, description, onhand, price, status, image_url
-        stmt.setString(startIndex + 1, stock.getProductName()); // Using sku column for product identifier
+        stmt.setString(startIndex + 1, stock.getSku()); // sku
         stmt.setString(startIndex + 2, stock.getProductName()); // name
         stmt.setString(startIndex + 3, stock.getDescription()); // description
         stmt.setInt(startIndex + 4, stock.getQuantity()); // onhand
         stmt.setBigDecimal(startIndex + 5, stock.getPrice()); // price
-        stmt.setString(startIndex + 6, "A"); // status - default to Active
-        stmt.setNull(startIndex + 7, Types.VARCHAR); // image_url - NULL by default
+        stmt.setString(startIndex + 6, stock.getStatus()); // status
+        stmt.setString(startIndex + 7, stock.getImageUrl()); // image_url
     }
 
     private Stock mapResultSetToStock(ResultSet rs) throws SQLException {
@@ -246,11 +245,13 @@ public class PostgreSQLStockRepository implements StockRepository {
 
         return new Stock(
             rs.getInt("id"),
-            rs.getString("name"), // Using name as product_name
+            rs.getString("name"), // productName
             rs.getString("description"),
-            rs.getInt("onhand"), // Using onhand as quantity
+            rs.getInt("onhand"), // quantity
             rs.getBigDecimal("price"),
-            rs.getString("sku"), // Using sku as category
+            rs.getString("sku"), // sku
+            rs.getString("image_url"), // imageUrl
+            rs.getString("status"), // status
             createdTs != null ? createdTs.toLocalDateTime() : null,
             updatedTs != null ? updatedTs.toLocalDateTime() : null
         );
