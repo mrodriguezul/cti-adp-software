@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<!--
+    Main Shell FXML View
+    Ticket: 1.1.1 - Initialize Main Application Window
+    Ticket: 1.1.2 - Implement MDI Desktop Pane
+
+    This BorderPane serves as the root container for the LPA Management System.
+    It provides a structured layout with dedicated regions for:
+    - Top: Menu bar (to be added in Ticket 1.2.1)
+    - Center: MDI Desktop pane for child module views (Ticket 1.1.2)
+    - Other regions: Available for future extensions (status bar, sidebar, etc.)
+
+    Controller: com.stockmanagement.presentation.controller.MainShellController
+-->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.stockmanagement.presentation.controller.MainShellController"
+            prefWidth="800"
+            prefHeight="600">
+    <!--
+        Top Region: Reserved for the global menu bar (Ticket 1.2.1)
+        Will contain: Stock, Sales, Admin, Help menus
+    -->
+    <top>
+        <!-- Menu bar will be added here in future implementation -->
+    </top>
+
+    <!--
+        Center Region: Main workspace container for MDI pane (Ticket 1.1.2)
+        StackPane allows for dynamic view switching and child node management.
+        It stretches to fill all available space in the center region.
+    -->
+    <center>
+        <StackPane fx:id="workspacePane"
+                   style="-fx-border-color: #e0e0e0; -fx-border-width: 1;">
+            <!-- Child views (internal frames, panels) will be dynamically added here -->
+        </StackPane>
+    </center>
+
+    <!--
+        Bottom Region: Reserved for status bar or footer information (future)
+    -->
+    <bottom>
+        <!-- Status bar or footer will be added here if needed -->
+    </bottom>
+</BorderPane>
