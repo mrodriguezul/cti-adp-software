@@ -2,15 +2,20 @@
 
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 
 <!--
     Main Shell FXML View
     Ticket: 1.1.1 - Initialize Main Application Window
     Ticket: 1.1.2 - Implement MDI Desktop Pane
+    Ticket: 1.2.1 - Build Global Menu Bar UI
 
     This BorderPane serves as the root container for the LPA Management System.
     It provides a structured layout with dedicated regions for:
-    - Top: Menu bar (to be added in Ticket 1.2.1)
+    - Top: Menu bar with global navigation (Ticket 1.2.1)
     - Center: MDI Desktop pane for child module views (Ticket 1.1.2)
     - Other regions: Available for future extensions (status bar, sidebar, etc.)
 
@@ -22,11 +27,64 @@
             prefWidth="800"
             prefHeight="600">
     <!--
-        Top Region: Reserved for the global menu bar (Ticket 1.2.1)
-        Will contain: Stock, Sales, Admin, Help menus
+        Top Region: Global menu bar (Ticket 1.2.1)
+        Contains main navigation menus: Menu (with submenus) and Help.
+        The MenuBar spans 100% width and provides access to all major modules.
     -->
     <top>
-        <!-- Menu bar will be added here in future implementation -->
+        <MenuBar>
+            <!--
+                Main Menu: Contains Stock Management, Sales, Admin, and Exit options.
+                Users can navigate to different modules through this menu.
+            -->
+            <Menu text="Menu">
+                <!-- Stock Management Option -->
+                <MenuItem text="Stock Management"
+                          fx:id="menuStock"
+                          onAction="#handleMenuClick"/>
+
+                <!-- Sales Submenu with Invoices and Clients -->
+                <Menu text="Sales">
+                    <MenuItem text="Invoices"
+                              fx:id="menuInvoices"
+                              onAction="#handleMenuClick"/>
+                    <MenuItem text="Clients"
+                              fx:id="menuClients"
+                              onAction="#handleMenuClick"/>
+                </Menu>
+
+                <!-- Separator line for visual organization -->
+                <SeparatorMenuItem/>
+
+                <!-- Admin Submenu with User Management -->
+                <Menu text="Admin">
+                    <MenuItem text="User Management"
+                              fx:id="menuUsers"
+                              onAction="#handleMenuClick"/>
+                </Menu>
+
+                <!-- Separator line for visual organization -->
+                <SeparatorMenuItem/>
+
+                <!-- Exit Application -->
+                <MenuItem text="Exit"
+                          fx:id="menuExit"
+                          onAction="#handleMenuClick"/>
+            </Menu>
+
+            <!--
+                Help Menu: Contains user documentation and system information.
+                These options provide assistance without leaving the application.
+            -->
+            <Menu text="Help">
+                <MenuItem text="User Guide"
+                          fx:id="menuGuide"
+                          onAction="#handleMenuClick"/>
+                <MenuItem text="About"
+                          fx:id="menuAbout"
+                          onAction="#handleMenuClick"/>
+            </Menu>
+        </MenuBar>
     </top>
 
     <!--

@@ -9,10 +9,10 @@
 ### Story 1.2: As an internal user, I want a fixed navigation menu at the top of the screen so that I can easily switch between modules.
 **Priority:** High | **Story Points:** 5
 
-| Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | References | Labels/Tags |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `[ ]` | **1.2.1** | Build Global Menu Bar UI | **Purpose:** Create the main navigation interface.<br>**Details:** Construct the menu hierarchy (Stock, Sales > Invoices/Clients, Admin, Help) with separator lines.<br>**AC:**<br>- Menu is fixed at the top, 100% width.<br>- All items and separators match PRD structure. | 2 | Frontend | Story 1.2 | Task, UI |
-| `[ ]` | **1.2.2** | Implement Menu Event Routing | **Purpose:** Connect menu clicks to view rendering.<br>**Details:** Wire action listeners to menu items to load the respective child views into the MDI pane.<br>**AC:**<br>- Clicking a menu item clears current view and loads correct FXML/Frame.<br>- Invalid views throw a graceful UI error. | 3 | Frontend | Story 1.2 | Task, UI, Logic |
+| Status | Ticket ID | Title | Details & Acceptance Criteria (AC)                                                                                                                                                                                                                                                                 | Effort | Domain | References | Labels/Tags |
+|:-------| :--- | :--- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| :--- | :--- | :--- | :--- |
+| `[x]`  | **1.2.1** | Build Global Menu Bar UI | **Purpose:** Create the main navigation interface.<br>**Details:** Construct the menu hierarchy (Stock, Sales > Invoices/Clients, Admin, Help > User guide/About) with separator lines.<br>**AC:**<br>- Menu is fixed at the top, 100% width.<br>- All items and separators match PRD structure.   | 2 | Frontend | Story 1.2 | Task, UI |
+| `[x]`  | **1.2.2** | Implement Menu Event Routing | **Purpose:** Connect menu clicks to view rendering.<br>**Details:** Wire action listeners to menu items to load the respective child views into the MDI pane.<br>**AC:**<br>- Clicking a menu item clears current view and loads correct FXML/Frame.<br>- Invalid views throw a graceful UI error. | 3 | Frontend | Story 1.2 | Task, UI, Logic |
 
 ### Story 2.1: As a staff member, I want to log in securely so that unauthorized individuals cannot access sensitive company data.
 **Priority:** High | **Story Points:** 5
