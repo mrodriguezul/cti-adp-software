@@ -11,6 +11,7 @@ import java.util.Properties;
 /**
  * Database configuration using HikariCP connection pool
  * Thread-safe Singleton pattern with eager initialization
+ * PostgreSQL Configuration
  */
 public class DatabaseConfig {
     // Eager initialization ensures thread safety
@@ -21,12 +22,11 @@ public class DatabaseConfig {
         Properties props = loadProperties();
         HikariConfig config = new HikariConfig();
         
-        config.setJdbcUrl(props.getProperty("db.url", "jdbc:mysql://localhost:3306/stock_management"));
-        config.setUsername(props.getProperty(
-                "db.username", "root"));
-        config.setPassword(props.getProperty("db.password", ""));
-        config.setDriverClassName(props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver"));
-        
+        config.setJdbcUrl(props.getProperty("db.url", "jdbc:postgresql://localhost:5433/cti_ecommerce"));
+        config.setUsername(props.getProperty("db.username", "cti_user"));
+        config.setPassword(props.getProperty("db.password", "cti_password_dev"));
+        config.setDriverClassName(props.getProperty("db.driver", "org.postgresql.Driver"));
+
         // Connection pool settings
         config.setMaximumPoolSize(Integer.parseInt(props.getProperty("db.pool.size", "10")));
         config.setMinimumIdle(Integer.parseInt(props.getProperty("db.pool.min.idle", "2")));
@@ -34,18 +34,12 @@ public class DatabaseConfig {
         config.setIdleTimeout(Long.parseLong(props.getProperty("db.idle.timeout", "600000")));
         config.setMaxLifetime(Long.parseLong(props.getProperty("db.max.lifetime", "1800000")));
         
-        // Performance settings
+        // Performance settings for PostgreSQL
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("useServerPrepStmts", "true");
-        config.addDataSourceProperty("useLocalSessionState", "true");
-        config.addDataSourceProperty("rewriteBatchedStatements", "true");
-        config.addDataSourceProperty("cacheResultSetMetadata", "true");
-        config.addDataSourceProperty("cacheServerConfiguration", "true");
-        config.addDataSourceProperty("elideSetAutoCommits", "true");
-        config.addDataSourceProperty("maintainTimeStats", "false");
-        
+        config.addDataSourceProperty("ApplicationName", "cti-stock-management");
+
         this.dataSource = new HikariDataSource(config);
     }
 

@@ -14,13 +14,15 @@ public class Stock {
     private String description;
     private Integer quantity;
     private BigDecimal price;
-    private String category;
+    private String sku;
+    private String imageUrl;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // Constructor for new stock items
     public Stock(String productName, String description, Integer quantity, 
-                 BigDecimal price, String category) {
+                 BigDecimal price, String sku) {
         this.validateProductName(productName);
         this.validateQuantity(quantity);
         this.validatePrice(price);
@@ -29,15 +31,18 @@ public class Stock {
         this.description = description;
         this.quantity = quantity;
         this.price = price;
-        this.category = category;
+        this.sku = sku;
+        this.status = "ACTIVE";
     }
 
     // Constructor for existing stock items (from database)
     public Stock(Integer id, String productName, String description, Integer quantity,
-                 BigDecimal price, String category, LocalDateTime createdAt, 
+                 BigDecimal price, String sku, String imageUrl, String status, LocalDateTime createdAt,
                  LocalDateTime updatedAt) {
-        this(productName, description, quantity, price, category);
+        this(productName, description, quantity, price, sku);
         this.id = id;
+        this.imageUrl = imageUrl;
+        this.status = status != null ? status : "ACTIVE";
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -117,8 +122,16 @@ public class Stock {
         return price;
     }
 
-    public String getCategory() {
-        return category;
+    public String getSku() {
+        return sku;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -139,8 +152,16 @@ public class Stock {
         this.description = description;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setStatus(String status) {
+        this.status = status != null ? status : "ACTIVE";
     }
 
     @Override
@@ -163,7 +184,8 @@ public class Stock {
                 ", productName='" + productName + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
-                ", category='" + category + '\'' +
+                ", sku='" + sku + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

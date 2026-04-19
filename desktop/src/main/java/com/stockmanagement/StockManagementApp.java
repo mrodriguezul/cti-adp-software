@@ -2,7 +2,7 @@ package com.stockmanagement;
 
 import com.stockmanagement.application.service.StockService;
 import com.stockmanagement.infrastructure.config.DatabaseConfig;
-import com.stockmanagement.infrastructure.persistence.MySQLStockRepository;
+import com.stockmanagement.infrastructure.persistence.PostgreSQLStockRepository;
 import com.stockmanagement.presentation.controller.StockController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +21,7 @@ public class StockManagementApp extends Application {
     @Override
     public void init() {
         // Initialize dependencies following DDD and Dependency Injection principles
-        MySQLStockRepository stockRepository = new MySQLStockRepository();
+        PostgreSQLStockRepository stockRepository = new PostgreSQLStockRepository();
         stockService = new StockService(stockRepository);
     }
 

@@ -44,12 +44,12 @@ public interface StockRepository {
     List<Stock> findAll();
     
     /**
-     * Find stocks by category
-     * @param category the category name
-     * @return list of stocks in the category
+     * Find stocks by SKU
+     * @param sku the SKU code
+     * @return list of stocks with the SKU
      */
-    List<Stock> findByCategory(String category);
-    
+    List<Stock> findBySku(String sku);
+
     /**
      * Find stocks by product name (partial match)
      * @param productName the product name to search

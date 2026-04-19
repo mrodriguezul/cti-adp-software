@@ -43,14 +43,12 @@
             <!-- Stock Table -->
             <TableView fx:id="stockTable" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50.0"/>
+                    <TableColumn fx:id="skuColumn" text="SKU" prefWidth="100.0"/>
                     <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="150.0"/>
                     <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200.0"/>
                     <TableColumn fx:id="quantityColumn" text="Quantity" prefWidth="80.0"/>
                     <TableColumn fx:id="priceColumn" text="Price" prefWidth="100.0"/>
-                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="120.0"/>
-                    <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="150.0"/>
-                    <TableColumn fx:id="updatedAtColumn" text="Updated At" prefWidth="150.0"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -73,6 +71,12 @@
             </Label>
 
             <Separator/>
+
+            <!-- SKU -->
+            <VBox spacing="5.0">
+                <Label text="SKU *" styleClass="field-label"/>
+                <TextField fx:id="skuField" promptText="Enter SKU code"/>
+            </VBox>
 
             <!-- Product Name -->
             <VBox spacing="5.0">
@@ -99,10 +103,16 @@
                 <TextField fx:id="priceField" promptText="Enter price"/>
             </VBox>
 
-            <!-- Category -->
+            <!-- Image URL -->
             <VBox spacing="5.0">
-                <Label text="Category" styleClass="field-label"/>
-                <TextField fx:id="categoryField" promptText="Enter category"/>
+                <Label text="Image URL" styleClass="field-label"/>
+                <TextField fx:id="imageUrlField" promptText="Enter image URL"/>
+            </VBox>
+
+            <!-- Status -->
+            <VBox spacing="5.0">
+                <Label text="Status" styleClass="field-label"/>
+                <ComboBox fx:id="statusComboBox" promptText="Select status"/>
             </VBox>
 
             <Separator/>
