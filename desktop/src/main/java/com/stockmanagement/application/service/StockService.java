@@ -47,7 +47,7 @@ public class StockService {
         stock.updatePrice(price);
         stock.setSku(sku);
         stock.setStatus(status);
-
+        
         return stockRepository.update(stock);
     }
 

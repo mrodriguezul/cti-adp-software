@@ -37,7 +37,7 @@ public class Stock {
 
     // Constructor for existing stock items (from database)
     public Stock(Integer id, String productName, String description, Integer quantity,
-                 BigDecimal price, String sku, String imageUrl, String status, LocalDateTime createdAt,
+                 BigDecimal price, String sku, String imageUrl, String status, LocalDateTime createdAt, 
                  LocalDateTime updatedAt) {
         this(productName, description, quantity, price, sku);
         this.id = id;

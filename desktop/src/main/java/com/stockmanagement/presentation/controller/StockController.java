@@ -19,6 +19,26 @@ import java.util.Optional;
 
 /**
  * JavaFX Controller for Stock Management UI
+ *
+ * REFACTORED FOR MDI INTEGRATION (Ticket 3.1.1)
+ *
+ * This controller is designed to work as an embedded child view within the main LPA
+ * Management System MDI shell. It does NOT manage any top-level Stage or Window.
+ *
+ * Architecture:
+ * - Presentation Layer: Handles UI interactions and delegates business logic to StockService
+ * - Dependencies: StockService is injected via constructor by the FXMLLoader
+ * - No direct Stage/Window manipulation: This view scales dynamically within its parent container
+ *
+ * Usage:
+ * The stock-view.fxml root (BorderPane) is loaded as a child node in the main shell's
+ * desktop pane via FXMLLoader with StockController dependency injection.
+ *
+ * Layout Constraints:
+ * - Root BorderPane has no fixed size (prefHeight/prefWidth removed)
+ * - VBox.vgrow="ALWAYS" on stockTable allows vertical expansion
+ * - HBox.hgrow="ALWAYS" on searchField allows horizontal expansion
+ * - When parent container resizes, this view scales accordingly
  */
 public class StockController {
 

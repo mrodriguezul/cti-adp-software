@@ -49,7 +49,7 @@ public interface StockRepository {
      * @return list of stocks with the SKU
      */
     List<Stock> findBySku(String sku);
-
+    
     /**
      * Find stocks by product name (partial match)
      * @param productName the product name to search

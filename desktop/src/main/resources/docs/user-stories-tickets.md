@@ -33,9 +33,9 @@
 **Priority:** High | **Story Points:** 5
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | References | Labels/Tags |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `[ ]` | **3.1.1** | Refactor Stock UI to Internal View | **Purpose:** Adapt standalone code to new shell.<br>**Details:** Convert existing Stock `JFrame` into a `JInternalFrame` or embedded FXML.<br>**AC:**<br>- View loads inside main MDI pane via menu click.<br>- UI layout remains unbroken. | 3 | Frontend | Story 3.1 | Improvement, UI |
-| `[ ]` | **3.1.2** | Verify Stock Service Segregation | **Purpose:** Ensure DDD architecture is preserved.<br>**Details:** Check that `StockController` only interacts with `StockService`.<br>**AC:**<br>- UI performs CRUD operations successfully.<br>- Domain tests pass without modification. | 2 | Backend | Story 3.1 | Task, Architecture |
+|:-------| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `[x]`  | **3.1.1** | Refactor Stock UI to Internal View | **Purpose:** Adapt standalone code to new shell.<br>**Details:** Convert existing Stock `JFrame` into a `JInternalFrame` or embedded FXML.<br>**AC:**<br>- View loads inside main MDI pane via menu click.<br>- UI layout remains unbroken. | 3 | Frontend | Story 3.1 | Improvement, UI |
+| `[ ]`  | **3.1.2** | Verify Stock Service Segregation | **Purpose:** Ensure DDD architecture is preserved.<br>**Details:** Check that `StockController` only interacts with `StockService`.<br>**AC:**<br>- UI performs CRUD operations successfully.<br>- Domain tests pass without modification. | 2 | Backend | Story 3.1 | Task, Architecture |
 
 ### Story 3.2: As an inventory manager, I want the system to validate my stock entries before saving so that inventory records remain mathematically sound and accurate.
 **Priority:** High | **Story Points:** 5
