@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+
+<!--
+    Main Shell FXML View
+    Ticket: 1.1.1 - Initialize Main Application Window
+    Ticket: 1.1.2 - Implement MDI Desktop Pane
+    Ticket: 1.2.1 - Build Global Menu Bar UI
+
+    This BorderPane serves as the root container for the LPA Management System.
+    It provides a structured layout with dedicated regions for:
+    - Top: Menu bar with global navigation (Ticket 1.2.1)
+    - Center: MDI Desktop pane for child module views (Ticket 1.1.2)
+    - Other regions: Available for future extensions (status bar, sidebar, etc.)
+
+    Controller: com.stockmanagement.presentation.controller.MainShellController
+-->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.stockmanagement.presentation.controller.MainShellController"
+            prefWidth="800"
+            prefHeight="600">
+    <!--
+        Top Region: Global menu bar (Ticket 1.2.1)
+        Contains main navigation menus: Menu (with submenus) and Help.
+        The MenuBar spans 100% width and provides access to all major modules.
+    -->
+    <top>
+        <MenuBar>
+            <!--
+                Main Menu: Contains Stock Management, Sales, Admin, and Exit options.
+                Users can navigate to different modules through this menu.
+            -->
+            <Menu text="Menu">
+                <!-- Stock Management Option -->
+                <MenuItem text="Stock Management"
+                          fx:id="menuStock"
+                          onAction="#handleMenuClick"/>
+
+                <!-- Sales Submenu with Invoices and Clients -->
+                <Menu text="Sales">
+                    <MenuItem text="Invoices"
+                              fx:id="menuInvoices"
+                              onAction="#handleMenuClick"/>
+                    <MenuItem text="Clients"
+                              fx:id="menuClients"
+                              onAction="#handleMenuClick"/>
+                </Menu>
+
+                <!-- Separator line for visual organization -->
+                <SeparatorMenuItem/>
+
+                <!-- Admin Submenu with User Management -->
+                <Menu text="Admin">
+                    <MenuItem text="User Management"
+                              fx:id="menuUsers"
+                              onAction="#handleMenuClick"/>
+                </Menu>
+
+                <!-- Separator line for visual organization -->
+                <SeparatorMenuItem/>
+
+                <!-- Exit Application -->
+                <MenuItem text="Exit"
+                          fx:id="menuExit"
+                          onAction="#handleMenuClick"/>
+            </Menu>
+
+            <!--
+                Help Menu: Contains user documentation and system information.
+                These options provide assistance without leaving the application.
+            -->
+            <Menu text="Help">
+                <MenuItem text="User Guide"
+                          fx:id="menuGuide"
+                          onAction="#handleMenuClick"/>
+                <MenuItem text="About"
+                          fx:id="menuAbout"
+                          onAction="#handleMenuClick"/>
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <!--
+        Center Region: Main workspace container for MDI pane (Ticket 1.1.2)
+        StackPane allows for dynamic view switching and child node management.
+        It stretches to fill all available space in the center region.
+    -->
+    <center>
+        <StackPane fx:id="workspacePane"
+                   style="-fx-border-color: #e0e0e0; -fx-border-width: 1;">
+            <!-- Child views (internal frames, panels) will be dynamically added here -->
+        </StackPane>
+    </center>
+
+    <!--
+        Bottom Region: Reserved for status bar or footer information (future)
+    -->
+    <bottom>
+        <!-- Status bar or footer will be added here if needed -->
+    </bottom>
+</BorderPane>
