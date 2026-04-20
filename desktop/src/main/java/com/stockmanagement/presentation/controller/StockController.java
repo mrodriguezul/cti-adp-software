@@ -161,10 +161,28 @@ public class StockController {
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-            Integer quantity = Integer.parseInt(quantityField.getText().trim());
-            BigDecimal price = new BigDecimal(priceField.getText().trim());
+
+            // Parse quantity - throws NumberFormatException if invalid
+            Integer quantity;
+            try {
+                quantity = Integer.parseInt(quantityField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
+            // Parse price - throws NumberFormatException if invalid
+            BigDecimal price;
+            try {
+                price = new BigDecimal(priceField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
             String imageUrl = imageUrlField.getText().trim();
 
+            // This may throw IllegalArgumentException from domain validation
             Stock stock = stockService.createStock(productName, description, quantity, price, sku);
             stock.setImageUrl(imageUrl);
             stock.setStatus("A"); // Default to ACTIVE (A)
@@ -173,9 +191,8 @@ public class StockController {
             clearFields();
             loadAllStocks();
             
-        } catch (NumberFormatException e) {
-            showError("Invalid number format. Please check quantity and price fields.");
         } catch (IllegalArgumentException e) {
+            // Catches domain validation errors (e.g., "Stock quantity cannot be negative.")
             showError(e.getMessage());
         } catch (Exception e) {
             showError("Error saving stock: " + e.getMessage());
@@ -195,21 +212,38 @@ public class StockController {
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-            Integer quantity = Integer.parseInt(quantityField.getText().trim());
-            BigDecimal price = new BigDecimal(priceField.getText().trim());
+
+            // Parse quantity - throws NumberFormatException if invalid
+            Integer quantity;
+            try {
+                quantity = Integer.parseInt(quantityField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
+            // Parse price - throws NumberFormatException if invalid
+            BigDecimal price;
+            try {
+                price = new BigDecimal(priceField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
             String statusLabel = statusComboBox.getValue();
             String statusCode = statusCodeMap.get(statusLabel);
 
-            stockService.updateStock(selectedStock.getId(), productName, description, 
+            // This may throw IllegalArgumentException from domain validation
+            stockService.updateStock(selectedStock.getId(), productName, description,
                                    quantity, price, sku, statusCode);
 
             showSuccess("Stock item updated successfully!");
             clearFields();
             loadAllStocks();
             
-        } catch (NumberFormatException e) {
-            showError("Invalid number format. Please check quantity and price fields.");
         } catch (IllegalArgumentException e) {
+            // Catches domain validation errors (e.g., "Stock quantity cannot be negative.")
             showError(e.getMessage());
         } catch (Exception e) {
             showError("Error updating stock: " + e.getMessage());

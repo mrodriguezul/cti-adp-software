@@ -58,14 +58,20 @@ public class Stock {
     }
 
     private void validateQuantity(Integer quantity) {
-        if (quantity == null || quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+        if (quantity == null) {
+            throw new IllegalArgumentException("Stock quantity cannot be null");
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Stock quantity cannot be negative.");
         }
     }
 
     private void validatePrice(BigDecimal price) {
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be negative");
+        if (price == null) {
+            throw new IllegalArgumentException("Price cannot be null");
+        }
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
     }
 
