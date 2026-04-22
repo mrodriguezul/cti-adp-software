@@ -32,7 +32,8 @@ public class Stock {
         this.quantity = quantity;
         this.price = price;
         this.sku = sku;
-        this.status = "ACTIVE";
+        // Use single-character status code to match DB schema (char(1))
+        this.status = "A";
     }
 
     // Constructor for existing stock items (from database)
@@ -42,7 +43,8 @@ public class Stock {
         this(productName, description, quantity, price, sku);
         this.id = id;
         this.imageUrl = imageUrl;
-        this.status = status != null ? status : "ACTIVE";
+        // Keep the provided status (should be a single-character code like 'A' or 'D')
+        this.status = status != null ? status : "A";
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -167,7 +169,8 @@ public class Stock {
     }
 
     public void setStatus(String status) {
-        this.status = status != null ? status : "ACTIVE";
+        // Expect single-character status codes ('A' or 'D'); default to 'A' if null
+        this.status = status != null ? status : "A";
     }
 
     @Override

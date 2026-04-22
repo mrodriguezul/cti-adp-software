@@ -124,19 +124,19 @@ public class StockController {
                 selectedStock = newValue;
                 if (newValue != null) {
                     populateFields(newValue);
-                    updateButton.setDisable(false);
-                    deleteButton.setDisable(false);
+                    if (updateButton != null) updateButton.setDisable(false);
+                    if (deleteButton != null) deleteButton.setDisable(false);
                 } else {
-                    updateButton.setDisable(true);
-                    deleteButton.setDisable(true);
+                    if (updateButton != null) updateButton.setDisable(true);
+                    if (deleteButton != null) deleteButton.setDisable(true);
                 }
             }
         );
     }
 
     private void setupButtonStates() {
-        updateButton.setDisable(true);
-        deleteButton.setDisable(true);
+        if (updateButton != null) updateButton.setDisable(true);
+        if (deleteButton != null) deleteButton.setDisable(true);
     }
 
     private void setupStatusComboBox() {
@@ -161,7 +161,7 @@ public class StockController {
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-
+            
             // Parse quantity - throws NumberFormatException if invalid
             Integer quantity;
             try {
@@ -170,7 +170,7 @@ public class StockController {
                 showError("Invalid input: Please enter valid numbers for quantity and price.");
                 return;
             }
-
+            
             // Parse price - throws NumberFormatException if invalid
             BigDecimal price;
             try {
@@ -179,13 +179,20 @@ public class StockController {
                 showError("Invalid input: Please enter valid numbers for quantity and price.");
                 return;
             }
-
+            
             String imageUrl = imageUrlField.getText().trim();
 
-            // This may throw IllegalArgumentException from domain validation
+            // Create and persist the entity via the service. createStock sets default status 'A' in domain.
             Stock stock = stockService.createStock(productName, description, quantity, price, sku);
-            stock.setImageUrl(imageUrl);
-            stock.setStatus("A"); // Default to ACTIVE (A)
+
+            // Persist imageUrl and ensure status code is saved (single-character). We update the record.
+            try {
+                stockService.updateStock(stock.getId(), productName, description, quantity, price, sku, "A", imageUrl);
+            } catch (Exception e) {
+                // If update fails, show error but the initial create likely succeeded. Surface specific message.
+                showError("Error saving stock details: " + e.getMessage());
+                return;
+            }
 
             showSuccess("Stock item created successfully!");
             clearFields();
@@ -212,7 +219,7 @@ public class StockController {
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-
+            
             // Parse quantity - throws NumberFormatException if invalid
             Integer quantity;
             try {
@@ -221,7 +228,7 @@ public class StockController {
                 showError("Invalid input: Please enter valid numbers for quantity and price.");
                 return;
             }
-
+            
             // Parse price - throws NumberFormatException if invalid
             BigDecimal price;
             try {
@@ -230,13 +237,14 @@ public class StockController {
                 showError("Invalid input: Please enter valid numbers for quantity and price.");
                 return;
             }
-
+            
             String statusLabel = statusComboBox.getValue();
             String statusCode = statusCodeMap.get(statusLabel);
+            String imageUrl = imageUrlField.getText().trim();
 
             // This may throw IllegalArgumentException from domain validation
-            stockService.updateStock(selectedStock.getId(), productName, description,
-                                   quantity, price, sku, statusCode);
+            stockService.updateStock(selectedStock.getId(), productName, description, 
+                                   quantity, price, sku, statusCode, imageUrl);
 
             showSuccess("Stock item updated successfully!");
             clearFields();
@@ -335,8 +343,8 @@ public class StockController {
         imageUrlField.clear();
         statusComboBox.setValue("ACTIVE");
         selectedStock = null;
-        updateButton.setDisable(true);
-        deleteButton.setDisable(true);
+        if (updateButton != null) updateButton.setDisable(true);
+        if (deleteButton != null) deleteButton.setDisable(true);
     }
 
     private void validateInputs() {

@@ -58,80 +58,82 @@
 
     <!-- Right: Form Panel -->
     <right>
-        <VBox spacing="15.0" styleClass="form-panel" prefWidth="350.0">
-            <padding>
-                <Insets top="10.0" right="15.0" bottom="10.0" left="15.0"/>
-            </padding>
+        <ScrollPane fitToWidth="true" pannable="true" vbarPolicy="AS_NEEDED">
+            <VBox spacing="15.0" styleClass="form-panel" prefWidth="350.0" fillWidth="true">
+                <padding>
+                    <Insets top="10.0" right="15.0" bottom="10.0" left="15.0"/>
+                </padding>
 
-            <Label text="Stock Details" styleClass="section-label">
-                <font>
-                    <Font name="System Bold" size="16.0"/>
-                </font>
-            </Label>
+                <Label text="Stock Details" styleClass="section-label">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
 
-            <Separator/>
+                <Separator/>
 
-            <!-- SKU -->
-            <VBox spacing="5.0">
-                <Label text="SKU *" styleClass="field-label"/>
-                <TextField fx:id="skuField" promptText="Enter SKU code"/>
+                <!-- SKU -->
+                <VBox spacing="5.0">
+                    <Label text="SKU *" styleClass="field-label"/>
+                    <TextField fx:id="skuField" promptText="Enter SKU code"/>
+                </VBox>
+
+                <!-- Product Name -->
+                <VBox spacing="5.0">
+                    <Label text="Product Name *" styleClass="field-label"/>
+                    <TextField fx:id="productNameField" promptText="Enter product name"/>
+                </VBox>
+
+                <!-- Description -->
+                <VBox spacing="5.0">
+                    <Label text="Description" styleClass="field-label"/>
+                    <TextArea fx:id="descriptionField" promptText="Enter description"
+                             prefRowCount="3" wrapText="true"/>
+                </VBox>
+
+                <!-- Quantity -->
+                <VBox spacing="5.0">
+                    <Label text="Quantity *" styleClass="field-label"/>
+                    <TextField fx:id="quantityField" promptText="Enter quantity"/>
+                </VBox>
+
+                <!-- Price -->
+                <VBox spacing="5.0">
+                    <Label text="Price *" styleClass="field-label"/>
+                    <TextField fx:id="priceField" promptText="Enter price"/>
+                </VBox>
+
+                <!-- Image URL -->
+                <VBox spacing="5.0">
+                    <Label text="Image URL" styleClass="field-label"/>
+                    <TextField fx:id="imageUrlField" promptText="Enter image URL"/>
+                </VBox>
+
+                <!-- Status -->
+                <VBox spacing="5.0">
+                    <Label text="Status" styleClass="field-label"/>
+                    <ComboBox fx:id="statusComboBox" promptText="Select status"/>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Action Buttons -->
+                <VBox spacing="10.0">
+                    <Button fx:id="saveButton" text="Save New" onAction="#handleSave"
+                           maxWidth="Infinity" styleClass="btn-save"/>
+                    <Button fx:id="updateButton" text="Update Selected" onAction="#handleUpdate"
+                           maxWidth="Infinity" styleClass="btn-update"/>
+                    <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDelete"
+                           maxWidth="Infinity" styleClass="btn-delete" visible="false" managed="false"/>
+                    <Button fx:id="clearButton" text="Clear Form" onAction="#handleClear"
+                           maxWidth="Infinity" styleClass="btn-clear"/>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Label text="* Required fields" styleClass="hint-label"/>
             </VBox>
-
-            <!-- Product Name -->
-            <VBox spacing="5.0">
-                <Label text="Product Name *" styleClass="field-label"/>
-                <TextField fx:id="productNameField" promptText="Enter product name"/>
-            </VBox>
-
-            <!-- Description -->
-            <VBox spacing="5.0">
-                <Label text="Description" styleClass="field-label"/>
-                <TextArea fx:id="descriptionField" promptText="Enter description" 
-                         prefRowCount="3" wrapText="true"/>
-            </VBox>
-
-            <!-- Quantity -->
-            <VBox spacing="5.0">
-                <Label text="Quantity *" styleClass="field-label"/>
-                <TextField fx:id="quantityField" promptText="Enter quantity"/>
-            </VBox>
-
-            <!-- Price -->
-            <VBox spacing="5.0">
-                <Label text="Price *" styleClass="field-label"/>
-                <TextField fx:id="priceField" promptText="Enter price"/>
-            </VBox>
-
-            <!-- Image URL -->
-            <VBox spacing="5.0">
-                <Label text="Image URL" styleClass="field-label"/>
-                <TextField fx:id="imageUrlField" promptText="Enter image URL"/>
-            </VBox>
-
-            <!-- Status -->
-            <VBox spacing="5.0">
-                <Label text="Status" styleClass="field-label"/>
-                <ComboBox fx:id="statusComboBox" promptText="Select status"/>
-            </VBox>
-
-            <Separator/>
-
-            <!-- Action Buttons -->
-            <VBox spacing="10.0">
-                <Button fx:id="saveButton" text="Save New" onAction="#handleSave" 
-                       maxWidth="Infinity" styleClass="btn-save"/>
-                <Button fx:id="updateButton" text="Update Selected" onAction="#handleUpdate" 
-                       maxWidth="Infinity" styleClass="btn-update"/>
-                <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDelete" 
-                       maxWidth="Infinity" styleClass="btn-delete"/>
-                <Button fx:id="clearButton" text="Clear Form" onAction="#handleClear" 
-                       maxWidth="Infinity" styleClass="btn-clear"/>
-            </VBox>
-
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <Label text="* Required fields" styleClass="hint-label"/>
-        </VBox>
+        </ScrollPane>
     </right>
 
 </BorderPane>
