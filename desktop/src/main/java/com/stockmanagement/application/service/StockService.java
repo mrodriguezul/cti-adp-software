@@ -49,7 +49,7 @@ public class StockService {
         stock.setSku(sku);
         stock.setStatus(status);
         stock.setImageUrl(imageUrl);
-
+        
         return stockRepository.update(stock);
     }
 
