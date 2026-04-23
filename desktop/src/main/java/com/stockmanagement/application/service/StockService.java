@@ -31,9 +31,10 @@ public class StockService {
 
     /**
      * Update an existing stock item
+     * Now accepts imageUrl so the presentation layer can persist image links
      */
     public Stock updateStock(Integer id, String productName, String description, 
-                            Integer quantity, BigDecimal price, String sku, String status) {
+                            Integer quantity, BigDecimal price, String sku, String status, String imageUrl) {
         Optional<Stock> existingStock = stockRepository.findById(id);
         
         if (existingStock.isEmpty()) {
@@ -47,7 +48,8 @@ public class StockService {
         stock.updatePrice(price);
         stock.setSku(sku);
         stock.setStatus(status);
-
+        stock.setImageUrl(imageUrl);
+        
         return stockRepository.update(stock);
     }
 

@@ -32,17 +32,19 @@ public class Stock {
         this.quantity = quantity;
         this.price = price;
         this.sku = sku;
-        this.status = "ACTIVE";
+        // Use single-character status code to match DB schema (char(1))
+        this.status = "A";
     }
 
     // Constructor for existing stock items (from database)
     public Stock(Integer id, String productName, String description, Integer quantity,
-                 BigDecimal price, String sku, String imageUrl, String status, LocalDateTime createdAt,
+                 BigDecimal price, String sku, String imageUrl, String status, LocalDateTime createdAt, 
                  LocalDateTime updatedAt) {
         this(productName, description, quantity, price, sku);
         this.id = id;
         this.imageUrl = imageUrl;
-        this.status = status != null ? status : "ACTIVE";
+        // Keep the provided status (should be a single-character code like 'A' or 'D')
+        this.status = status != null ? status : "A";
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -58,14 +60,20 @@ public class Stock {
     }
 
     private void validateQuantity(Integer quantity) {
-        if (quantity == null || quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+        if (quantity == null) {
+            throw new IllegalArgumentException("Stock quantity cannot be null");
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Stock quantity cannot be negative.");
         }
     }
 
     private void validatePrice(BigDecimal price) {
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be negative");
+        if (price == null) {
+            throw new IllegalArgumentException("Price cannot be null");
+        }
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
     }
 
@@ -161,7 +169,8 @@ public class Stock {
     }
 
     public void setStatus(String status) {
-        this.status = status != null ? status : "ACTIVE";
+        // Expect single-character status codes ('A' or 'D'); default to 'A' if null
+        this.status = status != null ? status : "A";
     }
 
     @Override

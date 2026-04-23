@@ -2,8 +2,6 @@ package com.stockmanagement.presentation.controller;
 
 import com.stockmanagement.application.service.StockService;
 import com.stockmanagement.domain.model.Stock;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,15 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * JavaFX Controller for Stock Management UI
- */
+// Controller for Stock Management UI (embedded view for MDI shell). Delegates to StockService.
 public class StockController {
 
     @FXML private TableView<Stock> stockTable;
@@ -39,15 +33,14 @@ public class StockController {
     @FXML private ComboBox<String> statusComboBox;
     @FXML private TextField searchField;
 
-    @FXML private Button saveButton;
+    @FXML @SuppressWarnings("unused") private Button saveButton;
     @FXML private Button updateButton;
     @FXML private Button deleteButton;
-    @FXML private Button clearButton;
+    @FXML @SuppressWarnings("unused") private Button clearButton;
 
     private final StockService stockService;
     private final ObservableList<Stock> stockList;
     private Stock selectedStock;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final Map<String, String> statusCodeMap = new HashMap<>();
     private final Map<String, String> codeStatusMap = new HashMap<>();
 
@@ -83,7 +76,7 @@ public class StockController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Price formatting
-        priceColumn.setCellFactory(col -> new TableCell<Stock, BigDecimal>() {
+        priceColumn.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(BigDecimal price, boolean empty) {
                 super.updateItem(price, empty);
@@ -104,19 +97,19 @@ public class StockController {
                 selectedStock = newValue;
                 if (newValue != null) {
                     populateFields(newValue);
-                    updateButton.setDisable(false);
-                    deleteButton.setDisable(false);
+                    if (updateButton != null) updateButton.setDisable(false);
+                    if (deleteButton != null) deleteButton.setDisable(false);
                 } else {
-                    updateButton.setDisable(true);
-                    deleteButton.setDisable(true);
+                    if (updateButton != null) updateButton.setDisable(true);
+                    if (deleteButton != null) deleteButton.setDisable(true);
                 }
             }
         );
     }
 
     private void setupButtonStates() {
-        updateButton.setDisable(true);
-        deleteButton.setDisable(true);
+        if (updateButton != null) updateButton.setDisable(true);
+        if (deleteButton != null) deleteButton.setDisable(true);
     }
 
     private void setupStatusComboBox() {
@@ -128,34 +121,56 @@ public class StockController {
     }
 
     private void setupSearchListener() {
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            handleSearch();
-        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> handleSearch());
     }
 
     @FXML
     private void handleSave() {
         try {
             validateInputs();
-            
+
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-            Integer quantity = Integer.parseInt(quantityField.getText().trim());
-            BigDecimal price = new BigDecimal(priceField.getText().trim());
+
+            // Parse quantity - throws NumberFormatException if invalid
+            int quantity;
+            try {
+                quantity = Integer.parseInt(quantityField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
+            // Parse price - throws NumberFormatException if invalid
+            BigDecimal price;
+            try {
+                price = new BigDecimal(priceField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
             String imageUrl = imageUrlField.getText().trim();
 
+            // Create and persist the entity via the service. createStock sets default status 'A' in domain.
             Stock stock = stockService.createStock(productName, description, quantity, price, sku);
-            stock.setImageUrl(imageUrl);
-            stock.setStatus("A"); // Default to ACTIVE (A)
+
+            // Persist imageUrl and ensure status code is saved (single-character). We update the record.
+            try {
+                stockService.updateStock(stock.getId(), productName, description, quantity, price, sku, "A", imageUrl);
+            } catch (Exception e) {
+                // If update fails, show error but the initial create likely succeeded. Surface specific message.
+                showError("Error saving stock details: " + e.getMessage());
+                return;
+            }
 
             showSuccess("Stock item created successfully!");
             clearFields();
             loadAllStocks();
-            
-        } catch (NumberFormatException e) {
-            showError("Invalid number format. Please check quantity and price fields.");
+
         } catch (IllegalArgumentException e) {
+            // Catches domain validation errors (e.g., "Stock quantity cannot be negative.")
             showError(e.getMessage());
         } catch (Exception e) {
             showError("Error saving stock: " + e.getMessage());
@@ -171,25 +186,43 @@ public class StockController {
 
         try {
             validateInputs();
-            
+
             String sku = skuField.getText().trim();
             String productName = productNameField.getText().trim();
             String description = descriptionField.getText().trim();
-            Integer quantity = Integer.parseInt(quantityField.getText().trim());
-            BigDecimal price = new BigDecimal(priceField.getText().trim());
+
+            // Parse quantity - throws NumberFormatException if invalid
+            int quantity;
+            try {
+                quantity = Integer.parseInt(quantityField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
+            // Parse price - throws NumberFormatException if invalid
+            BigDecimal price;
+            try {
+                price = new BigDecimal(priceField.getText().trim());
+            } catch (NumberFormatException e) {
+                showError("Invalid input: Please enter valid numbers for quantity and price.");
+                return;
+            }
+
             String statusLabel = statusComboBox.getValue();
             String statusCode = statusCodeMap.get(statusLabel);
+            String imageUrl = imageUrlField.getText().trim();
 
-            stockService.updateStock(selectedStock.getId(), productName, description, 
-                                   quantity, price, sku, statusCode);
+            // This may throw IllegalArgumentException from domain validation
+            stockService.updateStock(selectedStock.getId(), productName, description,
+                                   quantity, price, sku, statusCode, imageUrl);
 
             showSuccess("Stock item updated successfully!");
             clearFields();
             loadAllStocks();
-            
-        } catch (NumberFormatException e) {
-            showError("Invalid number format. Please check quantity and price fields.");
+
         } catch (IllegalArgumentException e) {
+            // Catches domain validation errors (e.g., "Stock quantity cannot be negative.")
             showError(e.getMessage());
         } catch (Exception e) {
             showError("Error updating stock: " + e.getMessage());
@@ -206,7 +239,7 @@ public class StockController {
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Confirm Delete");
         confirmDialog.setHeaderText("Delete Stock Item");
-        confirmDialog.setContentText("Are you sure you want to delete: " + 
+        confirmDialog.setContentText("Are you sure you want to delete: " +
                                     selectedStock.getProductName() + "?");
 
         Optional<ButtonType> result = confirmDialog.showAndWait();
@@ -281,8 +314,8 @@ public class StockController {
         imageUrlField.clear();
         statusComboBox.setValue("ACTIVE");
         selectedStock = null;
-        updateButton.setDisable(true);
-        deleteButton.setDisable(true);
+        if (updateButton != null) updateButton.setDisable(true);
+        if (deleteButton != null) deleteButton.setDisable(true);
     }
 
     private void validateInputs() {
