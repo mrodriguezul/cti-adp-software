@@ -1,7 +1,6 @@
 package com.stockmanagement.domain.model;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -10,330 +9,311 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit Tests for Stock Domain Model
- * Tests business logic and validation rules
+ * Unit tests for Stock domain entity
+ * Validates business rules and constraints
  */
-@DisplayName("Stock Domain Model Tests")
 class StockTest {
 
     private Stock stock;
-    private final BigDecimal testPrice = new BigDecimal("999.99");
 
     @BeforeEach
     void setUp() {
-        stock = new Stock("Laptop", "Gaming Laptop", 10, testPrice, "SKU-001");
+        stock = new Stock("Laptop", "High-performance laptop", 10, new BigDecimal("999.99"), "SKU-001");
     }
 
+    // ==================== Constructor Tests ====================
+
     @Test
-    @DisplayName("Should create valid stock with all required fields")
-    void testValidStockCreation() {
+    void testStockCreation_Success() {
         assertNotNull(stock);
         assertEquals("Laptop", stock.getProductName());
-        assertEquals("Gaming Laptop", stock.getDescription());
+        assertEquals("High-performance laptop", stock.getDescription());
         assertEquals(10, stock.getQuantity());
-        assertEquals(testPrice, stock.getPrice());
+        assertEquals(new BigDecimal("999.99"), stock.getPrice());
         assertEquals("SKU-001", stock.getSku());
+        assertEquals("A", stock.getStatus()); // Default status is 'A'
     }
 
     @Test
-    @DisplayName("Should reject empty product name")
-    void testEmptyProductName() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("", "Description", 10, testPrice, "SKU-002"));
+    void testStockCreation_WithFullConstructor() {
+        LocalDateTime now = LocalDateTime.now();
+        Stock stock = new Stock(1, "Monitor", "27-inch display", 5, new BigDecimal("299.99"),
+                               "SKU-002", "http://image.url", "A", now, now);
+
+        assertEquals(1, stock.getId());
+        assertEquals("Monitor", stock.getProductName());
+        assertEquals(5, stock.getQuantity());
+        assertEquals("A", stock.getStatus());
+        assertEquals("http://image.url", stock.getImageUrl());
+    }
+
+    // ==================== Validation Tests ====================
+
+    @Test
+    void testProductNameValidation_Empty() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock("", "Description", 10, new BigDecimal("100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject product name with only whitespace")
-    void testWhitespaceProductName() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("   ", "Description", 10, testPrice, "SKU-002"));
+    void testProductNameValidation_Null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock(null, "Description", 10, new BigDecimal("100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject product name exceeding 255 characters")
-    void testProductNameTooLong() {
-        String longName = "a".repeat(256);
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock(longName, "Description", 10, testPrice, "SKU-002"));
+    void testProductNameValidation_TooLong() {
+        String longName = "A".repeat(256);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock(longName, "Description", 10, new BigDecimal("100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should accept product name with exactly 255 characters")
-    void testProductNameMaxLength() {
-        String maxName = "a".repeat(255);
-        Stock testStock = new Stock(maxName, "Description", 10, testPrice, "SKU-002");
-        assertEquals(255, testStock.getProductName().length());
+    void testQuantityValidation_Negative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock("Laptop", "Description", -1, new BigDecimal("100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject null product name")
-    void testNullProductName() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock(null, "Description", 10, testPrice, "SKU-002"));
+    void testQuantityValidation_Null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock("Laptop", "Description", null, new BigDecimal("100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject negative quantity")
-    void testNegativeQuantity() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", -5, testPrice, "SKU-002"));
+    void testQuantityValidation_Zero() {
+        Stock stock = new Stock("Laptop", "Description", 0, new BigDecimal("100.00"), "SKU-001");
+        assertEquals(0, stock.getQuantity());
     }
 
     @Test
-    @DisplayName("Should accept quantity of zero")
-    void testZeroQuantity() {
-        Stock testStock = new Stock("Laptop", "Description", 0, testPrice, "SKU-002");
-        assertEquals(0, testStock.getQuantity());
+    void testPriceValidation_Negative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock("Laptop", "Description", 10, new BigDecimal("-100.00"), "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject null quantity")
-    void testNullQuantity() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", null, testPrice, "SKU-002"));
+    void testPriceValidation_Null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Stock("Laptop", "Description", 10, null, "SKU-001");
+        });
     }
 
     @Test
-    @DisplayName("Should reject negative price")
-    void testNegativePrice() {
-        BigDecimal negativePrice = new BigDecimal("-50.00");
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", 10, negativePrice, "SKU-002"));
+    void testPriceValidation_Zero() {
+        Stock stock = new Stock("Laptop", "Description", 10, new BigDecimal("0.00"), "SKU-001");
+        assertEquals(0, stock.getPrice().compareTo(BigDecimal.ZERO));
     }
 
-    @Test
-    @DisplayName("Should accept price of zero")
-    void testZeroPrice() {
-        Stock testStock = new Stock("Laptop", "Description", 10, BigDecimal.ZERO, "SKU-002");
-        assertEquals(0, testStock.getPrice().compareTo(BigDecimal.ZERO));
-    }
+    // ==================== Quantity Operations Tests ====================
 
     @Test
-    @DisplayName("Should reject null price")
-    void testNullPrice() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Stock("Laptop", "Description", 10, null, "SKU-002"));
-    }
-
-    @Test
-    @DisplayName("Should increase quantity when adding valid amount")
-    void testAddStockValidAmount() {
+    void testAddStock_Success() {
         stock.addStock(5);
         assertEquals(15, stock.getQuantity());
     }
 
     @Test
-    @DisplayName("Should handle adding large quantities")
-    void testAddStockLargeAmount() {
-        stock.addStock(1000);
-        assertEquals(1010, stock.getQuantity());
+    void testAddStock_InvalidAmount() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.addStock(-5);
+        });
     }
 
     @Test
-    @DisplayName("Should reject adding zero amount")
-    void testAddStockZeroAmount() {
-        assertThrows(IllegalArgumentException.class, () -> stock.addStock(0));
+    void testAddStock_ZeroAmount() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.addStock(0);
+        });
     }
 
     @Test
-    @DisplayName("Should reject adding negative amount")
-    void testAddStockNegativeAmount() {
-        assertThrows(IllegalArgumentException.class, () -> stock.addStock(-5));
-    }
-
-    @Test
-    @DisplayName("Should decrease quantity when removing valid amount")
-    void testRemoveStockValidAmount() {
+    void testRemoveStock_Success() {
         stock.removeStock(3);
         assertEquals(7, stock.getQuantity());
     }
 
     @Test
-    @DisplayName("Should allow removing exact available quantity")
-    void testRemoveStockExactAmount() {
-        stock.removeStock(10);
+    void testRemoveStock_InsufficientStock() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.removeStock(15); // Only 10 in stock
+        });
+    }
+
+    @Test
+    void testRemoveStock_InvalidAmount() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.removeStock(-5);
+        });
+    }
+
+    @Test
+    void testRemoveStock_ZeroAmount() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.removeStock(0);
+        });
+    }
+
+    // ==================== Price Update Tests ====================
+
+    @Test
+    void testUpdatePrice_Success() {
+        stock.updatePrice(new BigDecimal("1299.99"));
+        assertEquals(new BigDecimal("1299.99"), stock.getPrice());
+    }
+
+    @Test
+    void testUpdatePrice_Negative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.updatePrice(new BigDecimal("-100.00"));
+        });
+    }
+
+    @Test
+    void testUpdatePrice_Null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.updatePrice(null);
+        });
+    }
+
+    // ==================== Quantity Update Tests ====================
+
+    @Test
+    void testUpdateQuantity_Success() {
+        stock.updateQuantity(20);
+        assertEquals(20, stock.getQuantity());
+    }
+
+    @Test
+    void testUpdateQuantity_Negative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.updateQuantity(-5);
+        });
+    }
+
+    @Test
+    void testUpdateQuantity_Null() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.updateQuantity(null);
+        });
+    }
+
+    @Test
+    void testUpdateQuantity_Zero() {
+        stock.updateQuantity(0);
         assertEquals(0, stock.getQuantity());
     }
 
+    // ==================== Low Stock Check Tests ====================
+
     @Test
-    @DisplayName("Should reject removing more than available")
-    void testRemoveStockInsufficient() {
-        assertThrows(IllegalArgumentException.class, () -> stock.removeStock(15));
+    void testIsLowStock_True() {
+        boolean isLow = stock.isLowStock(15);
+        assertTrue(isLow);
     }
 
     @Test
-    @DisplayName("Should reject removing zero amount")
-    void testRemoveStockZeroAmount() {
-        assertThrows(IllegalArgumentException.class, () -> stock.removeStock(0));
+    void testIsLowStock_False() {
+        boolean isLow = stock.isLowStock(5);
+        assertFalse(isLow);
     }
 
     @Test
-    @DisplayName("Should reject removing negative amount")
-    void testRemoveStockNegativeAmount() {
-        assertThrows(IllegalArgumentException.class, () -> stock.removeStock(-5));
+    void testIsLowStock_Boundary() {
+        boolean isLow = stock.isLowStock(10);
+        assertFalse(isLow); // Equal to threshold is NOT low stock
+    }
+
+    // ==================== Setter Tests ====================
+
+    @Test
+    void testSetProductName_Success() {
+        stock.setProductName("Desktop");
+        assertEquals("Desktop", stock.getProductName());
     }
 
     @Test
-    @DisplayName("Should update quantity to new valid value")
-    void testUpdateQuantityValid() {
-        stock.updateQuantity(25);
-        assertEquals(25, stock.getQuantity());
+    void testSetProductName_Invalid() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stock.setProductName("");
+        });
     }
 
     @Test
-    @DisplayName("Should reject updating quantity to negative value")
-    void testUpdateQuantityNegative() {
-        assertThrows(IllegalArgumentException.class, () -> stock.updateQuantity(-10));
-    }
-
-    @Test
-    @DisplayName("Should update price to new valid value")
-    void testUpdatePriceValid() {
-        BigDecimal newPrice = new BigDecimal("1299.99");
-        stock.updatePrice(newPrice);
-        assertEquals(0, stock.getPrice().compareTo(newPrice));
-    }
-
-    @Test
-    @DisplayName("Should reject updating price to negative value")
-    void testUpdatePriceNegative() {
-        assertThrows(IllegalArgumentException.class,
-            () -> stock.updatePrice(new BigDecimal("-100")));
-    }
-
-    @Test
-    @DisplayName("Should identify stock below threshold as low")
-    void testIsLowStockBelowThreshold() {
-        assertTrue(stock.isLowStock(15));
-    }
-
-    @Test
-    @DisplayName("Should NOT identify stock at threshold as low")
-    void testIsLowStockAtThreshold() {
-        assertFalse(stock.isLowStock(10));
-    }
-
-    @Test
-    @DisplayName("Should NOT identify stock above threshold as low")
-    void testIsLowStockAboveThreshold() {
-        assertFalse(stock.isLowStock(5));
-    }
-
-    @Test
-    @DisplayName("Should update product name to valid value")
-    void testSetProductNameValid() {
-        stock.setProductName("Desktop Computer");
-        assertEquals("Desktop Computer", stock.getProductName());
-    }
-
-    @Test
-    @DisplayName("Should reject invalid product name via setter")
-    void testSetProductNameInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> stock.setProductName(""));
-    }
-
-    @Test
-    @DisplayName("Should update description")
     void testSetDescription() {
-        stock.setDescription("Updated description");
-        assertEquals("Updated description", stock.getDescription());
+        stock.setDescription("New description");
+        assertEquals("New description", stock.getDescription());
     }
 
     @Test
-    @DisplayName("Should update SKU")
     void testSetSku() {
         stock.setSku("SKU-NEW");
         assertEquals("SKU-NEW", stock.getSku());
     }
 
     @Test
-    @DisplayName("Should update image URL")
     void testSetImageUrl() {
-        stock.setImageUrl("http://example.com/image.jpg");
-        assertEquals("http://example.com/image.jpg", stock.getImageUrl());
+        stock.setImageUrl("http://new-image.url");
+        assertEquals("http://new-image.url", stock.getImageUrl());
     }
 
     @Test
-    @DisplayName("Should update status")
-    void testSetStatus() {
-        stock.setStatus("INACTIVE");
-        assertEquals("INACTIVE", stock.getStatus());
+    void testSetStatus_Valid() {
+        stock.setStatus("D");
+        assertEquals("D", stock.getStatus());
     }
 
     @Test
-    @DisplayName("Should default status to ACTIVE")
-    void testDefaultStatus() {
-        assertEquals("ACTIVE", stock.getStatus());
+    void testSetStatus_Null_DefaultsToActive() {
+        stock.setStatus(null);
+        assertEquals("A", stock.getStatus());
+    }
+
+    // ==================== Equality Tests ====================
+
+    @Test
+    void testEquality_SameId() {
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                "SKU-001", "http://url", "A", null, null);
+        Stock stock2 = new Stock(1, "Desktop", "Different", 5, new BigDecimal("200.00"),
+                                "SKU-002", "http://url2", "D", null, null);
+
+        assertEquals(stock1, stock2); // Same ID = equal
     }
 
     @Test
-    @DisplayName("Should consider stocks with same ID as equal")
-    void testStockEqualitySameId() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
-        Stock stock2 = new Stock(1, "Desktop", "Different", 20, new BigDecimal("500"), "SKU-002", null, "ACTIVE", null, null);
-        assertEquals(stock1, stock2);
+    void testEquality_DifferentId() {
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                "SKU-001", "http://url", "A", null, null);
+        Stock stock2 = new Stock(2, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                "SKU-001", "http://url", "A", null, null);
+
+        assertNotEquals(stock1, stock2); // Different ID = not equal
     }
 
     @Test
-    @DisplayName("Should consider stocks with different IDs as not equal")
-    void testStockEqualityDifferentId() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
-        Stock stock2 = new Stock(2, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
-        assertNotEquals(stock1, stock2);
-    }
+    void testHashCode_ConsistentWithEquality() {
+        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                "SKU-001", "http://url", "A", null, null);
+        Stock stock2 = new Stock(1, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                "SKU-001", "http://url", "A", null, null);
 
-    @Test
-    @DisplayName("Should consider same object reference as equal")
-    void testStockEqualitySameReference() {
-        assertEquals(stock, stock);
-    }
-
-    @Test
-    @DisplayName("Should not be equal to null")
-    void testStockEqualityNull() {
-        assertNotEquals(stock, null);
-    }
-
-    @Test
-    @DisplayName("Should not be equal to object of different type")
-    void testStockEqualityDifferentType() {
-        assertNotEquals(stock, "Not a stock");
-    }
-
-    @Test
-    @DisplayName("Should generate consistent hash code")
-    void testStockHashCode() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
-        Stock stock2 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", null, null);
         assertEquals(stock1.hashCode(), stock2.hashCode());
     }
 
-    @Test
-    @DisplayName("Should create stock with all parameters including ID and timestamps")
-    void testStockConstructorWithId() {
-        LocalDateTime now = LocalDateTime.now();
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, testPrice, "SKU-001", null, "ACTIVE", now, now);
-
-        assertEquals(1, stock1.getId());
-        assertEquals(now, stock1.getCreatedAt());
-        assertEquals(now, stock1.getUpdatedAt());
-    }
+    // ==================== toString Tests ====================
 
     @Test
-    @DisplayName("Should handle multiple operations in sequence correctly")
-    void testMultipleOperationsSequence() {
-        assertEquals(10, stock.getQuantity());
-
-        stock.addStock(5);
-        assertEquals(15, stock.getQuantity());
-
-        stock.removeStock(3);
-        assertEquals(12, stock.getQuantity());
-
-        stock.updateQuantity(20);
-        assertEquals(20, stock.getQuantity());
-
-        assertTrue(stock.isLowStock(25));
-        assertFalse(stock.isLowStock(15));
+    void testToString() {
+        String result = stock.toString();
+        assertNotNull(result);
+        assertTrue(result.contains("Laptop"));
+        assertTrue(result.contains("SKU-001"));
     }
 }

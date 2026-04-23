@@ -71,6 +71,19 @@
             <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- Byte Buddy (MockMaker implementation) - Explicitly for Java 21 compatibility -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.14.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.14.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

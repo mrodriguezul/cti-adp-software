@@ -3,182 +3,423 @@ package com.stockmanagement.application.service;
 import com.stockmanagement.domain.model.Stock;
 import com.stockmanagement.domain.repository.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 /**
- * Integration Tests for Stock Service
- * Tests service layer business logic
+ * Unit tests for StockService application layer
+ * Tests service logic and repository delegation
  */
-@DisplayName("Stock Service Tests")
+@ExtendWith(MockitoExtension.class)
 class StockServiceTest {
 
+    @Mock
+    private StockRepository stockRepository;
+
+    @InjectMocks
     private StockService stockService;
 
-    @Mock
-    private StockRepository mockRepository;
+    private Stock testStock;
+    private Stock testStock2;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        stockService = new StockService(mockRepository);
+        testStock = new Stock("Laptop", "High-performance", 10, new BigDecimal("999.99"), "SKU-001");
+        testStock2 = new Stock("Monitor", "27-inch display", 5, new BigDecimal("299.99"), "SKU-002");
     }
 
-    @Test
-    @DisplayName("Should create stock successfully")
-    void testCreateStock() {
-        Stock stock = new Stock("Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
-        when(mockRepository.save(any())).thenReturn(stock);
+    // ==================== Create Stock Tests ====================
 
-        Stock result = stockService.createStock("Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
+    @Test
+    void testCreateStock_Success() {
+        Stock newStock = new Stock("Keyboard", "Mechanical", 20, new BigDecimal("149.99"), "SKU-003");
+        when(stockRepository.save(any(Stock.class))).thenReturn(newStock);
+
+        Stock result = stockService.createStock("Keyboard", "Mechanical", 20, new BigDecimal("149.99"), "SKU-003");
 
         assertNotNull(result);
-        assertEquals("Laptop", result.getProductName());
-        verify(mockRepository).save(any());
+        assertEquals("Keyboard", result.getProductName());
+        verify(stockRepository, times(1)).save(any(Stock.class));
     }
 
     @Test
-    @DisplayName("Should retrieve stock by ID")
-    void testGetStockById() {
-        Stock stock = new Stock(1, "Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
+    void testCreateStock_WithNegativeQuantity() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.createStock("Laptop", "Description", -5, new BigDecimal("100.00"), "SKU-001");
+        });
+        verify(stockRepository, never()).save(any(Stock.class));
+    }
 
-        Optional<Stock> result = stockService.getStockById(1);
+    @Test
+    void testCreateStock_WithNegativePrice() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.createStock("Laptop", "Description", 10, new BigDecimal("-100.00"), "SKU-001");
+        });
+        verify(stockRepository, never()).save(any(Stock.class));
+    }
+
+    @Test
+    void testCreateStock_WithEmptyProductName() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.createStock("", "Description", 10, new BigDecimal("100.00"), "SKU-001");
+        });
+        verify(stockRepository, never()).save(any(Stock.class));
+    }
+
+    // ==================== Update Stock Tests ====================
+
+    @Test
+    void testUpdateStock_Success() {
+        int stockId = 1;
+        Stock existingStock = new Stock(stockId, "Laptop", "Old desc", 10, new BigDecimal("999.99"),
+                                       "SKU-001", "http://url", "A", null, null);
+        Stock updatedStock = new Stock(stockId, "Laptop Pro", "New desc", 15, new BigDecimal("1299.99"),
+                                      "SKU-001", "http://new-url", "A", null, null);
+
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(existingStock));
+        when(stockRepository.update(any(Stock.class))).thenReturn(updatedStock);
+
+        Stock result = stockService.updateStock(stockId, "Laptop Pro", "New desc", 15,
+                                               new BigDecimal("1299.99"), "SKU-001", "A", "http://new-url");
+
+        assertNotNull(result);
+        assertEquals("Laptop Pro", result.getProductName());
+        verify(stockRepository, times(1)).findById(stockId);
+        verify(stockRepository, times(1)).update(any(Stock.class));
+    }
+
+    @Test
+    void testUpdateStock_NotFound() {
+        int stockId = 999;
+        when(stockRepository.findById(stockId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.updateStock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                    "SKU-001", "A", "http://url");
+        });
+        verify(stockRepository, never()).update(any(Stock.class));
+    }
+
+    @Test
+    void testUpdateStock_WithNegativeQuantity() {
+        int stockId = 1;
+        Stock existingStock = new Stock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                       "SKU-001", "http://url", "A", null, null);
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(existingStock));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.updateStock(stockId, "Laptop", "Desc", -5, new BigDecimal("100.00"),
+                                    "SKU-001", "A", "http://url");
+        });
+        verify(stockRepository, never()).update(any(Stock.class));
+    }
+
+    // ==================== Delete Stock Tests ====================
+
+    @Test
+    void testDeleteStock_Success() {
+        int stockId = 1;
+        when(stockRepository.existsById(stockId)).thenReturn(true);
+
+        stockService.deleteStock(stockId);
+
+        verify(stockRepository, times(1)).deleteById(stockId);
+    }
+
+    @Test
+    void testDeleteStock_NotFound() {
+        int stockId = 999;
+        when(stockRepository.existsById(stockId)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.deleteStock(stockId);
+        });
+        verify(stockRepository, never()).deleteById(anyInt());
+    }
+
+    // ==================== Get Stock Tests ====================
+
+    @Test
+    void testGetStockById_Found() {
+        int stockId = 1;
+        Stock stock = new Stock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                               "SKU-001", "http://url", "A", null, null);
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(stock));
+
+        Optional<Stock> result = stockService.getStockById(stockId);
 
         assertTrue(result.isPresent());
         assertEquals("Laptop", result.get().getProductName());
+        verify(stockRepository, times(1)).findById(stockId);
     }
 
     @Test
-    @DisplayName("Should delete stock successfully")
-    void testDeleteStock() {
-        when(mockRepository.existsById(1)).thenReturn(true);
+    void testGetStockById_NotFound() {
+        int stockId = 999;
+        when(stockRepository.findById(stockId)).thenReturn(Optional.empty());
 
-        stockService.deleteStock(1);
+        Optional<Stock> result = stockService.getStockById(stockId);
 
-        verify(mockRepository).deleteById(1);
+        assertFalse(result.isPresent());
+        verify(stockRepository, times(1)).findById(stockId);
     }
 
-    @Test
-    @DisplayName("Should throw exception when deleting non-existent stock")
-    void testDeleteNonExistentStock() {
-        when(mockRepository.existsById(999)).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            stockService.deleteStock(999);
-        });
-    }
+    // ==================== Get All Stocks Tests ====================
 
     @Test
-    @DisplayName("Should search stocks by product name")
-    void testSearchByName() {
-        Stock stock = new Stock("Dell Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001");
-        List<Stock> stocks = List.of(stock);
-        when(mockRepository.findByProductNameContaining("Dell")).thenReturn(stocks);
-
-        List<Stock> result = stockService.searchStocksByName("Dell");
-
-        assertEquals(1, result.size());
-        assertEquals("Dell Laptop", result.get(0).getProductName());
-    }
-
-    @Test
-    @DisplayName("Should get stocks by SKU")
-    void testGetStocksBySku() {
-        Stock stock = new Stock(1, "Laptop", "Gaming", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        List<Stock> stocks = List.of(stock);
-        when(mockRepository.findBySku("SKU-001")).thenReturn(stocks);
-
-        List<Stock> result = stockService.getStocksBySku("SKU-001");
-
-        assertEquals(1, result.size());
-        assertEquals("SKU-001", result.get(0).getSku());
-    }
-
-    @Test
-    @DisplayName("Should get all stocks")
-    void testGetAllStocks() {
-        Stock stock1 = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        Stock stock2 = new Stock(2, "Mouse", "Desc", 20, BigDecimal.ONE, "SKU-002", null, "ACTIVE", null, null);
-        List<Stock> stocks = List.of(stock1, stock2);
-
-        when(mockRepository.findAll()).thenReturn(stocks);
+    void testGetAllStocks_Success() {
+        List<Stock> stocks = Arrays.asList(testStock, testStock2);
+        when(stockRepository.findAll()).thenReturn(stocks);
 
         List<Stock> result = stockService.getAllStocks();
 
+        assertNotNull(result);
         assertEquals(2, result.size());
+        verify(stockRepository, times(1)).findAll();
     }
 
     @Test
-    @DisplayName("Should filter low stock items")
-    void testGetLowStockItems() {
-        Stock stock1 = new Stock(1, "Item1", "Desc", 5, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        List<Stock> stocks = List.of(stock1);
+    void testGetAllStocks_Empty() {
+        when(stockRepository.findAll()).thenReturn(Arrays.asList());
 
-        when(mockRepository.findByQuantityBelow(10)).thenReturn(stocks);
+        List<Stock> result = stockService.getAllStocks();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(stockRepository, times(1)).findAll();
+    }
+
+    // ==================== Search Stock Tests ====================
+
+    @Test
+    void testSearchStocksByName_Found() {
+        String searchText = "Laptop";
+        List<Stock> stocks = Arrays.asList(testStock);
+        when(stockRepository.findByProductNameContaining(searchText)).thenReturn(stocks);
+
+        List<Stock> result = stockService.searchStocksByName(searchText);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(stockRepository, times(1)).findByProductNameContaining(searchText);
+    }
+
+    @Test
+    void testSearchStocksByName_NotFound() {
+        String searchText = "NonExistent";
+        when(stockRepository.findByProductNameContaining(searchText)).thenReturn(Arrays.asList());
+
+        List<Stock> result = stockService.searchStocksByName(searchText);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(stockRepository, times(1)).findByProductNameContaining(searchText);
+    }
+
+    @Test
+    void testSearchStocksByName_Empty_ReturnsAll() {
+        List<Stock> stocks = Arrays.asList(testStock, testStock2);
+        when(stockRepository.findAll()).thenReturn(stocks);
+
+        List<Stock> result = stockService.searchStocksByName("");
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(stockRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testSearchStocksByName_Null_ReturnsAll() {
+        List<Stock> stocks = Arrays.asList(testStock, testStock2);
+        when(stockRepository.findAll()).thenReturn(stocks);
+
+        List<Stock> result = stockService.searchStocksByName(null);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(stockRepository, times(1)).findAll();
+    }
+
+    // ==================== Get Stocks By SKU Tests ====================
+
+    @Test
+    void testGetStocksBySku_Found() {
+        String sku = "SKU-001";
+        List<Stock> stocks = Arrays.asList(testStock);
+        when(stockRepository.findBySku(sku)).thenReturn(stocks);
+
+        List<Stock> result = stockService.getStocksBySku(sku);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(stockRepository, times(1)).findBySku(sku);
+    }
+
+    @Test
+    void testGetStocksBySku_NotFound() {
+        String sku = "SKU-NOTFOUND";
+        when(stockRepository.findBySku(sku)).thenReturn(Arrays.asList());
+
+        List<Stock> result = stockService.getStocksBySku(sku);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(stockRepository, times(1)).findBySku(sku);
+    }
+
+    // ==================== Add Quantity Tests ====================
+
+    @Test
+    void testAddStockQuantity_Success() {
+        int stockId = 1;
+        Stock existingStock = new Stock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                       "SKU-001", "http://url", "A", null, null);
+        Stock updatedStock = new Stock(stockId, "Laptop", "Desc", 15, new BigDecimal("100.00"),
+                                      "SKU-001", "http://url", "A", null, null);
+
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(existingStock));
+        when(stockRepository.update(any(Stock.class))).thenReturn(updatedStock);
+
+        Stock result = stockService.addStockQuantity(stockId, 5);
+
+        assertNotNull(result);
+        assertEquals(15, result.getQuantity());
+        verify(stockRepository, times(1)).findById(stockId);
+        verify(stockRepository, times(1)).update(any(Stock.class));
+    }
+
+    @Test
+    void testAddStockQuantity_NotFound() {
+        int stockId = 999;
+        when(stockRepository.findById(stockId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.addStockQuantity(stockId, 5);
+        });
+        verify(stockRepository, never()).update(any(Stock.class));
+    }
+
+    // ==================== Remove Quantity Tests ====================
+
+    @Test
+    void testRemoveStockQuantity_Success() {
+        int stockId = 1;
+        Stock existingStock = new Stock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                       "SKU-001", "http://url", "A", null, null);
+        Stock updatedStock = new Stock(stockId, "Laptop", "Desc", 5, new BigDecimal("100.00"),
+                                      "SKU-001", "http://url", "A", null, null);
+
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(existingStock));
+        when(stockRepository.update(any(Stock.class))).thenReturn(updatedStock);
+
+        Stock result = stockService.removeStockQuantity(stockId, 5);
+
+        assertNotNull(result);
+        assertEquals(5, result.getQuantity());
+        verify(stockRepository, times(1)).findById(stockId);
+        verify(stockRepository, times(1)).update(any(Stock.class));
+    }
+
+    @Test
+    void testRemoveStockQuantity_InsufficientStock() {
+        int stockId = 1;
+        Stock existingStock = new Stock(stockId, "Laptop", "Desc", 10, new BigDecimal("100.00"),
+                                       "SKU-001", "http://url", "A", null, null);
+        when(stockRepository.findById(stockId)).thenReturn(Optional.of(existingStock));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stockService.removeStockQuantity(stockId, 15);
+        });
+        verify(stockRepository, never()).update(any(Stock.class));
+    }
+
+    // ==================== Stock Exists Tests ====================
+
+    @Test
+    void testStockExists_True() {
+        int stockId = 1;
+        when(stockRepository.existsById(stockId)).thenReturn(true);
+
+        boolean result = stockService.stockExists(stockId);
+
+        assertTrue(result);
+        verify(stockRepository, times(1)).existsById(stockId);
+    }
+
+    @Test
+    void testStockExists_False() {
+        int stockId = 999;
+        when(stockRepository.existsById(stockId)).thenReturn(false);
+
+        boolean result = stockService.stockExists(stockId);
+
+        assertFalse(result);
+        verify(stockRepository, times(1)).existsById(stockId);
+    }
+
+    // ==================== Low Stock Tests ====================
+
+    @Test
+    void testGetLowStockItems_Found() {
+        List<Stock> lowStocks = Arrays.asList(testStock2);
+        when(stockRepository.findByQuantityBelow(10)).thenReturn(lowStocks);
 
         List<Stock> result = stockService.getLowStockItems(10);
 
+        assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Item1", result.get(0).getProductName());
+        verify(stockRepository, times(1)).findByQuantityBelow(10);
     }
 
     @Test
-    @DisplayName("Should add quantity to stock")
-    void testAddStockQuantity() {
-        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
-        when(mockRepository.update(any())).thenReturn(stock);
+    void testGetLowStockItems_None() {
+        when(stockRepository.findByQuantityBelow(5)).thenReturn(Arrays.asList());
 
-        Stock result = stockService.addStockQuantity(1, 5);
+        List<Stock> result = stockService.getLowStockItems(5);
 
         assertNotNull(result);
-        verify(mockRepository).update(any());
+        assertTrue(result.isEmpty());
+        verify(stockRepository, times(1)).findByQuantityBelow(5);
     }
 
     @Test
-    @DisplayName("Should remove quantity from stock")
-    void testRemoveStockQuantity() {
-        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
-        when(mockRepository.update(any())).thenReturn(stock);
-
-        Stock result = stockService.removeStockQuantity(1, 3);
+    void testGetLowStockItems_NullThreshold() {
+        List<Stock> result = stockService.getLowStockItems(null);
 
         assertNotNull(result);
-        verify(mockRepository).update(any());
+        assertTrue(result.isEmpty());
+        verify(stockRepository, never()).findByQuantityBelow(anyInt());
     }
 
     @Test
-    @DisplayName("Should update stock with new values")
-    void testUpdateStock() {
-        Stock stock = new Stock(1, "Laptop", "Desc", 10, BigDecimal.TEN, "SKU-001", null, "ACTIVE", null, null);
-        when(mockRepository.findById(1)).thenReturn(Optional.of(stock));
-        when(mockRepository.update(any())).thenReturn(stock);
-
-        Stock result = stockService.updateStock(1, "Updated Laptop", "Updated Desc", 15,
-                                               BigDecimal.valueOf(1500), "SKU-002", "INACTIVE");
+    void testGetLowStockItems_ZeroThreshold() {
+        List<Stock> result = stockService.getLowStockItems(0);
 
         assertNotNull(result);
-        verify(mockRepository).update(any());
+        assertTrue(result.isEmpty());
+        verify(stockRepository, never()).findByQuantityBelow(anyInt());
     }
 
     @Test
-    @DisplayName("Should check if stock exists")
-    void testStockExists() {
-        when(mockRepository.existsById(1)).thenReturn(true);
+    void testGetLowStockItems_NegativeThreshold() {
+        List<Stock> result = stockService.getLowStockItems(-5);
 
-        boolean result = stockService.stockExists(1);
-
-        assertTrue(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(stockRepository, never()).findByQuantityBelow(anyInt());
     }
 }
+
