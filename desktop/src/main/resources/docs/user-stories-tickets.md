@@ -18,9 +18,9 @@
 **Priority:** High | **Story Points:** 5
 
 | Status | Ticket ID | Title | Details & Acceptance Criteria (AC) | Effort | Domain | References | Labels/Tags |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `[ ]` | **2.1.1** | Auth Domain & DB Repository | **Purpose:** Validate user credentials.<br>**Details:** Implement `UserAuthenticationService` and PostgreSQL repository targeting `lpa_users`.<br>**AC:**<br>- TDD tests pass for valid/invalid logins.<br>- Verifies Bcrypt/Argon2 hashes.<br>- Rejects users with status 'D'. | 3 | Backend | Story 2.1 | Task, Backend, Security |
-| `[ ]` | **2.1.2** | Login UI & Controller Integration | **Purpose:** Provide user-facing login screen.<br>**Details:** Build standalone login view launching before the main shell.<br>**AC:**<br>- View captures username/password.<br>- Shows error message on failure.<br>- On success, closes login and launches Main Shell. | 2 | Frontend | Story 2.1 | Task, UI |
+|:-------| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `[x]`  | **2.1.1** | Auth Domain & DB Repository | **Purpose:** Validate user credentials.<br>**Details:** Implement `UserAuthenticationService` and PostgreSQL repository targeting `lpa_users`.<br>**AC:**<br>- TDD tests pass for valid/invalid logins.<br>- Verifies Bcrypt/Argon2 hashes.<br>- Rejects users with status 'D'. | 3 | Backend | Story 2.1 | Task, Backend, Security |
+| `[ ]`  | **2.1.2** | Login UI & Controller Integration | **Purpose:** Provide user-facing login screen.<br>**Details:** Build standalone login view launching before the main shell.<br>**AC:**<br>- View captures username/password.<br>- Shows error message on failure.<br>- On success, closes login and launches Main Shell. | 2 | Frontend | Story 2.1 | Task, UI |
 
 ### Story 2.2: As a system administrator, I want the system to restrict access based on user roles so that normal users cannot access administrative functions.
 **Priority:** High | **Story Points:** 3
