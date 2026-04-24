@@ -43,6 +43,13 @@
             <version>5.1.0</version>
         </dependency>
 
+        <!-- Password Hashing -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
         <!-- Testing Dependencies -->
         <!-- JUnit 5 (Jupiter) -->
         <dependency>
