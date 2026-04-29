@@ -12,9 +12,9 @@
 **Goal:** Secure the application by implementing a login barrier that verifies credentials against the PostgreSQL database before granting access to the MDI shell.
 
 | Status | ID | User Story | Priority | Est. (Pts) | Acceptance Criteria |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `[ ]` | **2.1** | **As a staff member**, I want to **log in securely** so that unauthorized individuals cannot access sensitive company data. | High | 5 | 1. A standalone Login interface appears before the main shell is launched.<br>2. User inputs `username` and `password`.<br>3. System validates the password against the secure hash stored in `lpa_users`.<br>4. System verifies that the user's `status` is 'A' (Active).<br>5. Upon success, the main shell is launched; upon failure, a clear error message is displayed. |
-| `[ ]` | **2.2** | **As a system administrator**, I want **the system to restrict access based on user roles** so that normal users cannot access administrative functions. | High | 3 | 1. Upon login, the user's `role` is stored in a session context.<br>2. If the role is 'user', the "System Administration" menu is hidden or disabled.<br>3. If the role is 'admin', all menus remain visible and accessible.<br>4. Domain logic handling permissions is covered by unit tests. |
+|:-------| :--- | :--- | :--- | :--- | :--- |
+| `[x]`  | **2.1** | **As a staff member**, I want to **log in securely** so that unauthorized individuals cannot access sensitive company data. | High | 5 | 1. A standalone Login interface appears before the main shell is launched.<br>2. User inputs `username` and `password`.<br>3. System validates the password against the secure hash stored in `lpa_users`.<br>4. System verifies that the user's `status` is 'A' (Active).<br>5. Upon success, the main shell is launched; upon failure, a clear error message is displayed. |
+| `[ ]`  | **2.2** | **As a system administrator**, I want **the system to restrict access based on user roles** so that normal users cannot access administrative functions. | High | 3 | 1. Upon login, the user's `role` is stored in a session context.<br>2. If the role is 'user', the "System Administration" menu is hidden or disabled.<br>3. If the role is 'admin', all menus remain visible and accessible.<br>4. Domain logic handling permissions is covered by unit tests. |
 
 ## Epic-03: Stock Management UI Refactoring & Integration
 **Goal:** Migrate the existing standalone JavaFX Stock Management application into the new MDI shell while ensuring strict data validation and preserving its internal architecture.
