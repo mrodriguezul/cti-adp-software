@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    Login View FXML
+    Ticket: 2.1.2 - Login UI & Controller Integration
+
+    This view provides a clean, centered login form for users to authenticate
+    before accessing the main LPA Management System shell.
+
+    Features:
+    - Title label displaying "LPA System Login"
+    - Username input field
+    - Password input field (masked)
+    - Login button with action handler
+    - Error message label for displaying authentication failures
+
+    Controller: com.stockmanagement.presentation.controller.LoginController
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanagement.presentation.controller.LoginController"
+      alignment="CENTER"
+      spacing="15"
+      style="-fx-padding: 30;">
+
+    <!-- Title Label -->
+    <Label text="LPA System Login"
+           style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-alignment: center;">
+    </Label>
+
+    <!-- Spacer -->
+    <Label text="" />
+
+    <!-- Username Label and Field -->
+    <Label text="Username:"
+           style="-fx-font-size: 12;">
+    </Label>
+    <TextField fx:id="usernameField"
+               promptText="Enter your username"
+               style="-fx-padding: 8; -fx-font-size: 12;">
+    </TextField>
+
+    <!-- Password Label and Field -->
+    <Label text="Password:"
+           style="-fx-font-size: 12;">
+    </Label>
+    <PasswordField fx:id="passwordField"
+                   promptText="Enter your password"
+                   style="-fx-padding: 8; -fx-font-size: 12;">
+    </PasswordField>
+
+    <!-- Error Label (initially hidden/empty) -->
+    <Label fx:id="errorLabel"
+           text=""
+           style="-fx-text-fill: #cc0000; -fx-font-size: 12; -fx-wrap-text: true;">
+    </Label>
+
+    <!-- Spacer -->
+    <Label text="" />
+
+    <!-- Login Button -->
+    <Button fx:id="loginButton"
+            text="Login"
+            onAction="#handleLogin"
+            style="-fx-padding: 10; -fx-font-size: 12; -fx-min-width: 100;">
+    </Button>
+
+</VBox>
+

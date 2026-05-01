@@ -41,26 +41,26 @@ public class LpaApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Load the main shell FXML file
+            // Load the login FXML file
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/stockmanagement/presentation/view/main-shell.fxml")
+                getClass().getResource("/com/stockmanagement/presentation/view/login-view.fxml")
             );
 
             // Load the root node from FXML
             Parent root = loader.load();
 
-            // Create the scene
-            Scene scene = new Scene(root, 800, 600);
+            // Create the scene with fixed size for login window
+            Scene scene = new Scene(root, 400, 350);
 
             // Configure the primary stage
-            primaryStage.setTitle("LPA Management System");
+            primaryStage.setTitle("LPA Login");
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true); // Open window maximized
+            primaryStage.setResizable(false); // Prevent resizing the login window
             primaryStage.show();
 
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load application", e);
-            showErrorAndExit("Failed to load application: " + e.getMessage());
+            showErrorAndExit("Failed to load login screen: " + e.getMessage());
         }
     }
 
